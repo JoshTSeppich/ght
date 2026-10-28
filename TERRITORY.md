@@ -48,7 +48,7 @@ ground fast; the Burrow (wombats) are best at holding ground and moving under it
   10 s without one of yours present. Contested Reaches flash on the minimap.
 - **Holding gives:** sight of the whole Reach, +25% mining there, lower army upkeep (section 9), and +1 to your
   **Hold count**.
-- **Territory win (the second way to win):** hold **14 of 21** Reaches for 90 s. The countdown is shown to both
+- **Territory win (the second way to win):** hold **two-thirds of the Reaches** for 90 s (14 of 21 on Standard, 21 of 31 on Large, 28 of 41 on Huge; section 14, `winCountFor`). The countdown is shown to both
   players. Destroying the Core still wins outright.
 
 ## 4. The Drift (the ever-changing environment)
