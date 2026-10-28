@@ -29,6 +29,7 @@
 // every team bot is a single self-contained file by the §11 rule).
 
 import { createMatch, step, checkEnd } from './sim.mjs';
+import { createTerritoryMatch } from './sim-territory.mjs';
 import { observe } from './state.mjs';
 import { STATS, sideValue } from './stats.mjs';
 import { createLog, appendTick, finishLog } from './log.mjs';
@@ -128,19 +129,37 @@ export async function loadAi(ai, { side, seed, difficulty = 'normal' }) {
 }
 
 /**
+ * The rules a log records so rerun() can rebuild the same game: which state builder made it and the tick limit.
+ * `builder` is the function that made the state (its name is kept), or nothing for the classic match.
+ */
+export function logRules(state, builder) {
+  const name = typeof builder === 'function' && builder.name ? builder.name : state.territory ? 'territory' : 'classic';
+  return { state: name, maxTicks: state.maxTicks };
+}
+
+// The state a log started from. A caller-supplied builder wins (play/toaster-play.mjs states live outside env/); then the
+// log's rules; for logs from before the rules field, the opening observation (power and kitchen only exist in Toaster Wars).
+function rebuildState(log, createState) {
+  if (typeof createState === 'function') return createState(log.seed);
+  const named = log.rules?.state;
+  const toaster = named ? named !== 'classic' : !!(log.initial && (log.initial.power || log.initial.kitchen));
+  return toaster ? createTerritoryMatch(log.seed) : createMatch(log.seed);
+}
+
+/**
  * Re-run a log's commands through the simulation from its seed. Returns { state, ticks } where each entry of
  * `ticks` is { tick, commands, events } with the sim's own events (the referee-style late/error/forfeit markers
  * are not produced by the sim, so compare against sim events only, see simEvents()). This is the lockstep
  * promise of CLASSIC.md: the same seed and commands give the same game.
  */
-export function rerun(log, { maxTicks } = {}) {
-  const state = createMatch(log.seed);
-  // The log does not record the live match's tick limit, and a live game may run far past the stats table's
-  // 2000 (see DEFAULTS.maxTicks). The log's own length is the limit that reproduces it: a game that ended by
-  // timeout at tick N ends by timeout at N again, and one that ended earlier by a Core kill is unaffected
+export function rerun(log, { maxTicks, createState } = {}) {
+  const state = rebuildState(log, createState);
+  // New logs carry rules.maxTicks. For an older log the log's own length is the limit that reproduces it: a game that
+  // ended by timeout at tick N ends by timeout at N again, and one that ended earlier by a Core kill is unaffected
   // because the Core check comes before the tick check (§9).
   const inferred = Math.max(log.ticks.length, STATS.match.maxTicks);
-  state.maxTicks = Number.isInteger(maxTicks) && maxTicks > 0 ? maxTicks : inferred;
+  const recorded = log.rules?.maxTicks;
+  state.maxTicks = Number.isInteger(maxTicks) && maxTicks > 0 ? maxTicks : Number.isInteger(recorded) && recorded > 0 ? recorded : inferred;
   const ticks = [];
   for (const entry of log.ticks) {
     if (state.result) break;
@@ -163,7 +182,9 @@ export function createLiveMatch(options = {}) {
   const human = options.human === 1 ? 1 : 0;
   const aiSide = 1 - human;
   const tps = Number.isFinite(options.tps) && options.tps > 0 ? options.tps : DEFAULTS.tps;
-  const interval = 1000 / tps;
+  const baseInterval = 1000 / tps;
+  let interval = baseInterval; // ms per tick; setSpeed divides it (ticks stay identical, only the wall clock changes)
+  let speed = 1;
   const thinkMs = options.thinkMs ?? DEFAULTS.thinkMs;
   const hardMs = options.hardMs ?? DEFAULTS.hardMs;
   const maxErrors = options.maxErrors ?? DEFAULTS.maxErrors;
@@ -185,6 +206,7 @@ export function createLiveMatch(options = {}) {
   names[human] = humanName;
   names[aiSide] = typeof options.ai === 'string' ? options.ai.split('/').pop() : 'ai';
   const log = createLog({ seed, players: [names[0], names[1]], stats: STATS, initial: stripYou(observe(state, 0)) });
+  log.rules = logRules(state, options.createState);
 
   const listeners = { tick: [], end: [], error: [] };
   const clock = { ticks: 0, late: 0, errors: 0, dropped: 0, behindMs: 0, lastTickMs: 0, failure: null };
@@ -482,6 +504,15 @@ export function createLiveMatch(options = {}) {
     return true;
   }
 
+  /** Game speed multiplier (0.5x to 4x). The clock restarts from now, so no catch-up burst. */
+  function setSpeed(mult) {
+    if (!Number.isFinite(mult) || mult <= 0 || mult > 16) return false;
+    speed = mult;
+    interval = baseInterval / mult;
+    if (running) { restartClock(); schedule(); }
+    return true;
+  }
+
   function pause() {
     if (!running) return false;
     halt();
@@ -539,6 +570,8 @@ export function createLiveMatch(options = {}) {
     tick,
     start,
     pause,
+    setSpeed,
+    get speed() { return speed; },
     resume,
     stop,
     resign,

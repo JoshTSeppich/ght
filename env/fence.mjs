@@ -38,7 +38,7 @@ export function enableFences(state) {
 // The cache: graph, live fences and their tiles. Rebuilt whenever the stations, the fence orders or the rocks change.
 function snapshot(state) {
   const P = state.power;
-  const sig = stationsOf(state).map((q) => `${q.id}:${q.x},${q.y}`).join(';') + '|' + [...P.fenceLinks].join(';') + '|' + state.rockSet.size;
+  const sig = stationsOf(state).map((q) => `${q.id}:${q.x},${q.y}`).join(';') + '|' + [...P.fenceLinks].join(';') + '|' + state.rockSet.size + '|' + (state.energy ? state.energy.shedSig : '');
   if (P.fenceCache && P.fenceCache.sig === sig) return P.fenceCache;
   const graph = buildLines(state);
   const live = liveGroundLines(graph, state);

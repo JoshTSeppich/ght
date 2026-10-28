@@ -28,7 +28,7 @@
 //
 // The sim decides every hit: combat still emits its 'hit' event; the 'shot' event only starts the animation, which
 // plays the attack's beats (windup, impact, recover) at the timings the shot carries.
-import { STATS, kindStats } from "./stats.mjs";
+import { STATS, rowOf } from "./stats.mjs";
 import { allocId, distance, emit } from "./state.mjs";
 import { findSpawnTile } from "./economy.mjs";
 import { isToastOn } from "./toast.mjs";
@@ -44,16 +44,24 @@ export const AMMO_TUNING = Object.freeze({
 // Armed kinds: slots (the most slices held) and the attack that spends them. Beats are in milliseconds (COMBAT.md
 // section 4): impactMs is when the sim's hit lands on screen, recoverMs when the body is back at idle.
 const ARMED = Object.freeze({
-  // Slots are sized so one full load is about one kill (Popper: six 10-damage shots into a 60 hp Popper).
-  grunt: { slots: 6, attack: { name: "Pop Shot", slices: 1, windupMs: 160, impactMs: 375, recoverMs: 520 } },
-  lancer: { slots: 6, attack: { name: "Hot Coil", slices: 1, windupMs: 200, impactMs: 300, recoverMs: 480 } },
+  // Slots are sized so one slice is about one kill (Popper: one slice is three 20-damage shots, and a Popper has 60 hp).
+  grunt: { slots: 6, shotsPerSlice: 3, attack: { name: "Pop Shot", slices: 1, windupMs: 160, impactMs: 375, recoverMs: 520 } },
+  lancer: { slots: 6, shotsPerSlice: 3, attack: { name: "Hot Coil", slices: 1, windupMs: 200, impactMs: 300, recoverMs: 480 } },
   brute: { slots: 8, attack: { name: "Quad Volley", slices: 4, windupMs: 240, impactMs: 420, recoverMs: 700 } },
-  spiker: { slots: 6, attack: { name: "Crouton Flak", slices: 1, windupMs: 200, impactMs: 400, recoverMs: 520 } },
-  howler: { slots: 4, attack: { name: "Bread Shell", slices: 1, windupMs: 260, impactMs: 480, recoverMs: 700 } },
+  spiker: { slots: 6, shotsPerSlice: 3, attack: { name: "Crouton Flak", slices: 1, windupMs: 200, impactMs: 400, recoverMs: 520 } },
+  howler: { slots: 4, shotsPerSlice: 3, attack: { name: "Bread Shell", slices: 1, windupMs: 260, impactMs: 480, recoverMs: 700 } },
   // Bagel: STATS.units.dart.ammo is false, so it needs power but no slices (see needsSlices); the row is its animation.
   dart: { slots: 1, attack: { name: "Ram", slices: 1, windupMs: 120, impactMs: 300, recoverMs: 400 } },
+  // Air Layer (DECISIONS.md 3): the Crouton Kite carries no weapon at all (see ammoOf below), so only the two armed
+  // flyers get a row.
+  waffleWing: { slots: 6, shotsPerSlice: 3, attack: { name: "Golden Burst", slices: 1, windupMs: 180, impactMs: 340, recoverMs: 480 } },
+  crumpetBomber: { slots: 4, shotsPerSlice: 3, attack: { name: "Jam Drop", slices: 1, windupMs: 260, impactMs: 480, recoverMs: 700 } },
 });
 // Bagels roll on power alone: they are never "hungry", never resupplied and spend nothing.
+// One slice feeds shotsPerSlice shots (default 1; the Four-Slice spends four slices a volley). The shots left in the
+// slice being fired live in state.ammo.rounds[unit.id]. A Popper at 40 shots a minute and 3 shots a slice burns 13 slices
+// a minute, so one Toaster (48 a minute) keeps about four fighting.
+const shotsPer = (kind) => ARMED[kind]?.shotsPerSlice ?? 1;
 const needsSlices = (kind) => STATS.units[kind]?.ammo !== false;
 const DEFAULT_ARMED = Object.freeze({
   slots: 3,
@@ -63,10 +71,11 @@ const DEFAULT_ARMED = Object.freeze({
 const tps = () => STATS.clock.ticksPerSecond;
 export const ticksOf = (ms) => Math.round((ms * tps()) / 1000);
 
-/** The ammo row for a unit kind: { slots, attack }, or null for unarmed kinds (Crumbs, the Core, structures). */
+/** The ammo row for a unit kind: { slots, attack }, or null for unarmed kinds (Crumbs, the Core, structures, and any
+ * kind with no `damage` field at all - the Air Layer's Crouton Kite, a true scout, DECISIONS.md 3). */
 export function ammoOf(kind) {
   if (ARMED[kind]) return ARMED[kind];
-  if (kind === "worker" || kind === "core") return null;
+  if (kind === "worker" || kind === "core" || STATS.units[kind]?.damage === undefined) return null;
   if (Object.prototype.hasOwnProperty.call(STATS.units, kind)) return DEFAULT_ARMED;
   return null;
 }
@@ -82,6 +91,8 @@ export function enableAmmo(state, opts = {}) {
       stock: [stock, stock], // the Power Strip's own store, used when toast is off
       reserve: Number.isInteger(opts.reserve) && opts.reserve >= 0 ? opts.reserve : AMMO_TUNING.reserve,
       slices: {}, // unit id -> slices in its slots
+      rounds: {}, // unit id -> shots left in the slice it is firing
+      hungryNow: {}, // unit id -> true while it is Hungry (for the growl event)
       runs: [], // Crumb runs in flight, oldest first
       busy: {}, // Crumb id -> tick it is home again
       nextRun: 1,
@@ -129,6 +140,10 @@ function coreOf(state, side) {
 const fightersOf = (state, side) =>
   state.units.filter((u) => u.owner === side && isLive(u) && ammoOf(u.kind) && needsSlices(u.kind)).sort(byId);
 
+// Air Layer (DECISIONS.md 3): no Crumb ever flies a run to a flyer; it is only resupplied by standing at a Toaster or
+// a Cooling Rack (env/air.mjs stepAirResupply). Crumb hauling (assignRuns) and the lifeline both read this instead.
+const groundFightersOf = (state, side) => fightersOf(state, side).filter((u) => STATS.units[u.kind]?.layer !== "air");
+
 const crumbsOf = (state, side) => state.units.filter((u) => u.owner === side && isCrumb(u) && isLive(u)).sort(byId);
 
 function slicesOf(state, unit) {
@@ -146,8 +161,11 @@ export function unitState(state, unit) {
   const row = ammoOf(unit.kind);
   if (!row) return null;
   if (!needsSlices(unit.kind)) return "fed";
-  return slicesOf(state, unit) < row.attack.slices ? "hungry" : "fed";
+  return hasShot(state, unit, row) ? "fed" : "hungry";
 }
+
+const hasShot = (state, unit, row) =>
+  (state.ammo.rounds[unit.id] ?? 0) > 0 || slicesOf(state, unit) >= row.attack.slices;
 
 export function canMove(state, unit) {
   if (!isAmmoOn(state)) return true;
@@ -159,7 +177,7 @@ export function canFire(state, unit) {
   if (!poweredOf(state, unit)) return false;
   const row = ammoOf(unit.kind);
   if (!row || !needsSlices(unit.kind)) return true;
-  return slicesOf(state, unit) >= row.attack.slices;
+  return hasShot(state, unit, row);
 }
 
 export function spendShot(state, unit, targetId = null) {
@@ -167,7 +185,15 @@ export function spendShot(state, unit, targetId = null) {
   if (!canFire(state, unit)) return false;
   const row = ammoOf(unit.kind);
   if (!row) return true;
-  const cost = needsSlices(unit.kind) ? row.attack.slices : 0;
+  let cost = 0;
+  if (needsSlices(unit.kind)) {
+    const A = state.ammo;
+    if ((A.rounds[unit.id] ?? 0) > 0) A.rounds[unit.id] -= 1;
+    else {
+      cost = row.attack.slices;
+      A.rounds[unit.id] = shotsPer(unit.kind) - 1;
+    }
+  }
   state.ammo.slices[unit.id] = slicesOf(state, unit) - cost;
   emit(state, {
     e: "shot", id: unit.id, player: unit.owner, kind: unit.kind, attack: row.attack.name, slices: cost,
@@ -229,7 +255,7 @@ function assignRuns(state, side) {
   if (!core) return;
   let avail = stockOf(state, side) - A.reserve;
   const idle = crumbsOf(state, side).filter((c) => !(A.busy[c.id] > tick) && !A.runs.some((r) => r.crumb === c.id));
-  const needy = fightersOf(state, side)
+  const needy = groundFightersOf(state, side)
     .filter((u) => poweredOf(state, u) && slicesOf(state, u) + inboundTo(state, u.id) < ammoOf(u.kind).slots)
     .sort((a, b) => slicesOf(state, a) - slicesOf(state, b) || a.id - b.id);
   for (const unit of needy) {
@@ -239,7 +265,7 @@ function assignRuns(state, side) {
     const load = Math.min(AMMO_TUNING.crumbCarry, room, avail);
     if (load < 1) continue;
     const crumb = idle.shift();
-    const oneWay = Math.max(1, Math.ceil(distance(core, unit) * kindStats("worker").speed));
+    const oneWay = Math.max(1, Math.ceil(distance(core, unit) * rowOf(state, "worker").speed));
     const run = {
       id: A.nextRun++, side, crumb: crumb.id, unit: unit.id, slices: load,
       from: { x: core.x, y: core.y }, to: { x: unit.x, y: unit.y },
@@ -259,7 +285,7 @@ function stepLifeline(state, side) {
   const tick = state.tick;
   const crumbs = crumbsOf(state, side).length;
   const avail = stockOf(state, side) - A.reserve;
-  const needy = fightersOf(state, side).filter(
+  const needy = groundFightersOf(state, side).filter(
     (u) => poweredOf(state, u) && slicesOf(state, u) + inboundTo(state, u.id) < ammoOf(u.kind).slots,
   );
   const stuck = needy.length > 0 && stockOf(state, side) > 0 && (crumbs === 0 || avail <= 0);
@@ -308,8 +334,20 @@ export function stepAmmo(state) {
   const A = state.ammo;
   const alive = new Set(state.units.map((u) => u.id));
   for (const id of Object.keys(A.slices)) if (!alive.has(Number(id))) delete A.slices[id];
+  for (const id of Object.keys(A.rounds)) if (!alive.has(Number(id))) delete A.rounds[id];
+  for (const id of Object.keys(A.hungryNow)) if (!alive.has(Number(id))) delete A.hungryNow[id];
   for (const u of state.units) if (ammoOf(u.kind) && A.slices[u.id] === undefined) A.slices[u.id] = ammoOf(u.kind).slots;
   for (const id of Object.keys(A.busy)) if (A.busy[id] <= state.tick) delete A.busy[id];
+
+  // The growl: one event the tick a powered fighter runs dry (renderer droops its eyes, the HUD shows the chip).
+  for (const side of [0, 1]) {
+    for (const u of fightersOf(state, side)) {
+      const hungry = unitState(state, u) === "hungry";
+      if (hungry && !A.hungryNow[u.id]) emit(state, { e: "hungry", player: side, id: u.id, kind: u.kind });
+      if (hungry) A.hungryNow[u.id] = true;
+      else delete A.hungryNow[u.id];
+    }
+  }
 
   stepRuns(state);
   for (const side of [0, 1]) {
@@ -327,9 +365,14 @@ export function observeAmmo(state, side) {
   return {
     units: fightersOf(state, side).map((u) => {
       const row = ammoOf(u.kind);
+      const volley = row.attack.slices;
       return {
-        id: u.id, kind: u.kind, slices: slicesOf(state, u), slots: row.slots, cost: row.attack.slices,
+        id: u.id, kind: u.kind, slices: slicesOf(state, u), slots: row.slots, cost: volley,
         attack: row.attack.name, state: unitState(state, u),
+        // A volley spends `volley` slices, so a Four-Slice counts whole volleys (a leftover slice is no volley yet).
+        volleys: Math.floor(slicesOf(state, u) / volley), volleySlots: Math.floor(row.slots / volley),
+        shots: (A.rounds[u.id] ?? 0) + Math.floor(slicesOf(state, u) / volley) * shotsPer(u.kind),
+        hungry: unitState(state, u) === "hungry", droopy: unitState(state, u) === "hungry",
       };
     }),
     runs: A.runs.filter((r) => r.side === side).map((r) => {

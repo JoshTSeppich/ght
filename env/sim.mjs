@@ -13,7 +13,7 @@ import { applyCommands } from './commands.mjs';
 import { stepProduction, stepGathering } from './economy.mjs';
 import { stepMovement } from './movement.mjs';
 import { stepCombat } from './combat.mjs';
-import { STATS, PACING, sideValue, canonKind } from './stats.mjs';
+import { STATS, PACING, sideValue, valueOf, canonKind } from './stats.mjs';
 import { applyRuleCommands, stepRulesPre, stepRulesPost, runProduction } from './sim-territory.mjs';
 
 const DEFAULT_MAX_TICKS = 2000;
@@ -58,6 +58,7 @@ export function createMatch(seed, options = {}) {
  */
 export function step(state, commands) {
   state.events = [];
+  const structIds = stalemateOn(state) ? new Set(state.structures.map((s) => s.id)) : null;
 
   const lists = Array.isArray(commands) ? commands : [];
   const perSide = [0, 1].map((p) => (Array.isArray(lists[p]) ? lists[p].map(withCanonKind) : []));
@@ -82,6 +83,7 @@ export function step(state, commands) {
 
   // 6. Tick ends, then the end check.
   state.tick += 1;
+  if (structIds) updateStalemate(state, structIds);
   state.result = checkEnd(state);
   if (!state.result) state.result = stepRulesPost(state);
 
@@ -97,25 +99,72 @@ function coreOf(state, player) {
 }
 
 /**
- * The match-end check of §9, in order: both Cores gone ⇒ draw (`both-cores`);
- * one Core gone ⇒ the other side wins (`core`); tick reached the limit ⇒ higher
- * value wins (`timeout`), exact tie ⇒ draw (`timeout`). Otherwise null.
+ * The match-end check (DECISIONS.md #4): all buildings destroyed ⇒ the other side wins (`buildings`);
+ * tick reached 60:00 ⇒ draw (`timeout`); stalemate countdown expires ⇒ scored end (`stalemate`).
  */
 export function checkEnd(state) {
   const value = [sideValue(state, 0), sideValue(state, 1)];
   const tick = state.tick;
-  const core0 = coreOf(state, 0);
-  const core1 = coreOf(state, 1);
 
-  if (!core0 && !core1) return { winner: null, reason: 'both-cores', tick, value };
-  if (!core0) return { winner: 1, reason: 'core', tick, value };
-  if (!core1) return { winner: 0, reason: 'core', tick, value };
+  // Check if all buildings of one side are destroyed
+  const side0Buildings = state.structures.filter((s) => s.owner === 0);
+  const side1Buildings = state.structures.filter((s) => s.owner === 1);
+  if (side0Buildings.length === 0) return { winner: 1, reason: 'buildings', tick, value };
+  if (side1Buildings.length === 0) return { winner: 0, reason: 'buildings', tick, value };
 
-  if (tick >= maxTicksOf(state)) {
-    if (value[0] > value[1]) return { winner: 0, reason: 'timeout', tick, value };
-    if (value[1] > value[0]) return { winner: 1, reason: 'timeout', tick, value };
-    return { winner: null, reason: 'timeout', tick, value };
-  }
+  if (tick >= maxTicksOf(state)) return scoredEnd(state, 'timeout', value, tick);
+  if (state.stalemate && state.stalemate.endsAt !== null && tick >= state.stalemate.endsAt) return scoredEnd(state, 'stalemate', value, tick);
 
   return null;
+}
+
+// A scored end (timeout or stalemate): board score, then damage dealt to enemy buildings (state.buildingDamage, counted in
+// env/combat.mjs), then the Wheat bank (it never decides a side that has more on the board), then a true draw.
+function scoredEnd(state, reason, value, tick) {
+  const score = [timeoutValue(state, 0), timeoutValue(state, 1)];
+  const damage = [state.buildingDamage?.[0] ?? 0, state.buildingDamage?.[1] ?? 0];
+  const bank = [state.shards[0], state.shards[1]];
+  const by = [score, damage, bank].find((pair) => pair[0] !== pair[1]) ?? [0, 0];
+  const winner = by[0] > by[1] ? 0 : by[1] > by[0] ? 1 : null;
+  return { winner, reason, tick, value, score, damage };
+}
+
+/** Stalemate rule: 120 s with no structure damage, no unit kill and no new structure (income does not count) warns; 60 s later the match ends. */
+export const STALEMATE = Object.freeze({ quietTicks: 24 * 120, countdownTicks: 24 * 60 });
+
+// On for Toaster Wars (territory) matches; state.stalemateRule true or false overrides either way.
+const stalemateOn = (state) => (state.stalemateRule === undefined ? !!state.territory : state.stalemateRule === true);
+
+/**
+ * Called once a tick after combat with the structure ids from before the tick. A hit on a structure, a death (a kill or a
+ * lost building) or a structure that was not there before restarts the quiet clock and cancels a countdown.
+ */
+export function updateStalemate(state, idsBefore) {
+  const st = (state.stalemate ||= { last: state.tick - 1, endsAt: null });
+  const events = (state.events ||= []);
+  const active = state.structures.some((s) => !idsBefore.has(s.id)) || events.some((e) => e.e === 'die' || (e.e === 'hit' && idsBefore.has(e.id)));
+  if (active) {
+    st.last = state.tick;
+    if (st.endsAt !== null) {
+      st.endsAt = null;
+      events.push({ e: 'stalemate-clear' });
+    }
+  } else if (st.endsAt === null && state.tick - st.last >= STALEMATE.quietTicks) {
+    st.endsAt = st.last + STALEMATE.quietTicks + STALEMATE.countdownTicks;
+    events.push({ e: 'stalemate-warning', ticks: STALEMATE.countdownTicks, endsAt: st.endsAt });
+  }
+}
+
+/**
+ * What a side has on the board at a timeout: its units at cost, and the Core's remaining hp.
+ * Building costs never count in scoring (DECISIONS.md #4); this closes the Heat Lamp stockpile exploit.
+ * The wheat bank is not counted here.
+ */
+export function timeoutValue(state, player) {
+  let total = 0;
+  for (const u of state.units) if (u.owner === player) total += valueOf(u);
+  // Only count Core hp, not other building costs
+  const core = state.structures.find((s) => s.owner === player && s.kind === 'core');
+  if (core) total += Math.max(0, core.hp ?? 0);
+  return total;
 }

@@ -14,11 +14,14 @@ import { createDrift } from './drift.mjs';
 import { enableMarket, stepMarket } from './market.mjs';
 import { STATS, kindStats } from './stats.mjs';
 import { applyDriftEffects, doTunnel, stepTunnels } from './effects.mjs';
-import { kindTier, tierReason, enableResearch, doResearch, stepTiers, stepProductionGated } from './tiers.mjs';
+import { kindTier, tierReason, kitchenRefuseReason, enableResearch, doResearch, stepTiers, stepProductionGated } from './tiers.mjs';
+import { doToasterResearch, stepToasterResearch, flourReason, chargeFlour } from './research.mjs';
+import { setFence } from './fence.mjs';
 import { enablePower, stepPower, doPlug, doPlaceCord, snapshotPower, enforceCords, stepVerdict } from './power.mjs';
 import { enableAmmo, setAmmoHooks, stepAmmo } from './ammo.mjs';
 import { enableToast } from './toast.mjs';
 import { enableBakery, stepBakery } from './bakery.mjs';
+import { stepEnergy } from './energy.mjs';
 
 // Claim numbers: STATS.territory when the stats owner has landed it, TERRITORY.md section 3 otherwise.
 const fromStats = STATS.territory || {};
@@ -167,6 +170,9 @@ function doBudgetTrain(state, player, c) {
   if (!Array.isArray(trains) || !trains.includes(c.kind)) return 'wrong-kind';
   if (!building.complete) return 'not-complete';
   if (building.queue.length >= STATS.match.queueMax) return 'queue-full';
+  const noFlour = flourReason(state, player, c.kind); // tier 2 and 3 kinds cost Flour (decision 2)
+  if (noFlour) return noFlour;
+  chargeFlour(state, player, c.kind);
   building.queue.push(c.kind);
   emit(state, { e: 'queue', id: building.id, queue: [...building.queue] });
   return null;
@@ -185,23 +191,30 @@ function doLayTrack(state, player, c) {
   return reason === 'chain-off' ? 'bad-command' : reason;
 }
 
+// Toaster Wars (noTiers): the Kitchen tier of a kind, checked here so a scripted client cannot skip what the card greys out.
+const kitchenReason = (state, player, kind) => (state.noTiers ? kitchenRefuseReason(state, player, kind) : null);
+
 /** Take the rule commands (claim) out of one side's list and apply them. Returns the rest for commands.mjs. */
 export function applyRuleCommands(state, player, commands) {
   if (!(rulesOn(state) || state.power) || !Array.isArray(commands)) return commands;
   const rest = [];
   for (const c of commands) {
     const type = c && typeof c === 'object' ? c.type : null;
-    const mine = type === 'claim' || type === 'plug' || type === 'place-power' || type === 'tunnel' || (type === 'lay-track' && state.chain) || (type === 'research' && state.research) || (type === 'train' && state.budget);
+    const mine = type === 'claim' || type === 'plug' || type === 'place-power' || type === 'set-fence' || type === 'tunnel' || (type === 'lay-track' && state.chain) || (type === 'research' && state.research) || (type === 'train' && state.budget);
     let reason = null;
     try {
-      if (!mine && (type === 'train' || type === 'build')) reason = tierReason(state, player, kindTier(c.kind));
+      if (!mine && (type === 'train' || type === 'build')) reason = tierReason(state, player, kindTier(c.kind)) || kitchenReason(state, player, c.kind);
       else if (type === 'claim') reason = doClaim(state, player, c);
       else if (type === 'plug' && state.power) reason = doPlug(state, player, c);
-      else if (type === 'place-power' && state.power) reason = doPlaceCord(state, player, c);
+      else if (type === 'place-power' && state.power) {
+        reason = kitchenReason(state, player, c.kind) || flourReason(state, player, c.kind) || doPlaceCord(state, player, c);
+        if (!reason) chargeFlour(state, player, c.kind);
+      }
+      else if (type === 'set-fence' && state.power) reason = setFence(state, player, c.a, c.b, c.on !== false);
       else if (type === 'lay-track' && state.chain) reason = doLayTrack(state, player, c);
       else if (type === 'tunnel') reason = doTunnel(state, player, c);
-      else if (type === 'research' && state.research) reason = doResearch(state, player, c);
-      else if (type === 'train' && state.budget) reason = tierReason(state, player, kindTier(c.kind)) || doBudgetTrain(state, player, c);
+      else if (type === 'research' && state.research) reason = state.noTiers ? doToasterResearch(state, player, c) : doResearch(state, player, c);
+      else if (type === 'train' && state.budget) reason = tierReason(state, player, kindTier(c.kind)) || kitchenReason(state, player, c.kind) || doBudgetTrain(state, player, c);
     } catch { reason = 'bad-command'; }
     if (reason) emit(state, { e: 'reject', player, command: c, reason });
     if (!mine && !reason) rest.push(c);
@@ -242,9 +255,9 @@ export function stepRulesPre(state) {
   if (state.drift) stepDrift(state);
   if (state.claims) stepClaims(state);
   stepTunnels(state);
-  if (state.research) stepTiers(state);
+  if (state.research) { if (state.noTiers) stepToasterResearch(state); else stepTiers(state); }
   if (state.budget) stepBudget(state);
-  if (state.power) { snapshotPower(state); stepPower(state); }
+  if (state.power) { snapshotPower(state); stepPower(state); if (state.energy) stepEnergy(state); }
   if (state.ammo) { stepBakery(state); stepAmmo(state); }
 }
 

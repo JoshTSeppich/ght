@@ -13,7 +13,8 @@ import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
 import { runMatch } from './referee.mjs';
 
-const USAGE = 'usage: node env/run-match.mjs --seed N --p0 <player.mjs> --p1 <player.mjs> [--out match.json] [--think MS] [--hard MS] [--max-ticks N]';
+const DEFAULT_PLAYER = fileURLToPath(new URL('../players/toaster-sonnet/bot.mjs', import.meta.url));
+const USAGE ='usage: node env/run-match.mjs --seed N --p0 <player.mjs> --p1 <player.mjs> [--out match.json] [--think MS] [--hard MS] [--max-ticks N]';
 
 export function parseArgs(argv) {
   const opts = { seed: 1, p0: null, p1: null, out: null, think: null, hard: null, maxTicks: null, quiet: false, territory: true };
@@ -82,6 +83,12 @@ async function main() {
   if (opts.help) {
     console.log(USAGE);
     return 0;
+  }
+  // The default opponent plays the Toaster Wars rules (kitchen, Extension Box chain, cord-aware army); the classic
+  // fanatics never power up past the cord, so they only ever time out. --classic keeps the old players required.
+  if (opts.territory) {
+    opts.p0 = opts.p0 || DEFAULT_PLAYER;
+    opts.p1 = opts.p1 || DEFAULT_PLAYER;
   }
   if (!opts.p0 || !opts.p1) {
     console.error('both --p0 and --p1 are required');

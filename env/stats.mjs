@@ -94,7 +94,7 @@ export const STATS = deepFreeze({
   // Whole-match rules (spec sections 3, 4, 9).
   match: {
     startShards: 100,
-    maxTicks: 2000,
+    maxTicks: 86400, // 60 minutes at 24 ticks a second (DECISIONS.md #4)
     unitCap: 40,
     queueMax: 5,
     maxCommandsPerTick: 100,
@@ -130,6 +130,8 @@ export const STATS = deepFreeze({
   // Can't be built, so it has no cost. 2000 hp so a rush cannot flatten it in seconds.
   core: {
     hp: 1000,
+    armor: 1,
+    tags: ["Structure"],
     trains: ["worker"],
   },
 
@@ -137,11 +139,16 @@ export const STATS = deepFreeze({
   // (TERRITORY.md section 18): a Mill grinds wheat (Shards) into flour, a Well draws water, a Toaster turns
   // flour + water + power into toast (env/bakery.mjs). The Forge stays the barracks (shown as the Assembly Line).
   structures: {
-    forge: { cost: 150, hp: 400, buildTicks: 40, trains: ["grunt", "lancer", "brute", "howler", "spiker", "dart"] },
-    turret: { cost: 100, hp: 150, buildTicks: 30, damage: 12, range: 5, structureMultiplier: 1 },
-    mill: { cost: 75, hp: 200, buildTicks: 60 },
-    well: { cost: 50, hp: 150, buildTicks: 40 },
-    toaster: { cost: 100, hp: 250, buildTicks: 60 },
+    // Every building has armor 1 and the Structure tag. The Heat Lamp (turret) hits ground and air and, being a Structure,
+    // fires only while powered and fed (env/combat.mjs canAttack).
+    forge: { cost: 150, hp: 400, armor: 1, tags: ["Structure"], buildTicks: 40, trains: ["grunt", "lancer", "brute", "howler", "spiker", "dart"] },
+    turret: { cost: 100, hp: 150, armor: 1, tags: ["Structure"], layer: "ground", hits: { ground: true, air: true }, buildTicks: 30, damage: 12, range: 5, structureMultiplier: 1 },
+    mill: { cost: 75, hp: 200, armor: 1, tags: ["Structure"], buildTicks: 60 },
+    well: { cost: 50, hp: 150, armor: 1, tags: ["Structure"], buildTicks: 40 },
+    toaster: { cost: 100, hp: 250, armor: 1, tags: ["Structure"], buildTicks: 60 },
+    // Air Layer (DECISIONS.md 3): the tier-3 air factory, trains the three flyers. Tier gate (needs a Windmill or
+    // Dam) is enforced the same way as the Four-Slice/Broiler/Bagel: STATS.toasterTiers[3].unlocks, below.
+    coolingRack: { cost: 200, hp: 350, armor: 1, tags: ["Structure"], buildTicks: 90, trains: ["croutonKite", "waffleWing", "crumpetBomber"] },
   },
 
   // Units (spec section 5). speed is ticks per step: 1 moves every tick, 2 moves on even ticks only.
@@ -149,13 +156,22 @@ export const STATS = deepFreeze({
   // below) overlay them whenever hunger is on, which is every territory match. Broiler, Flak Popper and Bagel are new
   // kinds, so their rows here are already the toaster numbers.
   units: {
-    worker: { cost: 50, hp: 40, damage: 2, range: 1, speed: 1, trainTicks: 20, structureMultiplier: 1 },
-    grunt: { cost: 50, hp: 60, damage: 8, range: 1, speed: 1, trainTicks: 15, structureMultiplier: 1 },
-    lancer: { cost: 75, hp: 40, damage: 10, range: 4, speed: 1, trainTicks: 20, structureMultiplier: 1 },
-    brute: { cost: 150, hp: 240, damage: 25, range: 1, speed: 2, trainTicks: 40, structureMultiplier: 2 },
-    howler: { cost: 150, hp: 70, damage: 20, range: 9, speed: 4, trainTicks: 80, structureMultiplier: 1.5, splash: 1 },
-    spiker: { cost: 100, hp: 50, damage: 5, range: 5, speed: 3, trainTicks: 50, structureMultiplier: 0.5, splash: 1 },
-    dart: { cost: 100, hp: 120, damage: 12, range: 1, speed: 2, trainTicks: 50, structureMultiplier: 1, ammo: false },
+    // Combat Scale (DECISIONS.md 1): about 3x hp, armor, tags, bonus damage (per target tag), attackStep (damage per weapons
+    // level), layer, hits (which layers the weapon can hit) and minRange (dead zone in tiles; default 0).
+    worker: { cost: 50, hp: 120, armor: 0, tags: ["Light"], bonus: {}, attackStep: 1, layer: "ground", hits: { ground: true, air: false }, minRange: 0, damage: 2, range: 1, speed: 1, trainTicks: 20, structureMultiplier: 1 },
+    grunt: { cost: 75, hp: 60, armor: 1, tags: ["Light"], bonus: {}, attackStep: 1, layer: "ground", hits: { ground: true, air: false }, minRange: 0, damage: 8, range: 1, speed: 1, trainTicks: 15, structureMultiplier: 1 },
+    lancer: { cost: 65, hp: 40, armor: 0, tags: ["Mechanical"], bonus: { Light: 12 }, attackStep: 1, layer: "ground", hits: { ground: true, air: false }, minRange: 0, damage: 10, range: 4, speed: 1, trainTicks: 20, structureMultiplier: 1 },
+    brute: { cost: 225, hp: 240, armor: 2, tags: ["Armored"], bonus: { Armored: 12 }, attackStep: 2, layer: "ground", hits: { ground: true, air: false }, minRange: 0, damage: 25, range: 1, speed: 2, trainTicks: 40, structureMultiplier: 2 },
+    howler: { cost: 175, hp: 70, armor: 1, tags: ["Armored", "Mechanical"], bonus: {}, attackStep: 2, layer: "ground", hits: { ground: true, air: false }, minRange: 2, damage: 20, range: 9, speed: 4, trainTicks: 80, structureMultiplier: 1.5, splash: 1 },
+    spiker: { cost: 70, hp: 50, armor: 0, tags: ["Light"], bonus: { Air: 10 }, attackStep: 1, layer: "ground", hits: { ground: true, air: true }, minRange: 0, damage: 5, range: 5, speed: 3, trainTicks: 50, structureMultiplier: 0.5, splash: 1 },
+    dart: { cost: 125, hp: 120, armor: 1, tags: ["Light"], bonus: { Light: 6 }, attackStep: 1, layer: "ground", hits: { ground: true, air: false }, minRange: 0, damage: 12, range: 1, speed: 2, trainTicks: 50, structureMultiplier: 1, ammo: false },
+
+    // Air Layer (DECISIONS.md 3): tier 3, built from the Cooling Rack. layer "air" moves straight over all terrain
+    // (env/air.mjs) and fights/is-hit on the air layer (env/combat.mjs layerOf). The Crouton Kite carries no `damage`
+    // field at all (like STATS.core): canAttack() in env/combat.mjs reads that as "never attacks", same as the Core.
+    croutonKite: { cost: 40, hp: 40, armor: 0, tags: ["Air", "Light"], bonus: {}, attackStep: 0, layer: "air", hits: { ground: false, air: false }, minRange: 0, range: 1, speed: 1, trainTicks: 15, structureMultiplier: 1 },
+    waffleWing: { cost: 100, hp: 130, armor: 1, tags: ["Air", "Light"], bonus: { Air: 10 }, attackStep: 1, layer: "air", hits: { ground: false, air: true }, minRange: 0, damage: 14, range: 3, speed: 1, trainTicks: 35, structureMultiplier: 1 },
+    crumpetBomber: { cost: 160, hp: 150, armor: 1, tags: ["Air", "Armored"], bonus: {}, attackStep: 1, layer: "air", hits: { ground: true, air: false }, minRange: 2, damage: 22, range: 6, speed: 5, trainTicks: 55, structureMultiplier: 1.5, splash: 1 },
   },
 
   // Toaster Wars overlay (COMBAT.md, Joshua 09:27 "remember they're toasters?"). Applies when state.ammo is on: a shot is
@@ -163,15 +179,20 @@ export const STATS = deepFreeze({
   // take half; `ammo: false` = needs power but no slices (Bagel). Slots (how many slices a body holds) live in
   // env/ammo.mjs ARMED. Speeds are ticks per step: 3 = 8 tiles a second (the old 1 was 24). Use rowOf(state, kind).
   toaster: {
-    coreHp: 2000, // the Power Strip is not a 15 s target
+    upkeepPercent: 5, // Toaster Wars upkeep, % of a unit's cost a minute (the classic 10% stays in STATS.upkeep)
+    coreHp: 2400, // the Power Strip is not a 15 s target; 2400 so a fed siege takes minutes (pacing sweep, tests/toaster-pacing)
     units: {
       worker: { speed: 2, trainTicks: 40, shot: { damage: 2, every: 12 } },
-      grunt: { range: 4, speed: 3, trainTicks: 30, shot: { damage: 10, every: 18 } },
-      lancer: { range: 3, speed: 3, trainTicks: 40, shot: { damage: 6, every: 10 } },
-      brute: { range: 5, speed: 4, trainTicks: 80, shot: { damage: 36, every: 30 } },
-      howler: { trainTicks: 80, shot: { damage: 30, every: 36 } },
-      spiker: { trainTicks: 50, shot: { damage: 6, every: 14 } },
-      dart: { shot: { damage: 14, every: 12 } },
+      // hp here is the ~3x Toaster Wars scale; the classic hp stays in STATS.units (rowOf picks this one when hunger is on).
+      grunt: { hp: 180, range: 4, speed: 3, trainTicks: 30, shot: { damage: 20, every: 36 } },
+      lancer: { hp: 120, range: 3, speed: 3, trainTicks: 40, shot: { damage: 18, every: 30 } },
+      brute: { hp: 720, range: 5, speed: 4, trainTicks: 80, shot: { damage: 36, every: 30 } },
+      howler: { hp: 210, trainTicks: 80, shot: { damage: 30, every: 36 } },
+      spiker: { hp: 150, trainTicks: 50, shot: { damage: 6, every: 36 } },
+      dart: { hp: 360, shot: { damage: 8, every: 18 } },
+      // Air Layer: the Crouton Kite has no `damage` field at all (see STATS.units above), so it needs no shot here.
+      waffleWing: { shot: { damage: 14, every: 24 } },
+      crumpetBomber: { shot: { damage: 22, every: 48 } }, // slow bomber, one slice a shot (BUILD-CARDS-W2 M4)
     },
     structures: {
       forge: { buildTicks: 80 },
@@ -243,8 +264,50 @@ export const STATS = deepFreeze({
     },
   },
 
+  // Toaster Wars tiers (SYSTEMS-DESIGN.md section 2). The Driftfall `tiers` above stay for ?classic=1; this is the kitchen.
+  // A kind is open when its tier's need is met, judged on its own: `need` is 'toaster' (one complete Toaster of yours) or
+  // 'power' (a Windmill or Dam of yours, standing). No Hold, no foundry, sanctum or hangar. A kind on no list is tier 1.
+  // Windmill and Dam are tier 1 because they are the tier 3 need. Mill Dam (the big Dam site) is not a button yet.
+  toasterTiers: {
+    1: { need: null, needText: null, unlocks: ["worker", "mill", "well", "toaster", "extension", "turret", "windmill", "dam"] },
+    2: { need: "toaster", needText: "Needs a Toaster", unlocks: ["forge", "grunt", "lancer", "spiker", "pylon"] },
+    3: {
+      need: "power", needText: "Needs a Windmill or Dam",
+      unlocks: ["brute", "howler", "dart", "coolingRack", "croutonKite", "waffleWing", "crumpetBomber"],
+    },
+  },
+
   // Section 6: every upgrade, one flat list (see UPGRADES above for the rows and upgradeById for lookup).
   upgrades: UPGRADES,
+
+  // Toaster Wars research (build wave 2, M3; env/research.mjs builds the rows from this). Costs are Wheat + Flour [wheat, flour, seconds].
+  // levelCost: weapons and armor, levels 1 to 3. tracks: the Assembly Line ('forge') or Cooling Rack buys each. units: one-off unit
+  // researches (mods are numbers the unit code reads with unitMod). flourCost: Flour for tier 2 and 3 kinds; basic kinds cost Wheat only.
+  research: {
+    queueMax: 3,
+    levelCost: {
+      weapons: [[100, 2, 60], [175, 3, 75], [250, 4, 90]],
+      armor: [[125, 2, 60], [200, 3, 75], [275, 5, 90]],
+    },
+    tracks: {
+      "ground-weapons": { name: "Ground Weapons", kind: "weapons", building: "forge", effect: "ground toasters deal +1 damage per hit" },
+      "ground-armor": { name: "Ground Armor", kind: "armor", building: "forge", effect: "ground toasters take 1 less damage per hit" },
+      "air-weapons": { name: "Air Weapons", kind: "weapons", building: "cooling-rack", effect: "flyers deal +1 damage per hit" },
+      "air-armor": { name: "Air Armor", kind: "armor", building: "cooling-rack", effect: "flyers take 1 less damage per hit" },
+      "structure-armor": { name: "Building Armor", kind: "armor", building: "forge", effect: "buildings take 1 less damage per hit" },
+    },
+    units: [
+      { id: "popper-range", name: "Longer Pop", tier: 2, building: "forge", cost: [150, 3, 60], effect: "Poppers shoot 1 tile farther", unit: "grunt", mods: { rangeBonus: 1 } },
+      { id: "flak-range", name: "Wide Flak", tier: 2, building: "forge", cost: [150, 3, 60], effect: "Flak Poppers reach 1 tile farther against flyers", unit: "spiker", mods: { airRangeBonus: 1 } },
+      { id: "bagel-charge", name: "Rolling Start", tier: 3, building: "forge", cost: [200, 4, 75], effect: "Bagels hit for +3 after a running start", unit: "dart", mods: { chargeDamage: 3 } },
+      { id: "broiler-shell", name: "Big Shell", tier: 3, building: "forge", cost: [200, 4, 75], effect: "Broiler shells splash 1 tile wider", unit: "howler", mods: { splashRadiusBonus: 1 } },
+      { id: "slice-brace", name: "Quick Brace", tier: 3, building: "forge", cost: [200, 4, 75], effect: "Four-Slices brace for a volley in half the time", unit: "brute", mods: { braceCut: 0.5 } },
+    ],
+    flourCost: {
+      grunt: 0, lancer: 1, spiker: 1, forge: 2, pylon: 1, brute: 2, howler: 2, dart: 2,
+      coolingRack: 3, croutonKite: 1, waffleWing: 2, crumpetBomber: 2,
+    },
+  },
 
   // Faction names named in TERRITORY.md and the concept note (#237). roles maps the v3 roster kind to the in-game name
   // where TERRITORY.md gives one; the design round fills the rest. buffer is the Drill buffer (Burrow cubes hold 30).
@@ -272,7 +335,7 @@ export const STATS = deepFreeze({
   // Section 8: mining you build up to. Rates are per second of game time; the HUD shows them per minute.
   // hp and build times are fable's proposal (TERRITORY.md gives costs only). None of these kinds is buildable yet.
   economy: {
-    hand: { carry: 5 },
+    hand: { carry: 5, mineTicks: 200 },
     // Drills and Siphons mine one unit every mineEveryTicks (2 a second) into their buffer (Mining chain, #330).
     drill: {
       cost: 75, flux: 0, hp: 200, buildSeconds: 15, buildTicks: ticks(15), tier: 1, on: "shard", buffer: 20,
@@ -430,6 +493,9 @@ const ROSTER_UNITS = [
   { kind: "howler", name: "Broiler", attack: "Bread Shell", does: "artillery: a bread shell with splash", aliases: ["broiler"] },
   { kind: "spiker", name: "Flak Popper", attack: "Crouton Flak", does: "anti-air and anti-swarm burst", aliases: ["flak", "flak popper", "flakpopper"] },
   { kind: "dart", name: "Bagel", attack: "Ram", does: "rolling melee bump: needs power, no slices", aliases: ["bagel"] },
+  { kind: "croutonKite", name: "Crouton Kite", attack: "Scout Ping", does: "fast, cheap scout flyer; carries no weapon", aliases: ["crouton kite", "kite"] },
+  { kind: "waffleWing", name: "Waffle Wing", attack: "Golden Burst", does: "air-to-air fighter", aliases: ["waffle wing", "wing"] },
+  { kind: "crumpetBomber", name: "Crumpet Bomber", attack: "Jam Drop", does: "slow air-to-ground bomber with splash: one slice a shot", aliases: ["crumpet bomber", "bomber"] },
 ];
 const ROSTER_STRUCTURES = [
   { kind: "core", name: "Power Strip", does: "the base: everything plugs into it; lose it and you lose the match", aliases: ["power strip", "powerstrip", "strip"] },
@@ -438,6 +504,7 @@ const ROSTER_STRUCTURES = [
   { kind: "mill", name: "Mill", does: "grinds wheat into flour", aliases: [] },
   { kind: "well", name: "Well", does: "draws water (best by the river)", aliases: [] },
   { kind: "toaster", name: "Toaster", does: "flour + water + power make toast", aliases: [] },
+  { kind: "coolingRack", name: "Cooling Rack", does: "the tier-3 air factory: trains the three flyers", aliases: ["cooling rack"] },
 ];
 export const ROSTER = deepFreeze({ units: ROSTER_UNITS, structures: ROSTER_STRUCTURES });
 const ALIASES = new Map();
@@ -532,3 +599,7 @@ export function sideValue(state, player) {
   const structures = state.structures.filter((s) => s.owner === player);
   return shards + units.reduce((sum, u) => sum + valueOf(u), 0) + structures.reduce((sum, s) => sum + valueOf(s), 0);
 }
+
+// One table of every economy number (env/economy-table.mjs; ECONOMY.md is generated from it).
+import { buildEconomy, deepFreezeTable } from "./economy-table.mjs";
+export const ECONOMY = deepFreezeTable(buildEconomy(STATS));

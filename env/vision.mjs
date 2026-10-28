@@ -9,7 +9,10 @@ export const DEFAULT_SIGHT = Object.freeze({
   skiff: 7, barge: 6, seer: 8,
 });
 export const SITE_SIGHT = 2; // an unfinished structure
-export const NEAR_SIGHT = 2; // anything within this is always seen, whatever its height
+// High ground (SYSTEMS-DESIGN.md section 3): a unit on a high tile sees HIGH_SIGHT tiles farther; a unit on low ground
+// sees a high tile only when it is adjacent (NEAR_SIGHT 1) or a friendly unit on high ground sees it.
+export const HIGH_SIGHT = 2;
+export const NEAR_SIGHT = 1; // anything this close is always seen, whatever its height
 const AIR_KINDS = new Set(['skiff', 'barge', 'seer']);
 
 export function sightOf(piece) {
@@ -31,11 +34,11 @@ export function heightAt(state, x, y) {
 }
 
 // Mark every tile a piece sees. `rows` is an array of Uint8Array(width).
-function mark(state, rows, piece) {
+function mark(state, rows, piece, unit = false) {
   if (piece.inside != null) return; // cargo in a Barge sees nothing
-  const r = sightOf(piece);
   const air = isAir(piece);
   const own = heightAt(state, piece.x, piece.y);
+  const r = sightOf(piece) + (unit && !air && own > 0 ? HIGH_SIGHT : 0);
   const x0 = Math.max(0, piece.x - r), x1 = Math.min(state.width - 1, piece.x + r);
   const y0 = Math.max(0, piece.y - r), y1 = Math.min(state.height - 1, piece.y + r);
   for (let y = y0; y <= y1; y++) {
@@ -50,7 +53,7 @@ function mark(state, rows, piece) {
 export function visionOf(state, player) {
   const rows = Array.from({ length: state.height }, () => new Uint8Array(state.width));
   for (const s of state.structures) if (s.owner === player) mark(state, rows, s);
-  for (const u of state.units) if (u.owner === player && u.hp > 0) mark(state, rows, u);
+  for (const u of state.units) if (u.owner === player && u.hp > 0) mark(state, rows, u, true);
   return rows.map((row) => Array.from(row, (v) => (v ? '1' : '0')).join(''));
 }
 

@@ -43,7 +43,46 @@ export function kindTier(kind) {
 }
 
 /** Why this side cannot use something of this tier, or null. */
-export const tierReason = (state, side, tier) => (tier > sideTier(state, side) ? 'tier-locked' : null);
+export const tierReason = (state, side, tier) => (!state.noTiers && tier > sideTier(state, side) ? 'tier-locked' : null); // state.noTiers: Toaster Wars, every kind open from the start
+
+// ---------------------------------------------------------------------------------------------
+// Toaster Wars kitchen tiers (SYSTEMS-DESIGN.md section 2). Judged per kind, no Hold: the card and the Kitchen panel call
+// kitchenLockReason(state, side, kind); it reads the observation (power.view.points) or the sim (power.points) alike.
+// ---------------------------------------------------------------------------------------------
+
+/** The Toaster Wars tier of a kind: 1, 2 or 3. Kinds on no list are tier 1. */
+export function toasterTierOf(kind) {
+  for (const n of [3, 2]) if (STATS.toasterTiers[n].unlocks.includes(kind)) return n;
+  return 1;
+}
+
+function kitchenNeedMet(state, side, need, points) {
+  if (need === 'toaster') return (state.structures ?? []).some((s) => s.owner === side && s.kind === 'toaster' && s.complete);
+  if (need === 'power') return points.some((p) => p.owner === side && (p.kind === 'windmill' || p.kind === 'dam'));
+  return true;
+}
+
+/**
+ * Why this side cannot use this kind yet, as the one line the button shows ("Needs a Toaster"), or null when it is open.
+ * Only the tier's own need is checked; the Wheat cost is a separate lock (play/input.mjs).
+ */
+export function kitchenLockReason(state, side, kind) {
+  const tier = toasterTierOf(kind);
+  const row = STATS.toasterTiers[tier];
+  if (!row.need) return null;
+  return kitchenNeedMet(state, side, row.need, state.power?.view?.points ?? state.power?.points ?? []) ? null : row.needText;
+}
+
+/**
+ * The sim's refusal code for a Kitchen kind this side has no tier for ('needs-toaster' or 'needs-power'), or null when open.
+ * Same rule as kitchenLockReason (the card and the sim read one table); sim-territory.mjs calls it when noTiers is on,
+ * so a scripted client cannot skip the Kitchen.
+ */
+export function kitchenRefuseReason(state, side, kind) {
+  const row = STATS.toasterTiers[toasterTierOf(kind)];
+  if (!row.need) return null;
+  return kitchenNeedMet(state, side, row.need, state.power?.points ?? []) ? null : `needs-${row.need}`;
+}
 
 // ---------------------------------------------------------------------------------------------
 // Research

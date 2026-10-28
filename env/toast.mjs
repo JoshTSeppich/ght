@@ -1,11 +1,12 @@
-// Driftfall — the Toast Economy (TERRITORY.md sections 17 and 18). Pure module, OFF until enableToast(state) is called.
+// Toaster Wars — the toast moods (TERRITORY.md sections 17 and 18). Pure module. Every territory match calls enableToast
+// (env/sim-territory.mjs enableHunger). stepToast has no caller yet, so no mood changes (SWITCHED-OFF.md, reports/2026-10-26).
 //
 // Toast is baked at the Power Strip (your Core) from Flour + Water + Energy. Every fighting unit eats one Toast a minute.
 // What it eats decides its mood:
 //   happy   it got what it wants (plain for rank 0, butter, jam, then a gourmet topping) — attacks 10% faster
 //   grumpy  it got plain toast when it wanted a topping, or the topping was not in the bank — attacks 15% slower
 //   strike  no Toast at all — it sits down with a picket sign and cannot attack until fed
-// Toppings are the existing bank resources (the Trading House sells them): butter = flux, jam = glowmoss, honey =
+// Toppings are the existing bank resources (the Trading House that sells them is switched off on /play): butter = flux, jam = glowmoss, honey =
 // amberlight, salt = quakestone, sugar = stormglass, nut butter = ironroot. Eating a topping pays it from the bank.
 // Workers do not eat (they are the economy, and carry no upkeep, as in env/budget.mjs).
 //

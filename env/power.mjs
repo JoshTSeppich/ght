@@ -6,25 +6,27 @@
 // Power points: a Core is the Power Strip (its network is always lit: that is the reserve, so the base can always
 // rebuild); a completed claim is an Outlet; place-power adds Extension Boxes (reach further) and Generators (energy
 // that lights an island). Two points link when they are within the larger of their two ranges; a linked group is a
-// network. A plugged unit may stand anywhere within its cord length of one of its owner's points. Past that its move
-// stops (stepVerdict, called by movement.mjs). A network without a Strip or a Generator browns out: its units are stuck.
-// A cord is cut when an enemy unit stands on the line between a plugged unit and its anchor: the unit runs on a
-// battery (free to move) for POWER.batteryTicks, then powers down. A Crumb (worker) standing next to it for
-// POWER.plugTicks re-plugs it.
+// network. A plugged unit may stand anywhere within its cord length of one of its owner's points that has range (a
+// point with range 0, an unbuilt pad or a windmill, never anchors). A move that ends past that is sent back to its last
+// tile and its order dropped (stepVerdict; enforceCords, cord-limit). A network without a Strip or a Generator browns
+// out: its units are stuck. A cord is cut when an enemy unit stands on the line between a plugged unit and its anchor:
+// the unit runs on a battery (free to move) for POWER.batteryTicks, then powers down. Battery is also the grace when the
+// anchor is destroyed; a live anchor never gives it. A Crumb (worker) standing next to it for POWER.plugTicks re-plugs it.
 //
 // The sim calls: enablePower (createTerritoryMatch), doPlug / doPlaceCord (applyRuleCommands), stepPower (stepRulesPre).
 
 import { distance, isFree, isPassable, allocId, emit } from './state.mjs';
 import { STATS } from './stats.mjs';
-import { newCord, cordMove } from './cord-wrap.mjs';
+import { newCord, cordMove, segmentBlockedBy } from './cord-wrap.mjs';
 
 // Numbers from TERRITORY.md section 20. Cord lengths are in tiles, Chebyshev like every other distance here.
 // Unit kinds are the engine's; the Toastinator names are a presentation layer (worker = Crumb, grunt = Popper,
 // lancer = Zapper, brute = Four-Slice). Bagel (air) is not in the sim yet.
 export const POWER = Object.freeze({
-  cord: Object.freeze({ worker: 12, grunt: 8, lancer: 10, brute: 6 }),
-  range: Object.freeze({ strip: 14, outlet: 10, extension: 8, generator: 0 }),
-  cost: Object.freeze({ extension: 30, generator: 60 }),
+  cord: Object.freeze({ worker: 12, grunt: 12, lancer: 12, brute: 9 }),
+  range: Object.freeze({ strip: 14, outlet: 10, extension: 12, generator: 0, pylon: 8, windmill: 0, dam: 0 }),
+  cost: Object.freeze({ outlet: 100, extension: 30, generator: 60, pylon: 60, windmill: 0, dam: 0 }), // windmill/dam: the site sets the price (ENERGY.cost in env/energy.mjs)
+  pylonLink: 16, // a Relay Pylon links pylon to pylon this far (STATION.pylon.link); to anything else it uses its range
   batteryTicks: 240, // 10 s at 24 ticks per second
   plugTicks: 24, // 1 s next to a cut unit to plug it back in
   reserveCooldown: 720, // 30 s between free emergency Crumbs
@@ -44,7 +46,7 @@ export function enablePower(state) {
 function allPoints(state) {
   const points = [];
   for (const s of state.structures) {
-    if (s.kind === 'core' && s.hp > 0) points.push({ id: s.id, owner: s.owner, kind: 'strip', x: s.x, y: s.y, range: POWER.range.strip });
+    if (s.kind === 'core' && s.hp > 0) points.push({ id: s.id, owner: s.owner, kind: s.powerKind === 'outlet' ? 'outlet' : 'strip', x: s.x, y: s.y, range: s.powerKind === 'outlet' ? POWER.range.outlet : POWER.range.strip });
   }
   for (const c of state.claims || []) {
     if (c.complete && c.hp > 0 && !c.dead) points.push({ id: c.id, owner: c.owner, kind: 'outlet', x: c.x, y: c.y, range: POWER.range.outlet });
@@ -52,6 +54,9 @@ function allPoints(state) {
   for (const p of state.power.points) points.push(p);
   return points;
 }
+
+// How far two points of the cord network link: the larger range, or a pylon pair's long hop.
+const linkRange = (a, b) => (a.kind === 'pylon' && b.kind === 'pylon' ? POWER.pylonLink : Math.max(a.range, b.range));
 
 // Networks: groups of points linked by range. Returns Map point id -> { owner, strip, energy, lit }.
 function networksOf(points) {
@@ -63,13 +68,13 @@ function networksOf(points) {
     for (let i = 0; i < members.length; i++) {
       for (const q of points) {
         if (netOf.get(q.id) !== undefined) continue;
-        if (q.owner !== members[i].owner || distance(members[i], q) > Math.max(members[i].range, q.range)) continue;
+        if (q.owner !== members[i].owner || distance(members[i], q) > linkRange(members[i], q)) continue;
         netOf.set(q.id, null);
         members.push(q);
       }
     }
     const strip = members.some((m) => m.kind === 'strip');
-    const energy = members.filter((m) => m.kind === 'generator').length;
+    const energy = members.filter((m) => m.kind === 'generator' || m.kind === 'windmill' || m.kind === 'dam').length;
     const net = { owner: p.owner, strip, energy, lit: strip || energy > 0 };
     for (const m of members) netOf.set(m.id, net);
   }
@@ -101,7 +106,7 @@ function wrapTrial(state, unit, view, x, y) {
 function enemyWallTiles(state, owner) {
   const P = state.power;
   if (!P.fences) return EMPTY_TILES;
-  const sig = stationsOf(state).map((q) => `${q.id}:${q.x},${q.y}`).join(';') + '|' + [...P.fenceLinks].join(';') + '|' + state.rockSet.size;
+  const sig = stationsOf(state).map((q) => `${q.id}:${q.x},${q.y}`).join(';') + '|' + [...P.fenceLinks].join(';') + '|' + state.rockSet.size + '|' + (state.energy ? state.energy.shedSig : '');
   if (!P.wallCache || P.wallCache.sig !== sig) {
     const graph = buildLines(state);
     const tiles = [new Set(), new Set()];
@@ -114,12 +119,15 @@ function enemyWallTiles(state, owner) {
 }
 const EMPTY_TILES = new Set();
 
+// A point with no range (an unbuilt pad, a windmill: range 0) is never an anchor; it only lights a network.
+const anchorable = (p) => p.range > 0;
+
 // The nearest point of this owner within `cord` tiles of (x, y), or null. Ties go to the earlier point in list order.
 function nearestPoint(points, owner, x, y, cord) {
   let best = null;
   let bestD = Infinity;
   for (const p of points) {
-    if (p.owner !== owner) continue;
+    if (p.owner !== owner || !anchorable(p)) continue;
     const d = distance(p, { x, y });
     if (d <= cord && d < bestD) { best = p; bestD = d; }
   }
@@ -162,7 +170,7 @@ export function stepVerdict(state, unit, x, y) {
     const trial = wrapTrial(state, unit, view, x, y);
     if (trial) return trial.ok ? null : 'cord';
   }
-  const reach = view.points.some((p) => p.owner === unit.owner && distance(p, { x, y }) <= cordOf(unit.kind));
+  const reach = view.points.some((p) => p.owner === unit.owner && anchorable(p) && distance(p, { x, y }) <= cordOf(unit.kind));
   return reach ? null : 'cord';
 }
 
@@ -193,15 +201,32 @@ export function doPlaceCord(state, player, c) {
   if (!(c.kind in POWER.cost)) return 'bad-command';
   if (distance(w, c) > 1) return 'too-far';
   if (!isPassable(state, c.x, c.y) || !isFree(state, c.x, c.y)) return 'bad-target';
-  const cost = POWER.cost[c.kind];
+  if (c.kind === 'outlet' && allPoints(state).some(p => p.x === c.x && p.y === c.y)) return 'tile-taken';
+  // A Windmill goes on a high-ground pad, a Dam on a river dam site (env/energy.mjs); the site sets price and output.
+  let cost = POWER.cost[c.kind], make;
+  if (c.kind === 'windmill' || c.kind === 'dam') {
+    const site = state.energy && state.energy.sites.find((q) => q.x === c.x && q.y === c.y && (q.kind === c.kind || (c.kind === 'dam' && q.kind === 'milldam')));
+    if (!site) return 'not-a-site';
+    cost = state.energy.cost[site.kind]; make = state.energy.make[site.kind];
+  }
   if (state.shards[player] < cost) return 'no-shards';
   const range = POWER.range[c.kind];
-  const linked = allPoints(state).some((p) => p.owner === player && distance(p, c) <= Math.max(p.range, range));
+  const linked = allPoints(state).some((p) => p.owner === player && distance(p, c) <= linkRange(p, { kind: c.kind, range }));
   if (!linked) return 'out-of-cord';
 
   state.shards[player] -= cost;
   emit(state, { e: 'spend', player, amount: cost, shards: state.shards[player] });
+  // An Outlet is a second base: a targetable building, a worker production queue and a
+  // Wheat drop-off. Reuse the Core simulation row so every existing base system sees it;
+  // powerKind preserves the shorter Outlet link/plug range and its station drawing.
+  if (c.kind === 'outlet') {
+    const building = { id: allocId(state), owner: player, kind: 'core', powerKind: 'outlet', name: 'Outlet', cost, x: c.x, y: c.y, hp: STATS.toaster?.coreHp ?? STATS.core.hp, progress: 0, complete: true, queue: [] };
+    state.structures.push(building);
+    emit(state, { e: 'place-power', point: { id: building.id, owner: player, kind: 'outlet', x: c.x, y: c.y, range: POWER.range.outlet } });
+    return null;
+  }
   const point = { id: allocId(state), owner: player, kind: c.kind, x: c.x, y: c.y, range };
+  if (make !== undefined) point.make = make;
   state.power.points.push(point);
   emit(state, { e: 'place-power', point: { ...point } });
   return null;
@@ -222,7 +247,23 @@ export function stepPower(state) {
     if (st.state === 'plugged') {
       let p = nearestPoint(points, u.owner, u.x, u.y, cordOf(u.kind));
       // A wrapped cord keeps its anchor while the anchor stands, however far the bends have stretched it.
-      if (P.wrap && st.cord && st.anchor === st.cord.anchorId) p = points.find((q) => q.id === st.anchor) || p;
+      // A STRAIGHT cord (no bends) is free to hop to a nearer station, so an Extension Box chain carries a toaster on.
+      // A BENT cord stays wrapped on its anchor unless another station has a clear straight line to the unit within the
+      // cord (the toaster re-plugs there and the cord unwinds), so a chain of boxes unwinds the bends behind it.
+      if (P.wrap && st.cord && st.anchor === st.cord.anchorId && st.cord.pts.length > 1) {
+        const keep = points.find((q) => q.id === st.anchor);
+        if (keep) {
+          const walls = enemyWallTiles(state, u.owner);
+          const blocked = (bx, by) => state.rockSet.has(`${bx},${by}`) || walls.has(`${bx},${by}`);
+          const cl = cordOf(u.kind);
+          const clear = points.filter((q) => q.owner === u.owner && anchorable(q) && q.id !== keep.id && distance(q, u) <= cl && !segmentBlockedBy(q, u, blocked));
+          p = nearestPoint(clear, u.owner, u.x, u.y, cordOf(u.kind)) || keep;
+        }
+      }
+      // Battery grace is for a unit whose anchor is gone (destroyed). A live anchor keeps the unit plugged: a unit out of
+      // its cord was walked out, and enforceCords sends it back; it never goes to battery for that.
+      if (!p) p = points.find((q) => q.id === st.anchor && anchorable(q)) || null;
+      if (p && P.wrap && st.cord && st.anchor !== p.id) st.cord = { ...newCord(p), anchorId: p.id }; // re-plugged: the old bends are gone
       if (p) st.anchor = p.id;
       else {
         st.state = 'battery';
@@ -315,6 +356,9 @@ export function stepPower(state) {
 // its last legal tile and drops its order (cord-limit). Movement itself is untouched.
 export function snapshotPower(state) {
   if (!state.power) return;
+  // The sim skips stepRulesPost once a match has a result (env/sim.mjs), so the last tick's movement may be unchecked.
+  // Check it now, before the new snapshot replaces it.
+  if (state.power.before) enforceCords(state);
   state.power.before = new Map(state.units.map((u) => [u.id, { x: u.x, y: u.y }]));
 }
 
@@ -322,21 +366,49 @@ export function enforceCords(state) {
   const before = state.power && state.power.before;
   if (!before) return;
   state.power.before = null;
+  refresh(state); // the points as they stand now (a pending check runs a tick late)
   for (const u of state.units) {
     const was = before.get(u.id);
-    if (!was || (was.x === u.x && was.y === u.y)) continue;
+    const stranded = !!(u.power && u.power.stranded);
+    const moved = !!was && (was.x !== u.x || was.y !== u.y);
+    if (!moved && !stranded) continue;
     const reason = stepVerdict(state, u, u.x, u.y);
     if (!reason) {
-      if (state.power.wrap && u.power && u.power.state === 'plugged') {
+      if (stranded) u.power.stranded = null;
+      if (moved && state.power.wrap && u.power && u.power.state === 'plugged') {
         const trial = wrapTrial(state, u, state.power.view, u.x, u.y);
         if (trial && trial.ok) u.power.cord = trial.cord;
       }
       continue;
     }
-    if (isFree(state, was.x, was.y)) { u.x = was.x; u.y = was.y; }
+    // Back to the last legal tile; if another unit has taken it, the nearest free tile in cord. A stranded unit (no such
+    // tile was free last time) tries again from its last legal tile every tick, so it never keeps acting out of cord.
+    const from = stranded ? u.power.stranded : was;
+    const back = legalBackTile(state, u, from);
+    if (back) { u.x = back.x; u.y = back.y; }
+    if (u.power) u.power.stranded = back ? null : from;
+    // Remember why, so the owner's bot can read it and stop re-issuing the same order into the same wall (observe().power.refused).
+    if (u.power) u.power.refused = { tick: state.tick, reason, x: u.order && Number.isInteger(u.order.x) ? u.order.x : null, y: u.order && Number.isInteger(u.order.y) ? u.order.y : null, target: u.order && Number.isInteger(u.order.target) ? u.order.target : null };
     if (u.order) { u.order = null; emit(state, { e: 'order', id: u.id, order: null }); }
-    emit(state, { e: 'cord-limit', id: u.id, reason });
+    if (moved || !stranded) emit(state, { e: 'cord-limit', id: u.id, reason });
   }
+}
+
+// Where a cord-limited unit goes back to: its last tile when that is free, else the nearest free tile inside the cord
+// (rings out from it, ties in reading order), else null when every tile in reach is taken or blocked.
+function legalBackTile(state, u, was) {
+  if (isFree(state, was.x, was.y)) return was;
+  // Every in-cord tile is within twice the cord of the last tile, so the search covers the whole cord.
+  const reach = 2 * cordLength(u.kind);
+  for (let r = 1; r <= reach; r++) {
+    for (let y = was.y - r; y <= was.y + r; y++) {
+      for (let x = was.x - r; x <= was.x + r; x++) {
+        if (Math.max(Math.abs(x - was.x), Math.abs(y - was.y)) !== r || !isFree(state, x, y)) continue;
+        if (stepVerdict(state, u, x, y) === null) return { x, y };
+      }
+    }
+  }
+  return null;
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -369,7 +441,7 @@ export const cordLength = (kind) => POWER.cord[kind] ?? POWER.cord[CORD_ALIAS[ki
 export function stationsOf(state) {
   const out = [];
   for (const s of state.structures) {
-    if (s.kind === 'core' && s.hp > 0) out.push({ id: s.id, owner: s.owner, kind: 'strip', x: s.x, y: s.y });
+    if (s.kind === 'core' && s.hp > 0) out.push({ id: s.id, owner: s.owner, kind: s.powerKind === 'outlet' ? 'outlet' : 'strip', x: s.x, y: s.y });
   }
   for (const c of state.claims || []) {
     if (c.complete && c.hp > 0 && !c.dead) out.push({ id: c.id, owner: c.owner, kind: 'outlet', x: c.x, y: c.y });
@@ -481,9 +553,10 @@ export const lineKey = (idA, idB) => (idA < idB ? `${idA}-${idB}` : `${idB}-${id
  * Fences that stand right now: ground links a player activated (state.power.fenceLinks, a Set of lineKey) whose network
  * is lit. A fence on a dark network (brown-out) is passable, so it is not listed.
  */
-export function liveGroundLines(graph, state) {
+export function liveGroundLines(graph, state, ignoreShed = false) {
   const on = state && state.power && state.power.fenceLinks;
-  return graph.lines.filter((l) => l.type === 'ground' && on && on.has(lineKey(l.a.id, l.b.id)) && graph.lit.has(l.a.id));
+  const shed = !ignoreShed && state && state.energy ? state.energy.shedFences : null; // too little energy: the fence goes dark (env/energy.mjs)
+  return graph.lines.filter((l) => l.type === 'ground' && on && on.has(lineKey(l.a.id, l.b.id)) && graph.lit.has(l.a.id) && !(shed && shed.has(`${l.a.id}-${l.b.id}`)));
 }
 
 // The nearest free, passable tile next to a structure (rings 1 then 2), or null.

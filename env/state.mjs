@@ -155,6 +155,17 @@ export function observe(state, player) {
       wells: (state.springs || []).map(([x, y]) => [x, y]),
     };
   }
+  // Your own Extension Boxes and Generators (a cord is only as long as the last box), so a bot can see its chain. Never the enemy's.
+  if (state.power && Array.isArray(state.power.points)) {
+    obs.power = {
+      points: state.power.points.filter((p) => p.owner === player).map((p) => ({ id: p.id, kind: p.kind, x: p.x, y: p.y, range: p.range })),
+      // Your own units whose cord is cut ('battery' = running out, 'down' = dead until a Crumb plugs it back in).
+      // Your own units whose last move or attack was refused by the cord (reason 'cord' | 'down' | 'stuck', the tile or target it was heading for).
+      refused: state.units.filter((u) => u.owner === player && u.hp > 0 && u.power && u.power.refused).map((u) => ({ id: u.id, ...u.power.refused })),
+      energy: state.energy ? { ...state.energy.report[player] } : null, // { made, used, shed } (env/energy.mjs)
+      cut: state.units.filter((u) => u.owner === player && u.hp > 0 && u.power && (u.power.state === 'battery' || u.power.state === 'down')).map((u) => ({ id: u.id, state: u.power.state })),
+    };
+  }
   return obs;
 }
 
@@ -166,6 +177,8 @@ function baseObservation(state, player) {
     height: state.height,
     rocks: state.rocks.map(([x, y]) => [x, y]),
     crystals: state.crystals.map((c) => ({ x: c.x, y: c.y, amount: c.amount })),
+    // Wheat is the player-facing name for shards (PLAYABLE item 2). `shards` stays as an alias for old bots and tests.
+    wheat: [state.shards[0], state.shards[1]],
     shards: [state.shards[0], state.shards[1]],
     units: state.units.map((u) => ({
       id: u.id, owner: u.owner, kind: u.kind, x: u.x, y: u.y, hp: u.hp,
@@ -176,6 +189,7 @@ function baseObservation(state, player) {
       progress: s.progress, complete: s.complete, queue: [...s.queue],
     })),
     unitCap: STATS.match.unitCap,
-    maxTicks: STATS.match.maxTicks,
+    // the limit this match really runs to (the live match sets 21600); STATS only when the state has none (env/sim.mjs maxTicksOf)
+    maxTicks: Number.isInteger(state.maxTicks) && state.maxTicks > 0 ? state.maxTicks : STATS.match.maxTicks,
   };
 }

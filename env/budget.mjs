@@ -1,9 +1,10 @@
-// Driftfall — the army budget (TERRITORY.md section 9): no supply cap, training always runs and draws its cost
+// Driftfall — the army budget (TERRITORY.md section 9): no supply cap of its own (the 40-unit cap, STATS.match.unitCap,
+// is enforced in env/commands.mjs in every match, /play included), training always runs and draws its cost
 // gradually (into debt if needed), every combat unit pays upkeep per second, and debt pauses building and research
 // but never training. Deep debt makes units weary.
 //
-// OFF BY DEFAULT. Nothing here changes a match until enableBudget(state) is called, so the 40-unit cap and
-// pay-up-front training of the current rules stay exactly as they are. Callers (sim, commands, economy, combat)
+// OFF BY DEFAULT. Nothing here changes a match until enableBudget(state) is called, so pay-up-front training of the
+// current rules stays exactly as it is. Callers (sim, commands, economy, combat)
 // ask: chargesUpfront / unitCapApplies / canProgress / attackCooldownScale.
 //
 // Exact arithmetic: money is whole Shards in state.shards plus a remainder in state.budget.acc, counted in
@@ -52,6 +53,7 @@ export function enableBudget(state, options = {}) {
 
 export const isEnabled = (state) => !!(state && state.budget);
 export const chargesUpfront = (state) => !isEnabled(state);
+// Only the budget's own reading. The 40-unit cap itself is enforced in env/commands.mjs for every match, budget on or off.
 export const unitCapApplies = (state) => !isEnabled(state);
 
 // ---------------------------------------------------------------------------------------------
@@ -75,19 +77,20 @@ function reductionPercent(opts) {
 }
 
 // Upkeep of one unit, per minute, in units of 1/1e6 of its percent math: (cost * pct * (100-red) * (100-coil)).
-function unitWeight(unit, red, opts) {
+function unitWeight(unit, red, opts, pct = cfg().upkeepPercentPerMinute) {
   const coil = opts && opts.coil && opts.inHeldReach && opts.inHeldReach(unit) ? cfg().coilInReachPercent : 0;
-  return cfg().upkeepPercentPerMinute * (100 - red) * (100 - coil);
+  return pct * (100 - red) * (100 - coil);
 }
 
 function upkeepSums(state, player, opts) {
   const red = reductionPercent(opts);
+  const pct = state.budget?.upkeepPercent ?? cfg().upkeepPercentPerMinute; // a match may set its own (Toaster Wars: 5)
   let shards = 0;
   let flux = 0;
   for (const u of state.units) {
     if (u.owner !== player || NO_UPKEEP.has(u.kind)) continue;
     const cost = costParts(u.kind, opts);
-    const w = unitWeight(u, red, opts);
+    const w = unitWeight(u, red, opts, pct);
     shards += cost.shards * w;
     flux += cost.flux * w;
   }

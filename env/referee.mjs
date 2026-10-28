@@ -28,6 +28,7 @@ import { createTerritoryMatch } from './sim-territory.mjs';
 import { observe } from './state.mjs';
 import { STATS, sideValue } from './stats.mjs';
 import { createLog, appendTick, finishLog } from './log.mjs';
+import { logRules } from './live.mjs';
 
 const WORKER_FILE = fileURLToPath(new URL('./player-worker.mjs', import.meta.url));
 
@@ -228,6 +229,7 @@ export async function runMatch(options = {}) {
       stats: STATS,
       initial: stripYou(observe(state, 0)),
     });
+    log.rules = logRules(state, options.createState);
 
     // A module that failed to load forfeits at tick 0, before any step.
     const loadForfeit = loaded.map((l) => !l.ok);

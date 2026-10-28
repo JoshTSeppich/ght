@@ -10,7 +10,8 @@
 // `state.chain`, so the v2 game and every green build behave exactly as before.
 
 import { STATS, kindStats, rowOf } from "./stats.mjs";
-import { distance, isFree, allocId, emit, structuresOf, unitsOf } from "./state.mjs";
+import { distance, findEntity, isFree, isPassable, allocId, emit, structuresOf, unitsOf } from "./state.mjs";
+import { POWER } from "./power.mjs";
 
 // ---------------------------------------------------------------------------------------------
 // Stats lookup (every number comes from env/stats.mjs; chain kinds fall back to CHAIN_DEFAULTS
@@ -26,7 +27,7 @@ function statsFor(kind, state) {
 const unitStats = statsFor;
 const structureStats = statsFor;
 const maxHpOf = (s) => s.hp;
-const mineTicks = () => STATS.crystal.mineTicks;
+const mineTicks = (state) => (state && state.chain ? chainStats(state).handMine : STATS.crystal.mineTicks);
 const carryMax = (state) => (state.chain ? chainStats(state).handCarry : STATS.crystal.carry);
 
 // ---------------------------------------------------------------------------------------------
@@ -149,7 +150,40 @@ export function stepGathering(state) {
     if (!order || order.type !== "gather") continue;
     tickGather(state, unit, order);
   }
+  stepRepair(state);
   if (state.chain) stepChain(state);
+}
+
+// ---------------------------------------------------------------------------------------------
+// Construction rules (card 11): a site cancelled by its side refunds this share of its cost, and a Crumb beside a damaged
+// building of its side repairs it for Wheat. The rates are Construction's choice, not a sourced number: tune them here.
+// ---------------------------------------------------------------------------------------------
+export const CONSTRUCTION = Object.freeze({ cancelRefund: 0.75 });
+export const REPAIR = Object.freeze({ hpPerTick: 2, wheatPerTick: 1 });
+
+/** The hit points a finished building of this kind is repaired up to (the Toaster Wars row when one applies). */
+export function repairMaxHp(state, kind) {
+  return rowOf(state, kind)?.hp ?? kindStats(kind)?.hp ?? 0;
+}
+
+// A repair order runs each tick while the Crumb stays beside the building. It ends when the building is full, gone or no
+// longer this side's, when the Crumb has moved off, or when the side has no Wheat for the tick (the order event says so).
+export function stepRepair(state) {
+  for (const unit of inIdOrder(state, state.units)) {
+    const order = unit.order;
+    if (!order || order.type !== "repair") continue;
+    const target = findEntity(state, order.target);
+    const usable = target && target.owner === unit.owner && target.complete && target.hp > 0 && distance(unit, target) <= 1;
+    if (!usable || target.hp >= repairMaxHp(state, target.kind) || state.shards[unit.owner] < REPAIR.wheatPerTick) {
+      setOrder(state, unit, null);
+      continue;
+    }
+    state.shards[unit.owner] -= REPAIR.wheatPerTick;
+    target.hp = Math.min(repairMaxHp(state, target.kind), target.hp + REPAIR.hpPerTick);
+    emit(state, { e: "spend", player: unit.owner, amount: REPAIR.wheatPerTick, shards: state.shards[unit.owner] });
+    emit(state, { e: "progress", id: target.id, progress: target.progress ?? 0, hp: target.hp });
+    if (target.hp >= repairMaxHp(state, target.kind)) setOrder(state, unit, null);
+  }
 }
 
 function crystalAt(state, x, y) {
@@ -170,6 +204,63 @@ export function nearestCrystalWithShards(state, from) {
     }
   }
   return best;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Auto-gather (play/idle-crumbs.mjs, the Power Strip rally and `gather` with target 'auto'): the Wheat tile a Crumb
+// should mine next. Shared by the page and the sim, so bots and replays pick the same tile as the human side.
+// ---------------------------------------------------------------------------------------------
+
+const RING8 = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
+
+// Lexicographic order over the rank arrays built in pickWheatTile.
+function rankBefore(a, b) {
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return a[i] < b[i];
+  return false;
+}
+
+/**
+ * The Wheat tile `unit` should mine next, or null. Candidates: amount > 0 and within `reach` of one of `points` (the side's
+ * Strips and power points). Order: tiles that are not full first (a tile is full when every passable tile beside it holds a
+ * Crumb), then the fewest Crumbs already sent there, then the nearest to the unit, then lower y and x. `assigned` (tile key ->
+ * count) carries orders given earlier in the same tick that `units` does not show yet. Pure: no clock, no randomness.
+ */
+export function pickWheatTile({ unit, crystals, units, points, passable = () => true, assigned = new Map(), reach = POWER.cord.worker }) {
+  const key = (x, y) => `${x},${y}`;
+  const r2 = reach * reach;
+  const crewOf = new Map();    // tile key -> Crumbs of this owner whose gather order targets it
+  const standing = new Set();  // tile keys a Crumb of this owner stands on
+  for (const u of units) {
+    if (u.owner !== unit.owner || u.kind !== "worker" || u.id === unit.id) continue;
+    standing.add(key(u.x, u.y));
+    if (u.order?.type === "gather") crewOf.set(key(u.order.x, u.order.y), (crewOf.get(key(u.order.x, u.order.y)) || 0) + 1);
+  }
+  const isFull = (c) => {
+    let open = 0, held = 0;
+    for (const [dx, dy] of RING8) {
+      const x = c.x + dx, y = c.y + dy;
+      if (!passable(x, y)) continue;
+      open++;
+      if (standing.has(key(x, y))) held++;
+    }
+    return held === open;
+  };
+  let best = null, bestRank = null;
+  for (const c of crystals) {
+    if (!(c.amount > 0)) continue;
+    if (!points.some((p) => (p.x - c.x) ** 2 + (p.y - c.y) ** 2 <= r2)) continue;
+    const k = key(c.x, c.y);
+    const rank = [isFull(c) ? 1 : 0, (crewOf.get(k) || 0) + (assigned.get(k) || 0), distance(unit, c), c.y, c.x];
+    if (!bestRank || rankBefore(rank, bestRank)) { best = c; bestRank = rank; }
+  }
+  return best;
+}
+
+/** The sim's auto-gather for one worker: the pick over its owner's Strips and power points. */
+export function autoGatherTile(state, unit) {
+  const strips = structuresOf(state, unit.owner).filter((s) => s.kind === "core" && s.hp > 0);
+  const points = [...strips, ...(state.power?.points ?? []).filter((p) => p.owner === unit.owner)];
+  return pickWheatTile({ unit, crystals: state.crystals, units: state.units, points, passable: (x, y) => isPassable(state, x, y) });
 }
 
 function ownCore(state, player) {
@@ -197,10 +288,64 @@ function dropOff(state, unit) {
 
 const isDropOffKind = (kind) => kind === "core" || kind === "depot";
 
-// Point the order at the nearest tile with Shards, or go idle when none is left.
+// Where a side's workers may stand: within cord reach of one of its power points (env/power.mjs: the cord is the leash).
+// Strips (Cores), completed Outlets and built Extension Boxes and Pylons anchor a cord. With the power rules off
+// (classic matches) there is no leash, so every tile counts.
+export function inCordReach(state, owner, x, y, kind = "worker") {
+  if (!state.power) return true;
+  const cord = POWER.cord[kind] ?? 8;
+  const at = { x, y };
+  const anchored = (p) => distance(p, at) <= cord;
+  if (state.structures.some((s) => s.owner === owner && s.kind === "core" && s.hp > 0 && anchored(s))) return true;
+  if ((state.claims || []).some((c) => c.owner === owner && c.complete && c.hp > 0 && !c.dead && anchored(c))) return true;
+  return state.power.points.some((p) => p.owner === owner && p.range > 0 && anchored(p));
+}
+
+// Nearest tile with Shards that the unit's side can reach with its cord (ties by lower y, then lower x); null when none.
+function nearestFieldInReach(state, unit) {
+  let best = null;
+  let bestD = Infinity;
+  for (const c of state.crystals) {
+    if (!(c.amount > 0) || !inCordReach(state, unit.owner, c.x, c.y)) continue;
+    const d = distance(unit, c);
+    if (d < bestD || (d === bestD && (c.y < best.y || (c.y === best.y && c.x < best.x)))) {
+      best = c;
+      bestD = d;
+    }
+  }
+  return best;
+}
+
+// The saturation readout for the HUD (B4): a side's Crumbs against the wheat in its cord reach. `fields` counts the tiles
+// with Shards in reach; `capacity` counts the open tiles beside them (each one can hold a Crumb mining); `workersPerField`
+// is Crumbs over fields; `saturation` is Crumbs over capacity. No division by zero: an empty reach reads 0.
+export function fieldSaturation(state, owner) {
+  const workers = state.units.filter((u) => u.owner === owner && u.kind === "worker").length;
+  const fields = state.crystals.filter((c) => c.amount > 0 && inCordReach(state, owner, c.x, c.y));
+  const beside = new Set();
+  for (const c of fields) {
+    for (const [dx, dy] of NEIGHBOURS) {
+      const x = c.x + dx;
+      const y = c.y + dy;
+      if (isPassable(state, x, y)) beside.add(`${x},${y}`);
+    }
+  }
+  const capacity = beside.size;
+  return {
+    workers,
+    fields: fields.length,
+    capacity,
+    workersPerField: fields.length ? workers / fields.length : 0,
+    saturation: capacity ? workers / capacity : 0,
+  };
+}
+
+// Point the order at the nearest tile with Shards inside cord reach. When none is left there the Worker goes idle and
+// the sim emits field-empty (the Strip's side can see its field is gone; idle Crumbs and the HUD read it).
 function retarget(state, unit) {
-  const next = nearestCrystalWithShards(state, unit);
+  const next = nearestFieldInReach(state, unit);
   if (!next) {
+    emit(state, { e: "field-empty", id: unit.id, owner: unit.owner, x: unit.x, y: unit.y });
     setOrder(state, unit, null);
     return false;
   }
@@ -292,7 +437,7 @@ function tickGather(state, unit, order) {
     return;
   }
   order.ticks += 1;
-  if (order.ticks < mineTicks()) return;
+  if (order.ticks < mineTicks(state)) return;
 
   const take = Math.min(carry - unit.carrying, tile.amount);
   tile.amount -= take;
@@ -375,7 +520,7 @@ function tickPick(state, unit, order, deposit, carry) {
     return;
   }
   order.ticks += 1;
-  if (order.ticks < mineTicks()) return;
+  if (order.ticks < mineTicks(state)) return;
   const have = rare ? rare.amount : 0;
   const take = Math.min(carry - have, deposit.amount);
   deposit.amount -= take;
@@ -427,6 +572,7 @@ function deepFreeze(value) {
 export const CHAIN_DEFAULTS = deepFreeze({
   ticksPerSecond: 24,
   handCarry: 5,          // a Worker's hand-mining load (was 10 in v2)
+  handMine: 200,         // ticks a Worker mines one hand load (STATS.economy.hand.mineTicks)
   loadSize: 5,           // one load on a Track line
   drillTicks: 12,        // a Drill or Siphon mines one unit every 12 ticks: 2 a second
   buffer: 20,            // a Drill or Siphon holds this much
@@ -469,6 +615,7 @@ function statsNumbers() {
   const out = {
     ticksPerSecond: tps,
     handCarry: eco.hand?.carry,
+    handMine: eco.hand?.mineTicks,
     loadSize: eco.track?.loadSize,
     drillTicks: eco.drill?.mineEveryTicks,
     buffer: pick(STATS.factions?.coil?.buffer, eco.drill?.buffer),

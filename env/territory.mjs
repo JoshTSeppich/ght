@@ -2,9 +2,11 @@
 // Pure and deterministic: no clock, no randomness. The sim calls updateTerritory(state) once a tick after combat and
 // merges a returned result into state.result. Nothing here runs unless the sim wires it in.
 
+import { winCountFor } from '../maps/layout-sizes.mjs';
+
 export const TERRITORY_RULES = Object.freeze({
   holdTicks: 240, // 10 s at 24 ticks a second: enemy alone this long breaks a hold
-  winCount: 14, // Reaches held ...
+  winCount: 14, // Reaches held (a stated default: createTerritory reads the map's own target, winCountFor) ...
   winTicks: 2160, // ... for 90 s
   claimKinds: Object.freeze(['totem', 'mound']),
   coreClaims: true, // the Core claims the Reach it stands in
@@ -66,7 +68,8 @@ export function buildReaches(layout) {
 
 export function createTerritory(state, reachMap, rules = {}) {
   state.territory = {
-    rules: { ...TERRITORY_RULES, ...rules },
+    // The map's own target (two thirds of its Reaches, rounded up); an explicit rules.winCount still wins.
+    rules: { ...TERRITORY_RULES, winCount: winCountFor(reachMap.reaches.length), ...rules },
     map: reachMap,
     reaches: reachMap.reaches.map((x) => ({ id: x.id, claimedBy: null, holder: null, contested: false, alone: [0, 0] })),
     hold: [0, 0],

@@ -2,11 +2,15 @@ import { makeRng } from './rng.mjs';
 import { drawV4, encodeV4, decodeV4, scatterV4, territoryLayoutV4 } from '../maps/layout-v4.mjs';
 import { loadMapSize, winCountFor } from '../maps/layout-sizes.mjs';
 import { drawWheatfield, WHEATFIELD } from '../maps/layout-wheatfield.mjs';
+import { drawLadder, LADDER } from '../maps/layout-ladder.mjs';
 
 const SIZE = 32;
 const PAIRS = 24;
 const ATTEMPTS = 2000;
 const AMOUNT = 400;
+// Wheatfield Valley is 256 tiles across and a siege there is a 12 to 16 minute campaign (pacing, sonnet): its home fields
+// must outlast the cord chain, the kitchen and the army upkeep, so a wheat tile holds more than a classic Shard tile.
+const WHEAT_AMOUNT = 1800;
 const KEEP_OUT = 2;
 
 export function mirror(x, y) {
@@ -62,11 +66,12 @@ export function chosenMap({ territory = false } = {}) {
 // (192, 31 Reaches, watch mode's default) and huge (256, 41 Reaches). TERRITORY.md section 14.
 export const MAP_SIZES = Object.freeze(['standard', 'large', 'huge']);
 const sizeOf = (map) => (map === 'v4' ? 'standard' : map);
-export const isTerritoryMap = (map) => MAP_SIZES.includes(sizeOf(map)) || map === WHEATFIELD.name;
+export const isTerritoryMap = (map) => MAP_SIZES.includes(sizeOf(map)) || map === WHEATFIELD.name || map === LADDER.name;
 
 let v4Base = null;
 /** The hand-drawn v4 map, decoded once (tiles as char rows, reachGrid as a Uint8Array). Same as maps/driftfall-v4.json. */
 let wheatfieldBase = null;
+let ladderBase = null;
 /** Wheatfield Valley, 256 x 256 with 31 Reaches (maps/layout-wheatfield.mjs), decoded once. */
 function loadWheatfield() {
   if (!wheatfieldBase) {
@@ -78,6 +83,10 @@ function loadWheatfield() {
 
 export function loadMapV4(size = 'standard') {
   const name = sizeOf(size);
+  if (name === LADDER.name) {
+    if (!ladderBase) ladderBase = { ...decodeV4(encodeV4(drawLadder())), size: LADDER.name, winCount: winCountFor(9) };
+    return ladderBase;
+  }
   if (name === WHEATFIELD.name) return loadWheatfield();
   if (name !== 'standard') return loadMapSize(name);
   if (!v4Base) v4Base = { ...decodeV4(encodeV4(drawV4())), size: 'standard', winCount: winCountFor(21) };
@@ -106,7 +115,8 @@ export function generateMapV4(seed, size = 'standard') {
 }
 
 function buildMapV4(seed, size) {
-  const m = scatterV4(loadMapV4(size), seed);
+  const m = size === LADDER.name ? loadMapV4(size) : scatterV4(loadMapV4(size), seed);
+  const fieldAmount = size === WHEATFIELD.name || size === LADDER.name ? WHEAT_AMOUNT : AMOUNT;
   const rocks = [], crystals = [], vents = [], rubble = [], ramps = [];
   const water = [], bridges = [], fords = [], wells = [], sockets = [], camps = [], ruins = [];
   for (let y = 0; y < m.height; y++) for (let x = 0; x < m.width; x++) {
@@ -120,8 +130,8 @@ function buildMapV4(seed, size) {
     else if (c === 'G') sockets.push([x, y]);
     else if (c === 'k') camps.push([x, y]);
     else if (c === 'X') ruins.push([x, y]);
-    else if (c === 'S') crystals.push({ x, y, amount: AMOUNT });
-    else if (c === 'R') crystals.push({ x, y, amount: AMOUNT * 2, rich: true });
+    else if (c === 'S') crystals.push({ x, y, amount: fieldAmount });
+    else if (c === 'R') crystals.push({ x, y, amount: fieldAmount * 2, rich: true });
     else if (c === 'L') vents.push({ x, y, amount: 600 });
     else if (c === 'o') rubble.push({ x, y, hp: 200 });
     else if (c === '=' || c === '|') ramps.push({ x, y, axis: c === '=' ? 'ew' : 'ns' });
@@ -132,6 +142,7 @@ function buildMapV4(seed, size) {
     scatter: m.scatter, size: m.size, gateBase: m.gateBase, reachCount: m.reaches.length, winCount: m.winCount,
     // Wheatfield's extra layers (empty on the other maps): water tiles, crossings, wells, sockets, camps and the ruin.
     water, bridges, fords, wells, sockets, camps, ruins, extras: m.extras ?? null,
+    ...(m.extras?.watchtowers ? { watchtowers: m.extras.watchtowers } : {}),
   };
 }
 

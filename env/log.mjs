@@ -17,6 +17,8 @@ const EVENT_FIELDS = {
   late: ['player'],
   error: ['player', 'message'],
   forfeit: ['player', 'reason'],
+  'field-empty': ['id', 'owner', 'x', 'y'], // card 4 (Economy): env/economy.mjs retarget
+  refund: ['player', 'amount', 'shards'],   // card 11 (Construction): env/commands.mjs cancel
 };
 
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
