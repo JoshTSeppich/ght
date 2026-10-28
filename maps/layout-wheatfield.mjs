@@ -84,6 +84,10 @@ const FEATURES = [
 /** The dam gap: four water tiles on the anti-diagonal through (128, 128). Symmetric, so two pairs. */
 const DAM_GAP = [[126, 129], [127, 128], [128, 127], [129, 126]];
 
+// The side 0 pond: its top-left tile and size. Its nearest tile (12, 238) is about 8.5 tiles from the Strip at (18, 232).
+// This spot was chosen over (6, 236): there the side 1 bot built half as fast (tests/bots-windmills.test.mjs).
+const POND = { x: 10, y: 238, w: 3, h: 4 };
+
 const mx = (x) => W - 1 - x;
 const my = (y) => H - 1 - y;
 
@@ -158,6 +162,18 @@ export function drawWheatfield() {
     if (what === 'workers') { workers[0] = v.map(([x, y]) => ({ x, y })); workers[1] = v.map(([x, y]) => ({ x: mx(x), y: my(y) })); continue; }
     const [x, y, w = 1, h = 1] = v;
     paint(what, x, y, w, h);
+  }
+  // A pond of creek water beside each Strip (decision C): 3 x 4 tiles, 8 to 12 tiles from the Strip, on open ground. It is
+  // water like the creek ('~'), so a Well beside it draws at the creek rate, and it belongs to no Reach, like the creek.
+  const ponds = [];
+  for (const [px, py] of [[POND.x, POND.y], [mx(POND.x + POND.w - 1), my(POND.y + POND.h - 1)]]) {
+    for (let y = py; y < py + POND.h; y++) for (let x = px; x < px + POND.w; x++) {
+      if (tiles[y][x] !== '.') throw new Error(`pond at ${x},${y} is on ${tiles[y][x]}`);
+      tiles[y][x] = '~';
+      rid0[y][x] = 0;
+      heights[y][x] = 0;
+    }
+    ponds.push({ x: px, y: py, w: POND.w, h: POND.h });
   }
   // The Old Windmill: a single ruin on the north-east bank, near the dam.
   const ruin = { x: 134, y: 122 };
@@ -259,6 +275,7 @@ export function drawWheatfield() {
     },
     ruins: [[ruin.x, ruin.y]],
     crossings: { bridges: BRIDGE_X, fords: FORD_X },
+    ponds,
   };
   reaches.sort((p, q) => p.id - q.id);
   return { tiles, heights, reachId: rid0, reaches, gates, spec: WHEATFIELD, cores, workers, extras };
