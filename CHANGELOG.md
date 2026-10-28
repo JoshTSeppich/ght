@@ -1,6 +1,10 @@
-# Driftfall changelog
+# GHT changelog
 
 Written by the Build Changelog Writer (`live/changelog.mjs`). Newest first. Each line says what changed, who made it, and why. The chat message that explains it is named as `channel.jsonl #N`, the number that `node read.mjs` prints.
+
+## 2026-10-28
+
+- **Renamed to GHT — Ghosties, Toasties & Broskies** The game, formerly Driftfall and Toaster Wars, is now GHT, and the Hosties faction is now the Broskies (Ghosties are unchanged). The GitHub repository moved from JoshTSeppich/driftfall to JoshTSeppich/ght (the old URL redirects). Map files are now `maps/ght-v3.*` and `maps/ght-v4.*`, the package is `ght`, the `DRIFTFALL_MAP` and `DRIFTFALL_FUZZ_*` environment variables are now `GHT_MAP` and `GHT_FUZZ_*`, the Hostie lab is `play/broskie-lab.html` and the art direction note is `research/BROSKIES-GPT.md`. New match logs say `format: "ght-log"`; every reader still loads logs recorded as `driftfall-log`. Entries below keep the names they were written with. Added README.md.
 
 ## 2026-10-22
 
