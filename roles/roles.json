@@ -610,6 +610,30 @@
    "owns": "art/key"
   },
   {
+   "id": "R134",
+   "department": "Art",
+   "title": "Art Director (Assets)",
+   "status": "core",
+   "scope": "Owns the asset contract: sprite sizes, palette, transparent background, naming, atlas layout, destination paths. Approves every generated batch before it is integrated. Starts from research/CUTE-SPEC-GPT.md and research/TOY-EDGES-GPT.md. Contract ships before the first image.",
+   "owns": "docs/assets-contract.md"
+  },
+  {
+   "id": "R135",
+   "department": "Art",
+   "title": "Asset Generator (GPT)",
+   "status": "core",
+   "scope": "Runs on GPT/Codex. Produces unit, building and terrain art to the asset contract, in batches named per the contract. Writes only to assets/generated/; never touches assets/sprites/.",
+   "owns": "assets/generated/"
+  },
+  {
+   "id": "R136",
+   "department": "Art",
+   "title": "Asset Integrator",
+   "status": "core",
+   "scope": "Owns the validator that rejects non-conforming files, moves accepted assets from assets/generated/ into assets/sprites/ and wires them to unit/building ids. Order is fixed: contract, then validator, then images.",
+   "owns": "tools/assets-validate.mjs"
+  },
+  {
    "id": "R077",
    "department": "Cinematics",
    "title": "Cinematic Director",

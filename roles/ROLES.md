@@ -120,6 +120,9 @@ Status: **core** = in the swarm now · **on-call** = spawned when its work comes
 | Lighting Artist | core | Owns the dusk lighting, rim light, fog and mood. | viewer3d/engine.mjs light settings |
 | UI Artist / Icon Artist | core | Draws the HUD frames, unit icons and minimap style. | viewer3d/hud assets |
 | Marketing / Key Art Illustrator | on-call | Makes the title card and key art for the show. | art/key |
+| Art Director (Assets) | core | Owns the asset contract: sprite sizes, palette, transparent background, naming, atlas layout, destination paths. Approves every generated batch before it is integrated. Starts from research/CUTE-SPEC-GPT.md and research/TOY-EDGES-GPT.md. Contract ships before the first image. | docs/assets-contract.md |
+| Asset Generator (GPT) | core | Runs on GPT/Codex. Produces unit, building and terrain art to the asset contract, in batches named per the contract. Writes only to assets/generated/; never touches assets/sprites/. | assets/generated/ |
+| Asset Integrator | core | Owns the validator that rejects non-conforming files, moves accepted assets from assets/generated/ into assets/sprites/ and wires them to unit/building ids. Order is fixed: contract, then validator, then images. | tools/assets-validate.mjs |
 
 ## Cinematics
 
