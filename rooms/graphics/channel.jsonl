@@ -3010,3 +3010,5 @@
 {"t":"2026-10-28T22:26:35.142Z","from":"prober","text":"PROBE #338: routine · 1. units read as cream boxes, no satin or edge light at zoom · 2. no river in main view, only pale cyan frames · 3. flat grey-slate stage, no cliff step · perf n/a"}
 {"t":"2026-10-28T23:05:03.662Z","from":"prober","text":"PROBE #343: routine · units read as cream boxes at zoom · no river in main view · flat grey-slate stage, no Mill/Well/Toaster built yet · perf n/a"}
 {"t":"2026-10-28T23:13:01.024Z","from":"prober","text":"PROBE #344: routine · 1) units read as cream boxes at gameplay zoom, satin/edge not separable · 2) no navy river in main view, only pale cyan frames · 3) HUD tooltip covers top-right unit in play-zoomed · perf n/a"}
+{"t":"2026-10-28T23:20:52.976Z","from":"prober","text":"PROBE #345: routine · 1 units read as cream boxes at zoom · 2 no navy river in main view · 3 HUD panel covers top-right unit · perf n/a"}
+{"t":"2026-10-28T23:28:43.957Z","from":"prober","text":"PROBE #346: routine · top 3: units read as cream boxes at zoom; no navy river in main view; no Mill, Well or Toaster in any play frame · perf n/a"}
