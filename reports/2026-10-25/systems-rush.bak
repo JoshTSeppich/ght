@@ -1,0 +1,33 @@
+// Probe (f): at 4:00, N fed Poppers (grunts) are dropped next to the enemy Strip with an Extension Box of ours beside them (a
+// "perfect" chain, no travel). Does the Strip die, and when? The defender is toaster-easy; we do nothing else. Read-only on the repo.
+// Usage: node systems-rush.mjs [N=6] [startSecond=240] [seed=7] [crumbs=0] [reissueEvery=0 (ticks; 0 = order once)]
+import { makeMatch } from './lib.mjs';
+import { allocId } from '../../env/state.mjs';
+const N = Number(process.argv[2] ?? 6), T0 = Number(process.argv[3] ?? 240) * 24, seed = Number(process.argv[4] ?? 7), C = Number(process.argv[5] ?? 0), RE = Number(process.argv[6] ?? 0);
+const m = await makeMatch({ seed, difficulty: 'easy', maxTicks: 21600 });
+const s = m.d.state;
+const enemy = s.structures.find((x) => x.kind === 'core' && x.owner === 1);
+let spawned = false, ids = [], hit = null;
+await m.runTicks(T0 + 24 * 240, (tk) => {
+  if (!spawned && tk >= T0) {
+    spawned = true;
+    const bx = enemy.x - 6, by = enemy.y + 6;
+    s.power.points.push({ id: allocId(s), owner: 0, kind: 'extension', x: bx, y: by, range: 12 });
+    for (let i = 0; i < N + C; i++) {
+      const kind = i < N ? 'grunt' : 'worker';
+      const u = { id: allocId(s), owner: 0, kind, x: bx + (i % 3), y: by + 1 + Math.floor(i / 3), hp: kind === 'grunt' ? 60 : 40, order: null, carrying: 0 };
+      s.units.push(u); ids.push(u.id);
+      if (s.ammo) s.ammo.slices[u.id] = kind === 'grunt' ? 6 : 0;
+    }
+    console.log(`t=${(tk / 24).toFixed(0)}s spawned ${N} Poppers (+${C} Crumbs), Strip hp`, enemy.hp, 'enemy units', s.units.filter((u) => u.owner === 1).length);
+    m.d.queue(ids.filter((id) => s.units.find((u) => u.id === id).kind === 'grunt').map((id) => ({ type: 'attack', unit: id, target: enemy.id })));
+  }
+  if (spawned) {
+    const mine = s.units.filter((u) => ids.includes(u.id) && u.kind === 'grunt');
+    if (RE && (tk - T0) % RE === 0 && tk > T0) m.d.queue(mine.map((u) => ({ type: 'attack', unit: u.id, target: enemy.id })));
+    if ((tk - T0) % (24 * 10) === 0) console.log(`+${(tk - T0) / 24}s Strip hp ${enemy.hp} Poppers alive ${mine.length} slices ${mine.map((u) => s.ammo.slices[u.id]).join(',')} pos ${mine.map((u) => `${u.x.toFixed(0)},${u.y.toFixed(0)}:${u.power && u.power.state}`).join(' ')} strip ${enemy.x},${enemy.y} enemy units ${s.units.filter((u) => u.owner === 1).length}`);
+    if (enemy.hp <= 0 && hit === null) hit = tk;
+  }
+});
+console.log('Strip killed at', hit === null ? 'never (within 4 min)' : ((hit - T0) / 24).toFixed(0) + ' s after the drop', '| ended', JSON.stringify(m.ended));
+m.stop();

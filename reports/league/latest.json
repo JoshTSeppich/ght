@@ -1,0 +1,1029 @@
+{
+ "generated": "league.mjs",
+ "maxMin": 15,
+ "seeds": [
+  3
+ ],
+ "bots": [
+  "rush",
+  "expand",
+  "tech",
+  "turtle",
+  "normal",
+  "easy"
+ ],
+ "errors": [],
+ "summary": {
+  "matches": 30,
+  "timerEndings": 27,
+  "firstDamageMedianTick": 8675,
+  "byBot": {
+   "rush": {
+    "played": 10,
+    "wins": 1,
+    "losses": 9,
+    "draws": 0,
+    "timerEndings": 10,
+    "unitKinds": [
+     "grunt",
+     "lancer",
+     "worker"
+    ],
+    "expansions": 217
+   },
+   "expand": {
+    "played": 10,
+    "wins": 8,
+    "losses": 2,
+    "draws": 0,
+    "timerEndings": 7,
+    "unitKinds": [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ],
+    "expansions": 260
+   },
+   "tech": {
+    "played": 10,
+    "wins": 8,
+    "losses": 2,
+    "draws": 0,
+    "timerEndings": 10,
+    "unitKinds": [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ],
+    "expansions": 179
+   },
+   "turtle": {
+    "played": 10,
+    "wins": 8,
+    "losses": 2,
+    "draws": 0,
+    "timerEndings": 9,
+    "unitKinds": [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ],
+    "expansions": 86
+   },
+   "normal": {
+    "played": 10,
+    "wins": 4,
+    "losses": 6,
+    "draws": 0,
+    "timerEndings": 8,
+    "unitKinds": [
+     "dart",
+     "worker"
+    ],
+    "expansions": 210
+   },
+   "easy": {
+    "played": 10,
+    "wins": 1,
+    "losses": 9,
+    "draws": 0,
+    "timerEndings": 10,
+    "unitKinds": [
+     "lancer",
+     "worker"
+    ],
+    "expansions": 90
+   }
+  }
+ },
+ "matches": [
+  {
+   "seed": 3,
+   "sides": [
+    "rush",
+    "expand"
+   ],
+   "ticks": 7063,
+   "minutes": 4.9,
+   "reason": "stalemate",
+   "winner": 1,
+   "timer": true,
+   "firstDamageTick": null,
+   "unitsUsed": [
+    [
+     "worker"
+    ],
+    [
+     "worker"
+    ]
+   ],
+   "expansions": [
+    14,
+    20
+   ],
+   "orders": 3156,
+   "refused": 1
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "rush",
+    "tech"
+   ],
+   "ticks": 6339,
+   "minutes": 4.4,
+   "reason": "stalemate",
+   "winner": 1,
+   "timer": true,
+   "firstDamageTick": null,
+   "unitsUsed": [
+    [
+     "worker"
+    ],
+    [
+     "worker"
+    ]
+   ],
+   "expansions": [
+    16,
+    18
+   ],
+   "orders": 435,
+   "refused": 0
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "rush",
+    "turtle"
+   ],
+   "ticks": 21600,
+   "minutes": 15,
+   "reason": "timeout",
+   "winner": 1,
+   "timer": true,
+   "firstDamageTick": 8596,
+   "unitsUsed": [
+    [
+     "grunt",
+     "lancer",
+     "worker"
+    ],
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    30,
+    5
+   ],
+   "orders": 2114,
+   "refused": 5
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "rush",
+    "normal"
+   ],
+   "ticks": 10555,
+   "minutes": 7.33,
+   "reason": "stalemate",
+   "winner": 1,
+   "timer": true,
+   "firstDamageTick": null,
+   "unitsUsed": [
+    [
+     "worker"
+    ],
+    [
+     "worker"
+    ]
+   ],
+   "expansions": [
+    18,
+    14
+   ],
+   "orders": 4796,
+   "refused": 124
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "rush",
+    "easy"
+   ],
+   "ticks": 17987,
+   "minutes": 12.49,
+   "reason": "stalemate",
+   "winner": 1,
+   "timer": true,
+   "firstDamageTick": 8620,
+   "unitsUsed": [
+    [
+     "grunt",
+     "lancer",
+     "worker"
+    ],
+    [
+     "lancer",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    30,
+    1
+   ],
+   "orders": 2056,
+   "refused": 1
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "expand",
+    "rush"
+   ],
+   "ticks": 10265,
+   "minutes": 7.13,
+   "reason": "stalemate",
+   "winner": 0,
+   "timer": true,
+   "firstDamageTick": null,
+   "unitsUsed": [
+    [
+     "worker"
+    ],
+    [
+     "worker"
+    ]
+   ],
+   "expansions": [
+    17,
+    15
+   ],
+   "orders": 4855,
+   "refused": 4
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "expand",
+    "tech"
+   ],
+   "ticks": 17757,
+   "minutes": 12.33,
+   "reason": "stalemate",
+   "winner": 1,
+   "timer": true,
+   "firstDamageTick": 8182,
+   "unitsUsed": [
+    [
+     "worker"
+    ],
+    [
+     "grunt",
+     "lancer",
+     "spiker",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    16,
+    18
+   ],
+   "orders": 1875,
+   "refused": 1
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "expand",
+    "turtle"
+   ],
+   "ticks": 21600,
+   "minutes": 15,
+   "reason": "timeout",
+   "winner": 0,
+   "timer": true,
+   "firstDamageTick": 11701,
+   "unitsUsed": [
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ],
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    31,
+    3
+   ],
+   "orders": 12673,
+   "refused": 179
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "expand",
+    "normal"
+   ],
+   "ticks": 13539,
+   "minutes": 9.4,
+   "reason": "core",
+   "winner": 0,
+   "timer": false,
+   "firstDamageTick": 8335,
+   "unitsUsed": [
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ],
+    [
+     "worker"
+    ]
+   ],
+   "expansions": [
+    32,
+    14
+   ],
+   "orders": 1366,
+   "refused": 47
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "expand",
+    "easy"
+   ],
+   "ticks": 13647,
+   "minutes": 9.48,
+   "reason": "stalemate",
+   "winner": 0,
+   "timer": true,
+   "firstDamageTick": null,
+   "unitsUsed": [
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ],
+    [
+     "lancer",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    29,
+    3
+   ],
+   "orders": 1329,
+   "refused": 0
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "tech",
+    "rush"
+   ],
+   "ticks": 6349,
+   "minutes": 4.41,
+   "reason": "stalemate",
+   "winner": 0,
+   "timer": true,
+   "firstDamageTick": null,
+   "unitsUsed": [
+    [
+     "worker"
+    ],
+    [
+     "worker"
+    ]
+   ],
+   "expansions": [
+    17,
+    16
+   ],
+   "orders": 551,
+   "refused": 0
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "tech",
+    "expand"
+   ],
+   "ticks": 21600,
+   "minutes": 15,
+   "reason": "timeout",
+   "winner": 0,
+   "timer": true,
+   "firstDamageTick": 8032,
+   "unitsUsed": [
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ],
+    [
+     "worker"
+    ]
+   ],
+   "expansions": [
+    20,
+    17
+   ],
+   "orders": 2505,
+   "refused": 0
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "tech",
+    "turtle"
+   ],
+   "ticks": 18943,
+   "minutes": 13.15,
+   "reason": "stalemate",
+   "winner": 1,
+   "timer": true,
+   "firstDamageTick": null,
+   "unitsUsed": [
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ],
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    18,
+    15
+   ],
+   "orders": 1724,
+   "refused": 0
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "tech",
+    "normal"
+   ],
+   "ticks": 20381,
+   "minutes": 14.15,
+   "reason": "stalemate",
+   "winner": 0,
+   "timer": true,
+   "firstDamageTick": 12967,
+   "unitsUsed": [
+    [
+     "grunt",
+     "lancer",
+     "spiker",
+     "worker"
+    ],
+    [
+     "worker"
+    ]
+   ],
+   "expansions": [
+    17,
+    19
+   ],
+   "orders": 5691,
+   "refused": 32
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "tech",
+    "easy"
+   ],
+   "ticks": 18943,
+   "minutes": 13.15,
+   "reason": "stalemate",
+   "winner": 0,
+   "timer": true,
+   "firstDamageTick": null,
+   "unitsUsed": [
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ],
+    [
+     "lancer",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    17,
+    15
+   ],
+   "orders": 1242,
+   "refused": 0
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "turtle",
+    "rush"
+   ],
+   "ticks": 21600,
+   "minutes": 15,
+   "reason": "timeout",
+   "winner": 0,
+   "timer": true,
+   "firstDamageTick": 8665,
+   "unitsUsed": [
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ],
+    [
+     "grunt",
+     "lancer",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    19,
+    30
+   ],
+   "orders": 3504,
+   "refused": 33
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "turtle",
+    "expand"
+   ],
+   "ticks": 20486,
+   "minutes": 14.23,
+   "reason": "core",
+   "winner": 1,
+   "timer": false,
+   "firstDamageTick": 11743,
+   "unitsUsed": [
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ],
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    2,
+    34
+   ],
+   "orders": 10807,
+   "refused": 96
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "turtle",
+    "tech"
+   ],
+   "ticks": 21600,
+   "minutes": 15,
+   "reason": "timeout",
+   "winner": 0,
+   "timer": true,
+   "firstDamageTick": 17422,
+   "unitsUsed": [
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ],
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    16,
+    18
+   ],
+   "orders": 1344,
+   "refused": 1
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "turtle",
+    "normal"
+   ],
+   "ticks": 19539,
+   "minutes": 13.57,
+   "reason": "stalemate",
+   "winner": 0,
+   "timer": true,
+   "firstDamageTick": null,
+   "unitsUsed": [
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ],
+    [
+     "worker"
+    ]
+   ],
+   "expansions": [
+    5,
+    28
+   ],
+   "orders": 1857,
+   "refused": 295
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "turtle",
+    "easy"
+   ],
+   "ticks": 15547,
+   "minutes": 10.8,
+   "reason": "stalemate",
+   "winner": 0,
+   "timer": true,
+   "firstDamageTick": null,
+   "unitsUsed": [
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ],
+    [
+     "lancer",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    8,
+    13
+   ],
+   "orders": 254,
+   "refused": 0
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "normal",
+    "rush"
+   ],
+   "ticks": 10525,
+   "minutes": 7.31,
+   "reason": "stalemate",
+   "winner": 0,
+   "timer": true,
+   "firstDamageTick": null,
+   "unitsUsed": [
+    [
+     "worker"
+    ],
+    [
+     "worker"
+    ]
+   ],
+   "expansions": [
+    14,
+    18
+   ],
+   "orders": 6337,
+   "refused": 146
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "normal",
+    "expand"
+   ],
+   "ticks": 14573,
+   "minutes": 10.12,
+   "reason": "core",
+   "winner": 1,
+   "timer": false,
+   "firstDamageTick": 8410,
+   "unitsUsed": [
+    [
+     "worker"
+    ],
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    13,
+    33
+   ],
+   "orders": 7791,
+   "refused": 287
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "normal",
+    "tech"
+   ],
+   "ticks": 19912,
+   "minutes": 13.83,
+   "reason": "stalemate",
+   "winner": 1,
+   "timer": true,
+   "firstDamageTick": 12259,
+   "unitsUsed": [
+    [
+     "worker"
+    ],
+    [
+     "grunt",
+     "lancer",
+     "spiker",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    18,
+    18
+   ],
+   "orders": 3568,
+   "refused": 294
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "normal",
+    "turtle"
+   ],
+   "ticks": 21600,
+   "minutes": 15,
+   "reason": "timeout",
+   "winner": 1,
+   "timer": true,
+   "firstDamageTick": 15201,
+   "unitsUsed": [
+    [
+     "dart",
+     "worker"
+    ],
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    30,
+    5
+   ],
+   "orders": 2349,
+   "refused": 33
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "normal",
+    "easy"
+   ],
+   "ticks": 16251,
+   "minutes": 11.29,
+   "reason": "stalemate",
+   "winner": 0,
+   "timer": true,
+   "firstDamageTick": null,
+   "unitsUsed": [
+    [
+     "worker"
+    ],
+    [
+     "lancer",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    27,
+    9
+   ],
+   "orders": 1733,
+   "refused": 33
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "easy",
+    "rush"
+   ],
+   "ticks": 21600,
+   "minutes": 15,
+   "reason": "timeout",
+   "winner": 1,
+   "timer": true,
+   "firstDamageTick": 8675,
+   "unitsUsed": [
+    [
+     "lancer",
+     "worker"
+    ],
+    [
+     "grunt",
+     "lancer",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    1,
+    30
+   ],
+   "orders": 4216,
+   "refused": 0
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "easy",
+    "expand"
+   ],
+   "ticks": 13705,
+   "minutes": 9.52,
+   "reason": "stalemate",
+   "winner": 1,
+   "timer": true,
+   "firstDamageTick": null,
+   "unitsUsed": [
+    [
+     "lancer",
+     "worker"
+    ],
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    4,
+    31
+   ],
+   "orders": 1917,
+   "refused": 310
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "easy",
+    "tech"
+   ],
+   "ticks": 19189,
+   "minutes": 13.33,
+   "reason": "stalemate",
+   "winner": 1,
+   "timer": true,
+   "firstDamageTick": null,
+   "unitsUsed": [
+    [
+     "lancer",
+     "worker"
+    ],
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    15,
+    18
+   ],
+   "orders": 1368,
+   "refused": 0
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "easy",
+    "turtle"
+   ],
+   "ticks": 16113,
+   "minutes": 11.19,
+   "reason": "stalemate",
+   "winner": 1,
+   "timer": true,
+   "firstDamageTick": null,
+   "unitsUsed": [
+    [
+     "lancer",
+     "worker"
+    ],
+    [
+     "grunt",
+     "howler",
+     "lancer",
+     "spiker",
+     "worker"
+    ]
+   ],
+   "expansions": [
+    14,
+    8
+   ],
+   "orders": 259,
+   "refused": 0
+  },
+  {
+   "seed": 3,
+   "sides": [
+    "easy",
+    "normal"
+   ],
+   "ticks": 21600,
+   "minutes": 15,
+   "reason": "timeout",
+   "winner": 1,
+   "timer": true,
+   "firstDamageTick": 15363,
+   "unitsUsed": [
+    [
+     "lancer",
+     "worker"
+    ],
+    [
+     "worker"
+    ]
+   ],
+   "expansions": [
+    15,
+    33
+   ],
+   "orders": 2083,
+   "refused": 240
+  }
+ ]
+}

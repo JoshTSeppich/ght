@@ -1,0 +1,12 @@
+import { makeMatch } from './lib.mjs';
+const m = await makeMatch({ difficulty: 'easy' });
+const s = m.d.state;
+console.log('keys', Object.keys(s).join(','));
+console.log('players', JSON.stringify(s.players ?? s.shards).slice(0, 300));
+console.log('p0 units', s.units.filter((u) => u.owner === 0).map((u) => u.kind).join(' '));
+const rows = [];
+const w = () => (s.players ? s.players[0].shards : JSON.stringify(s.shards));
+await m.runTicks(241, (tk) => { if (tk <= 12 || tk % 24 === 0) rows.push('tick ' + tk + ' wheat ' + w()); });
+console.log(rows.join('\n'));
+console.log('orders', s.units.filter((u) => u.owner === 0).map((u) => u.kind + ':' + JSON.stringify(u.order ?? u.cmd ?? u.state ?? null)).join(' | '));
+m.stop();

@@ -1,0 +1,28 @@
+✔ easy by default, normal and none on request (0.609333ms)
+✔ none is the sandbox, and leaving it drops mode=sandbox (0.172417ms)
+✔ the menu gets an Opponent select that reloads with the choice (0.83625ms)
+✔ a referee territory match writes its rules into the log and rerun reproduces it (5173.076625ms)
+✔ a classic referee match still replays as a classic state (255.987416ms)
+✔ a live match records its rules and rerun takes the same state builder (3818.454791ms)
+✔ an old territory log with no rules is recognised by its opening state (4344.499875ms)
+✔ rerun reproduces a fresh toaster-sonnet mirror match exactly (the room match setup) (17124.839417ms)
+✔ two toaster-sonnet bots play real referee ticks, not a tick-0 load forfeit (4710.317791ms)
+✔ a refused move is not sent again while the back-off lasts (3704.043458ms)
+✔ mirror match on the real rules: few refusals, the chain holds at mid-lane until the push, the board keeps changing (38196.472166ms)
+✔ toaster-easy is one self-contained file (no imports) and loads in the referee sandbox (4410.718083ms)
+✔ seed 3: easy loses to normal, no Strip dies before 10:00, 4-6 Poppers home at 8:00 (205319.212458ms)
+✔ seed 5: easy loses to normal, no Strip dies before 10:00, 4-6 Poppers home at 8:00 (158350.965542ms)
+✔ seed 90: easy loses to normal, no Strip dies before 10:00, 4-6 Poppers home at 8:00 (111438.952583ms)
+✔ observe shows a side its own Power points and nothing of the enemy (3427.4405ms)
+✔ observe lists a side's own cut units (58.748083ms)
+✔ a toaster bot walks its Extension Boxes most of the way to the enemy Strip (31242.010625ms)
+✔ no Power Strip falls before 3:00 in a bot v bot match (44814.923375ms)
+﹣ a full bot v bot match is decisive or close by the 15:00 cap, and never early (0.695291ms) # SKIP
+ℹ tests 20
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 510721.896041
