@@ -24,7 +24,7 @@ export function replaySetupQuery(query, record, index='last') {
 export function setupHtml(query) {
  const values=setupValues(query);
  const select=(key,label,choices)=>`<label>${label} <select name="${key}">${choices.map(([v,name])=>`<option value="${v}"${values[key]===v?' selected':''}>${name}</option>`).join('')}</select></label>`;
- return '<h1>GHOSTIES, HOSTIES, AND TOASTIES</h1><p>Set up your match</p><form style="display:grid;gap:16px;text-align:left">'+select('map','Map',MAPS)+select('side','Side',[['0','Side 1'],['1','Side 2']])+select('difficulty','Difficulty',LEVELS)+select('keys','Key profile',[['grid','Grid (Q W E R T)'],['classic','Classic (M S H P A)']])+'<button type="submit">Start match</button></form>';
+ return '<h1>GHOSTIES, TOASTIES & BROSKIES</h1><p>Set up your match</p><form style="display:grid;gap:16px;text-align:left">'+select('map','Map',MAPS)+select('side','Side',[['0','Side 1'],['1','Side 2']])+select('difficulty','Difficulty',LEVELS)+select('keys','Key profile',[['grid','Grid (Q W E R T)'],['classic','Classic (M S H P A)']])+'<button type="submit">Start match</button></form>';
 }
 const panelStyle='position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#151122f5;color:#fff;font:16px system-ui;text-align:center';
 export function mountStartScreen(root,{query='',go=s=>{location.search=s;}}={}) {

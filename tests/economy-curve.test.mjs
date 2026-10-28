@@ -26,7 +26,7 @@ test('prices follow value: tougher or longer-reaching units never cost less than
   assert.ok(u.brute.wheat > u.howler.wheat, 'the 240 hp Four-Slice is the dearest');
 });
 
-test('upkeep is lower in Toaster Wars (5%), the classic budget keeps 10%, and the HUD sum agrees', () => {
+test('upkeep is lower in GHT (5%), the classic budget keeps 10%, and the HUD sum agrees', () => {
   assert.equal(ECONOMY.upkeep.percentOfCostPerMinute, 5);
   assert.equal(STATS.upkeep.ratePerMinute, 0.1);
   const s = createToasterState(3);

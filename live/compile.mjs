@@ -141,7 +141,7 @@ async function build(buildNo) {
   const seed = (buildNo % 9000) + 1;
   const tmp = path.join(ROOT, 'matches', '.latest.tmp.json');
   let match;
-  // The default Toaster Wars territory match, cut to 3 game-minutes (4320 ticks) so every build can record and check it.
+  // The default GHT territory match, cut to 3 game-minutes (4320 ticks) so every build can record and check it.
   const mr = await run(process.execPath, ['env/run-match.mjs', '--seed', String(seed), '--p0', 'players/sample-player.mjs', '--p1', 'players/sample-player.mjs', '--max-ticks', '4320', '--out', rel(tmp), '--quiet'], 120000);
   if (mr.code === 0 && fs.existsSync(tmp)) {
     fs.renameSync(tmp, path.join(ROOT, 'matches', 'latest.json'));

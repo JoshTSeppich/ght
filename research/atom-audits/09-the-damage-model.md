@@ -13,9 +13,9 @@ What the live sim does today: every tick, each armed unit in range hits for its 
 | Focus fire beats spread fire | PARTIAL | An attack order focuses one target (combat.mjs:46). Idle units hit the nearest. Since hits are instant and stack, focus is the only thing that matters, but the player has no good "focus this" feedback and units never retarget a better threat. |
 | Splash punishes clumping | MISSING | No splash in the sim. Howler/Thumper (stats.mjs:85, 205) is named but has no area attack. Territory also lists Spiker/Mender. |
 | Friendly splash | NOT FOR US (now) | Adds feel-bad before basic splash exists. Revisit for Drift hazards (Flood already hurts everyone, stats.mjs:178) and one Thumper variant at most. |
-| Shields absorb first, ignore modifiers | NOT FOR US | Only one faction's identity in the atom. Driftfall's equivalent already has a home: Burrow dirt walls and Hold Fast claim weapons. Skip a second hit-point layer. |
-| No randomness (SC2) / high-ground miss (BW) | HAVE (no randomness) / NOT FOR US (miss chance) | Combat is fully deterministic (also needed by the replay tests). High-ground miss: no height in combat; Driftfall's Mesa Reaches are better served by sight bonus, not dice. |
-| Attack cadence (implied by "damage per hit") | MISSING | The atom assumes discrete hits. Driftfall has one every tick. This is the root cause behind haiku's finding (#415): 4 units drop a 1000-hp Core in ~35 ticks. |
+| Shields absorb first, ignore modifiers | NOT FOR US | Only one faction's identity in the atom. GHT's equivalent already has a home: Burrow dirt walls and Hold Fast claim weapons. Skip a second hit-point layer. |
+| No randomness (SC2) / high-ground miss (BW) | HAVE (no randomness) / NOT FOR US (miss chance) | Combat is fully deterministic (also needed by the replay tests). High-ground miss: no height in combat; GHT's Mesa Reaches are better served by sight bonus, not dice. |
+| Attack cadence (implied by "damage per hit") | MISSING | The atom assumes discrete hits. GHT has one every tick. This is the root cause behind haiku's finding (#415): 4 units drop a 1000-hp Core in ~35 ticks. |
 
 Tally: 1 HAVE, 3 PARTIAL, 6 MISSING, 2 NOT FOR US (rows mixed on the last one).
 

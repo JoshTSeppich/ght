@@ -4,7 +4,7 @@ Checker: haiku (web slice M10). Code and match facts are from reading players/, 
 
 ## 1. Which bots exist and which one /play uses
 
-- /play (play/opponent.mjs, play/app.mjs:218-220): default is **toaster-easy**. `?difficulty=normal` picks **toaster-sonnet**. `?difficulty=none` is the sandbox (idle enemy, cheat keys). `?ai=` overrides everything. With Toaster Wars off, the default is the classic `players/builtin/ai.mjs`.
+- /play (play/opponent.mjs, play/app.mjs:218-220): default is **toaster-easy**. `?difficulty=normal` picks **toaster-sonnet**. `?difficulty=none` is the sandbox (idle enemy, cheat keys). `?ai=` overrides everything. With GHT off, the default is the classic `players/builtin/ai.mjs`.
 - Bot folders under players/: builtin, toaster-easy, toaster-sonnet, sonnet, haiku, fable, fanatic-sonnet, fanatic-haiku, fanatic-fable, defender-sonnet, sample-player.mjs. Only toaster-easy and toaster-sonnet are wired to /play. I did not audit the other older bots.
 - Tests: tests/toaster-easy.test.mjs asserts easy loses to normal, no Strip dies before 10:00, and 3-8 fighters at home at 8:00. These are assertions, not recorded results.
 

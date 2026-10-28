@@ -1,4 +1,4 @@
-// tech-tree-doc: TECH-TREE.md is generated from env/stats.mjs (Toaster Wars tiers) and play/toaster-play.mjs; a stale file fails
+// tech-tree-doc: TECH-TREE.md is generated from env/stats.mjs (GHT tiers) and play/toaster-play.mjs; a stale file fails
 // here (WELLS-TECH-TERRAIN.md T3). Owner: haiku. The script's --check mode is run for real, so `npm test` catches a doc that was not regenerated.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -15,7 +15,7 @@ import { renderTechTreeDoc, labelOf, CARDS, clashesOnACard } from '../scripts/te
 const script = fileURLToPath(new URL('../scripts/tech-tree-doc.mjs', import.meta.url));
 const read = (p) => fs.readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 const doc = renderTechTreeDoc();
-// The Toaster Wars tier table: every kind on each list, by tier.
+// The GHT tier table: every kind on each list, by tier.
 const TIERS = [1, 2, 3].map((n) => ({ n, ...STATS.toasterTiers[n] }));
 // The text from "## Tier n" up to the next "## " heading.
 const tierSection = (n) => {
@@ -43,22 +43,22 @@ test('--check exits 0 for the real file, and 1 for a stale copy', () => {
   assert.equal(fresh.status, 0, fresh.stderr);
 });
 
-test('the doc names the Toaster Wars gate of each tier, from the same table /play reads', () => {
+test('the doc names the GHT gate of each tier, from the same table /play reads', () => {
   assert.ok(tierSection(1).includes('Needs nothing: open from the start.'), 'Tier 1');
   assert.ok(tierSection(2).includes(`${STATS.toasterTiers[2].needText}.`), 'Tier 2 gate');
   assert.ok(tierSection(3).includes(`${STATS.toasterTiers[3].needText}.`), 'Tier 3 gate');
 });
 
-test('the doc names no Driftfall tier rule that /play does not use (Holds, Foundry, Sanctum, Hangar)', () => {
+test('the doc names no GHT tier rule that /play does not use (Holds, Foundry, Sanctum, Hangar)', () => {
   assert.doesNotMatch(doc, /Hold \d/);
   assert.doesNotMatch(doc, /Foundry|Sanctum|Hangar/);
 });
 
-test('the doc includes research on /play and names no Driftfall faction upgrade', () => {
+test('the doc includes research on /play and names no GHT faction upgrade', () => {
   assert.match(doc, /## Research on \/play/);
   assert.match(doc, /Upgrade Tracks/);
   assert.match(doc, /Unit Researches/);
-  // Check that faction-specific upgrades (coil, burrow) are not in the doc, but Toaster Wars upgrades are OK
+  // Check that faction-specific upgrades (coil, burrow) are not in the doc, but GHT upgrades are OK
   const factionUpgrades = UPGRADES.filter(u => u.faction && u.faction !== 'shared');
   for (const u of factionUpgrades) assert.ok(!doc.includes(u.name), `${u.name} is faction-specific research /play does not have`);
 });
@@ -73,7 +73,7 @@ test('every tier unlock sits in the section of its own tier, with its hotkey whe
   }
 });
 
-test('every Toaster Wars unit lands in the tier that toasterTierOf() gives it, and its Wheat cost is in that row', () => {
+test('every GHT unit lands in the tier that toasterTierOf() gives it, and its Wheat cost is in that row', () => {
   for (const { unlocks } of TIERS) for (const kind of unlocks.filter((k) => Object.hasOwn(STATS.units, k))) {
     const section = tierSection(toasterTierOf(kind));
     assert.ok(section.includes(`| ${toasterName(kind)} |`), kind);

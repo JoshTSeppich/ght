@@ -6,7 +6,7 @@ import { fieldSaturation } from '../env/economy.mjs';
 import { createToasterState } from '../play/toaster-play.mjs';
 import { saturationLine } from '../play/hud-saturation.mjs';
 
-test('a fresh Toaster Wars match shows the Crumbs, fields and percent that fieldSaturation reports', () => {
+test('a fresh GHT match shows the Crumbs, fields and percent that fieldSaturation reports', () => {
   const state = createToasterState(7);
   const f = fieldSaturation(state, 0);
   const html = saturationLine(state, 0);

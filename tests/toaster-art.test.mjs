@@ -73,7 +73,7 @@ test('unit art kinds cover the whole roster', () => {
   for (const k of ['worker', 'grunt', 'lancer', 'brute', 'howler', 'spiker', 'dart']) assert.ok(UNIT_ART_KINDS.includes(k), k);
 });
 
-test('Toaster Wars card: proper names, costs and clean hotkeys; the old "forge" word is gone', async () => {
+test('GHT card: proper names, costs and clean hotkeys; the old "forge" word is gone', async () => {
   const { createInput } = await import('../play/input.mjs');
   const { TOASTER_HOTKEYS, toasterInputOptions } = await import('../play/toaster-play.mjs');
   const { STATS } = await import('../env/stats.mjs');

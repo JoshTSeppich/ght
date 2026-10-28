@@ -1,13 +1,13 @@
 // Snakenator ink silhouettes: one instanced billboard per kind, one shared team-foot-ring batch.
-// Also supports Toaster Wars air units with shadows (drawn as dark discs on the ground below).
+// Also supports GHT air units with shadows (drawn as dark discs on the ground below).
 import * as THREE from 'three';
 export const DRAWN_KINDS = Object.freeze({
   worker: 'siphoner', grunt: 'fang', lancer: 'spitter', brute: 'constrictor',
   spiker: 'hisser', howler: 'boomslang',
   dart: null, mender: null, shade: null, conduit: null, skiff: null, barge: null, seer: null,
-  // Toaster Wars air units (tier 3)
+  // GHT air units (tier 3)
   croutonKite: 'crouton-kite', waffleWing: 'waffle-wing', crumpetBomber: 'crumpet-bomber',
-  // Toaster Wars structures
+  // GHT structures
   coolingRack: 'cooling-rack',
 });
 const HEIGHT = {
@@ -25,11 +25,11 @@ const SPRITES = Object.freeze({
   constrictor: '../assets/sprites/snakenators/constrictor.png',
   hisser: '../assets/sprites/snakenators/hisser.png',
   boomslang: '../assets/sprites/snakenators/boomslang.png',
-  // Toaster Wars air units with shadows to read as airborne
+  // GHT air units with shadows to read as airborne
   'crouton-kite': '../assets/generated/toaster-air-scout.png',
   'waffle-wing': '../assets/generated/toaster-air-fighter.png',
   'crumpet-bomber': '../assets/generated/toaster-air-bomber.png',
-  // Toaster Wars building
+  // GHT building
   'cooling-rack': '../assets/generated/toaster-cooling-rack.png',
 });
 export function spriteFor(kind) {

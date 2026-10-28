@@ -33,7 +33,7 @@ result runs `location.reload()` (play/app.mjs:405), which keeps the same query. 
 the same map and the same game. Nobody can play a different game without typing a new URL. This is the biggest
 single gap for the rematch goal, and it is caught by rows 3 and 4 above.
 
-## TOP 5 changes (ranked by how much they improve how Driftfall plays)
+## TOP 5 changes (ranked by how much they improve how GHT plays)
 
 **1. A rematch is a new game, with a reason to play again.**
 - What: the result screen gets two buttons. "Rematch" keeps the seed. "New seed" picks the next seed from a short list

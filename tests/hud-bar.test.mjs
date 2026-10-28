@@ -42,7 +42,7 @@ test('Power chip reads "used of made" with a visible caption, and goes red only 
   assert.match(short, /2 load\(s\) went dark/);
 });
 
-test('Toaster Wars shows Upkeep and a Toasties N/40 chip with the unit cap', () => {
+test('GHT shows Upkeep and a Toasties N/40 chip with the unit cap', () => {
   const s = fresh();
   const side0 = s.units.filter((u) => u.owner === 0).length;
   const html = renderBar(s, { side: 0 });

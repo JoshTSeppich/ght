@@ -1,14 +1,14 @@
-// Card 8 item 4: a match result plays one stinger. A Toaster Wars win has the synth jingle only; every other result
-// (Toaster Wars loss, any non-Toaster win or loss) has exactly one sample stinger. Draws play nothing.
+// Card 8 item 4: a match result plays one stinger. A GHT win has the synth jingle only; every other result
+// (GHT loss, any non-Toaster win or loss) has exactly one sample stinger. Draws play nothing.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { resultStingers } from '../play/toaster-sounds.mjs';
 
-test('a Toaster Wars win plays the synth jingle and no sample stinger', () => {
+test('a GHT win plays the synth jingle and no sample stinger', () => {
   assert.deepEqual(resultStingers({ winner: 0 }, 0, true), { synth: 'jingle', sample: null });
 });
 
-test('a Toaster Wars loss plays the sample defeat stinger and no jingle', () => {
+test('a GHT loss plays the sample defeat stinger and no jingle', () => {
   assert.deepEqual(resultStingers({ winner: 1 }, 0, true), { synth: null, sample: 'defeat' });
 });
 

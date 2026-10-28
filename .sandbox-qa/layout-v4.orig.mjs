@@ -1,10 +1,10 @@
-// Driftfall v4 map (128 x 128, 21 Reaches), owned by sonnet (TERRITORY.md section 2).
+// GHT v4 map (128 x 128, 21 Reaches), owned by sonnet (TERRITORY.md section 2).
 // Hand-drawn at the Reach level: ten Reaches are listed for side 0, the point mirror (x, y) -> (127 - x, 127 - y)
 // makes side 1, and the neutral Centre sits on the mirror point. The seed only scatters rocks and rubble inside
 // Reaches (see scatterV4); the drawn base has none.
 //
 // This file is pure (no fs, no clock) so env/map.mjs can import it in node and in the browser.
-// `node maps/build-v4.mjs` prints the map and writes maps/driftfall-v4.json.
+// `node maps/build-v4.mjs` prints the map and writes maps/ght-v4.json.
 //
 // Legend: # rock  . floor  = ramp east-west  | ramp north-south  S shard (400)  R rich shard (800)  L Flux vent
 //         o rubble (scatter only)
@@ -158,10 +158,10 @@ export function drawV4() {
 
 const DIGITS = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/';
 
-/** Compact JSON form (what maps/driftfall-v4.json holds): char rows for tiles, heights and ids. */
+/** Compact JSON form (what maps/ght-v4.json holds): char rows for tiles, heights and ids. */
 export function encodeV4(base) {
   return {
-    format: 'driftfall-map', version: 4, width: W, height: H,
+    format: 'ght-map', version: 4, width: W, height: H,
     legend: { '#': 'rock', '.': 'floor', '=': 'ramp east-west', '|': 'ramp north-south', S: 'shard 400', R: 'rich shard 800', L: 'vent 600', o: 'rubble 200 hp' },
     ids: 'reachIds: one base-64 digit per tile; 0 none, 1..21 Reach id, 32 + n = gate n',
     tiles: base.tiles.map((r) => r.join('')),

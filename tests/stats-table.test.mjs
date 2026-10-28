@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { STATS, UNIT_KINDS, STRUCTURE_KINDS, valueOf, sideValue, ECONOMY } from '../env/stats.mjs';
 
 const UNIT_FIELDS = ['cost', 'hp', 'damage', 'range', 'speed', 'trainTicks'];
-// Costs come from the ECONOMY table (re-priced for Toaster Wars); the other columns are spec section 5.
+// Costs come from the ECONOMY table (re-priced for GHT); the other columns are spec section 5.
 const SPEC_UNITS = {
   worker: { cost: ECONOMY.units.worker.wheat, hp: 120, // M2 Combat Scale (DECISIONS.md 1): 3x hp, 40 -> 120
  damage: 2, range: 1, speed: 1, trainTicks: 20 },
@@ -21,10 +21,10 @@ const SPEC_STRUCTURES = {
 
 const isPosNum = (v) => typeof v === 'number' && Number.isFinite(v) && v > 0;
 
-// The four spec units keep their classic numbers; the Toaster-Wars roster adds Broiler, Flak Popper and Bagel
+// The four spec units keep their classic numbers; the GHT roster adds Broiler, Flak Popper and Bagel
 // (howler, spiker, dart), the kitchen (mill, well, toaster), and the Air Layer (DECISIONS.md 3): Crouton Kite,
 // Waffle Wing, Crumpet Bomber and the Cooling Rack. tests/toaster-roster.test.mjs covers those.
-test('unit kinds list is the four spec units plus the three Toaster-Wars kinds', () => {
+test('unit kinds list is the four spec units plus the three GHT kinds', () => {
   assert.deepEqual(
     [...UNIT_KINDS].sort(),
     [...Object.keys(SPEC_UNITS), 'dart', 'howler', 'spiker', 'croutonKite', 'waffleWing', 'crumpetBomber'].sort(),

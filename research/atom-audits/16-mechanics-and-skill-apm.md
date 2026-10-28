@@ -14,13 +14,13 @@ env/combat.mjs, env/items.mjs (Recall), env/economy.mjs (Drills, Siphons, Tracks
 territory match (env/sim-territory.mjs) is not called by the page. So macro features that live only in territory
 mode (Reaches, upkeep, the Trading House) are not on Joshua's screen yet.
 
-Verdict key: HAVE = Driftfall already does an equivalent, on the live page. PARTIAL = some of it exists, or it exists
-in code and tests but is not on the live page. MISSING = not there. NOT FOR US = deliberately not in Driftfall, with
+Verdict key: HAVE = GHT already does an equivalent, on the live page. PARTIAL = some of it exists, or it exists
+in code and tests but is not on the live page. MISSING = not there. NOT FOR US = deliberately not in GHT, with
 the reason.
 
 ## Verdict table
 
-| # | Atom (section 16) | Verdict | Driftfall today (evidence) |
+| # | Atom (section 16) | Verdict | GHT today (evidence) |
 |---|---|---|---|
 | 16.1 | APM as a measure of mechanical speed (pros 250–400+) | NOT FOR US | Speed of hands is not the goal. NORTHSTAR asks for "a stranger ... understands everything without help" and a one-click start, and Joshua asked for "intuitive at every level" (TERRITORY s13). A 400-APM ceiling works against both. We do not count actions anywhere (no APM counter in env/log.mjs or play/). If we want it for playtests, that is a measurement, not a game rule. |
 | 16.2 | Macro: constant production (keep every building busy) | PARTIAL | Each building queues up to 5 (`queueMax: 5`, env/stats.mjs:99); `queueTrain` picks the shortest queue (play/input.mjs:295); a full queue says "Queue is full" (input.mjs:302). Nothing repeats a train on its own, so an idle Core is the player's mistake, and the page never says so (see 16.6). |
@@ -37,7 +37,7 @@ the reason.
 | 16.13 | Build-order execution timing to the second | MISSING | The sim runs on ticks at 24 tps and the clock is on the top bar (play/app.mjs:632), but the page shows no build timer, no "time since this started" and no target timings from TERRITORY s7. A player cannot see whether they are on time. |
 | 16.14 | Mechanical difficulty as a deliberate skill ceiling | NOT FOR US | Raw click difficulty would fight NORTHSTAR's "one click to start" and the Council's rule for a readable game (FANATICS.md). We put the skill ceiling in decisions instead: Drift timing (TERRITORY s4), claim and hold of Reaches, and when to spend. Those already exist as design; see 16.3 and 16.5. |
 
-## TOP 5 changes (ranked by how much they improve how Driftfall plays)
+## TOP 5 changes (ranked by how much they improve how GHT plays)
 
 **1. Wire the alert stack and the idle-Worker key onto the live page.**
 - What: in play/app.mjs, use `createAlerts` (play/teach.mjs) for the alert line, so Space jumps to the newest alert

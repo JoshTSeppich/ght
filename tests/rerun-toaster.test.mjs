@@ -1,4 +1,4 @@
-// Replays (Match Rules, card 1.5): rerun() reads the log's rules and rebuilds a Toaster Wars state, so a territory
+// Replays (Match Rules, card 1.5): rerun() reads the log's rules and rebuilds a GHT state, so a territory
 // log replays to the same events and the same result. Old logs with no `rules` are recognised by their opening state.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -29,7 +29,7 @@ test('a referee territory match writes its rules into the log and rerun reproduc
   // validateLog already objects to the territory event names (claimed, hold-gained); the rules field adds nothing to that.
   assert.deepEqual(validateLog(log).filter((p) => !/unknown event kind/.test(p)), [], 'the extra field keeps the log valid');
   const again = rerun(log);
-  assert.ok(again.state.territory, 'rebuilt as a Toaster Wars state');
+  assert.ok(again.state.territory, 'rebuilt as a GHT state');
   assert.ok(again.state.power && again.state.ammo, 'with cords and ammo, like the match');
   compareToLog(log, again);
 });
@@ -56,7 +56,7 @@ test('an old territory log with no rules is recognised by its opening state', ()
   assert.equal(log.rules, undefined, 'the saved room log predates the rules field');
   const head = { ...log, ticks: log.ticks.slice(0, 50), result: null };
   const again = rerun(head);
-  assert.ok(again.state.territory, 'rebuilt as Toaster Wars from log.initial (power and kitchen)');
+  assert.ok(again.state.territory, 'rebuilt as GHT from log.initial (power and kitchen)');
   assert.equal(again.ticks.length, 50);
 });
 

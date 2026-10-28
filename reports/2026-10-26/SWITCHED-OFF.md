@@ -6,7 +6,7 @@ calls them. Nothing has been deleted. Each line needs Joshua's choice: **wire** 
 ## Panels and systems
 
 - **Research card** (play/research-card.mjs, its test): no page imports it, and app.mjs has no research code. /play has no research
-  (play/toaster-play.mjs switchOffDriftfall). Choice: wire it on ?classic=1 (hud) or delete it with its test.
+  (play/toaster-play.mjs switchOffGht). Choice: wire it on ?classic=1 (hud) or delete it with its test.
 - **Alert history** (createAlerts in play/teach.mjs, keeps the last 8): no page calls it. Card 8.2 (hud) already wires it to Space.
   Choice: keep if the HUD card lands, otherwise delete.
 - **First-minutes coach** (createCoach in play/teach.mjs): no page calls it. Choice: wire it into /play (hud, text from ux-writer)

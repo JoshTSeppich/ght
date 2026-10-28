@@ -1,4 +1,4 @@
-# Driftfall test plan and quality bar
+# GHT test plan and quality bar
 
 Owner: QA Lead (fable). Only this file. Plain English. Every claim below was checked by running it; the time of the
 last run is in section 3. If a line here and the code disagree, say so in the chat and one of them gets fixed.

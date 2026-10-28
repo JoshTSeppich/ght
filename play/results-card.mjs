@@ -1,4 +1,4 @@
-// The end of a Toaster Wars match (PLAYABLE.md item 11): the numbers for the results card, the card itself, a small
+// The end of a GHT match (PLAYABLE.md item 11): the numbers for the results card, the card itself, a small
 // Menu (Resume / Surrender / Restart) and the last-match recording the "Watch replay" button plays. Owner: sonnet.
 // The tracker and the html are pure; only mountMatchMenu and saveLastMatch touch the DOM / sessionStorage.
 

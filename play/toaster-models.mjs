@@ -21,7 +21,7 @@ export const COLORS = Object.freeze({
 export const GEO_TRIS = Object.freeze({ box: 12, plane: 2, tyre: 20, prism: 20 });
 export const TOASTER_KINDS = Object.freeze(['crumb', 'popper', 'zapper', 'four-slice', 'broiler', 'flak-popper', 'bagel']);
 
-// Sim kind -> toaster. The old Driftfall names stay mapped; roster names and any unknown kind fall back to the Popper so no
+// Sim kind -> toaster. The old GHT names stay mapped; roster names and any unknown kind fall back to the Popper so no
 // unit is ever invisible. (toaster-spec.mjs toasterOf does the same for exact ids.)
 const KIND_TO_TOASTER = Object.freeze({
   worker: 'crumb', grunt: 'popper', lancer: 'zapper', brute: 'four-slice', dart: 'bagel', howler: 'broiler',

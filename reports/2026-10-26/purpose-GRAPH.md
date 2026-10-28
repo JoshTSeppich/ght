@@ -1,4 +1,4 @@
-# Purpose graph: Toaster Wars on /play (2026-10-26, read-only)
+# Purpose graph: GHT on /play (2026-10-26, read-only)
 
 Slice: THE WHOLE GRAPH. Read: env/stats.mjs, env/bakery.mjs, env/power.mjs, env/energy.mjs, env/ammo.mjs, env/tiers.mjs, env/combat.mjs, env/economy.mjs, env/sim-territory.mjs, env/territory.mjs, play/toaster-play.mjs, play/input.mjs, play/station-controls.mjs, play/app.mjs. Numbers below are from a node run on `createPlayableState(1)` (the /play match) and `rowOf()`, not from the docs.
 
@@ -6,9 +6,9 @@ Tier reports: purpose-T1.md, T2.md and T3.md landed while I was writing. Their m
 
 ## 0. What /play is (verified in code)
 
-- `createPlayableState` = `createTerritoryMatch` + energy + fences + wrap, then `switchOffDriftfall` (play/toaster-play.mjs:42-50).
+- `createPlayableState` = `createTerritoryMatch` + energy + fences + wrap, then `switchOffGht` (play/toaster-play.mjs:42-50).
 - ON: budget (upkeep 5%/min), power (cords), ammo (toast), bakery (mill/well/toaster), chain (drills etc. in the sim), fences, energy, territory rules.
-- OFF: research (`delete state.research`), Drift, market, Driftfall tiers (`noTiers`).
+- OFF: research (`delete state.research`), Drift, market, GHT tiers (`noTiers`).
 - Kitchen tiers are the only tiers (env/stats.mjs:251-255, env/tiers.mjs kitchenLockReason).
 - Start: 100 Wheat each side, 6 Crumbs each side, Power Strip 2400 hp, start stack 8 slices. Wheat tiles hold 1800 each.
 - Cords are the leash: every plugged fighter must stay within its cord of one of its side's points (power.mjs stepVerdict, enforceCords). Crumb cord 12, Popper 12, Zapper 12, Four-Slice 9.
@@ -113,7 +113,7 @@ Nothing feeds them on /play (data only):
 - Drill, Siphon, Track, Depot, Press, Trading House: the economy chain is on, but no card button (the card lists `STATS.structures` only, input.mjs:177). Reachable only by a scripted command (UNVERIFIED which path).
 - Totem, Mound, claims, Tunnels (env/effects.mjs doTunnel): no card button, `state.claims = []`.
 - Sockets (Wheatfield generator sockets): parsed in env/map.mjs:115-138, drawn in play/toaster-buildings.mjs and minimap-kitchen.mjs, read by no rule in env/.
-- Driftfall-only unlocks: mender, shade, mast, seer, conduit, skiff, barge (`STATS.tiers`, env/stats.mjs:235-243). Foundry, Sanctum and Hangar are not in `STATS.structures`.
+- GHT-only unlocks: mender, shade, mast, seer, conduit, skiff, barge (`STATS.tiers`, env/stats.mjs:235-243). Foundry, Sanctum and Hangar are not in `STATS.structures`.
 - Air: no flying unit exists in the Toaster roster. Air upgrades (6 rows), Stormglass's "air units" use, and the Flak Popper's "anti-air" text have no target. The Bagel is listed as a flyer in `env/fence.mjs:27`, which is wrong (section 11).
 
 Card buttons that do nothing (play/input.mjs:457-470, `soon(...)`): Roll (Bagel), Shove (Four-Slice), Target (Heat Lamp), Pilot (Strip), Unplug (stations). They show "Coming" and have no command.
@@ -206,7 +206,7 @@ Ranked smallest first. Each names the file and the owner from reports/2026-10-26
 9. env/ammo.mjs:50: lower the Four-Slice volley cost from 4 slices, so it stops burning 192 slices a minute. One number. Owner: Balance toolsmith (the number), Power and Bakery Engineer (the file).
 10. env/stats.mjs:46-86, play/toaster-play.mjs:49, env/combat.mjs:118: keep research on /play with Ground Weapons 1 priced in Wheat (flux 0) and read its +1 damage in combat, so the 33 upgrades have a first buyer. Owner: Tech Tree Engineer (card 3) and Combat Systems Engineer (card 2). Three lines, so it is the largest of the ten.
 
-Next, not in the ten (each bigger or a Joshua call): the 6 Air upgrade rows (env/stats.mjs:50-51, Tech Tree); the Driftfall-only unlock names (env/stats.mjs:235-243) and RULE_STRUCTURES entries /play never places (env/stats.mjs:474-481, Tech Tree and Construction); the tier-3 gate checking that a Windmill is lit, not only placed (env/tiers.mjs, Tech Tree); the neutral camps and their 9 items (env/neutrals.mjs is imported by nothing; no card covers camps; Joshua to name an owner); the Wheatfield sockets (env/map.mjs:115-138; Power and Bakery, or delete); the drill/depot/press/house buttons (Construction Engineer).
+Next, not in the ten (each bigger or a Joshua call): the 6 Air upgrade rows (env/stats.mjs:50-51, Tech Tree); the GHT-only unlock names (env/stats.mjs:235-243) and RULE_STRUCTURES entries /play never places (env/stats.mjs:474-481, Tech Tree and Construction); the tier-3 gate checking that a Windmill is lit, not only placed (env/tiers.mjs, Tech Tree); the neutral camps and their 9 items (env/neutrals.mjs is imported by nothing; no card covers camps; Joshua to name an owner); the Wheatfield sockets (env/map.mjs:115-138; Power and Bakery, or delete); the drill/depot/press/house buttons (Construction Engineer).
 
 ## 10. Not verified
 

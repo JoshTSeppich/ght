@@ -1,4 +1,4 @@
-// Driftfall built-in opponent for live play (CLASSIC.md). One self-contained file: it uses only the player API
+// GHT built-in opponent for live play (CLASSIC.md). One self-contained file: it uses only the player API
 // (ENV-SPEC §10), no imports, no clock, no randomness, so it also runs in the browser and replays exactly.
 //
 //   createPlayer({ side, seed, stats, difficulty: 'easy' | 'normal' })   // difficulty defaults to 'normal'

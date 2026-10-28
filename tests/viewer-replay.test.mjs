@@ -61,7 +61,7 @@ const promised = (s) => ({
 // A small match log written by hand in the section 12 format. Tick numbers are the tick each entry produces.
 function makeLog() {
   return {
-    format: 'driftfall-log',
+    format: 'ght-log',
     version: 1,
     seed: 7,
     players: ['alpha', 'beta'],

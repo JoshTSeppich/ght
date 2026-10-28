@@ -1,10 +1,10 @@
-// Driftfall 3D audio (owner: haiku). Positional sound effects from assets/audio/MANIFEST.json, one ambient loop,
+// GHT 3D audio (owner: haiku). Positional sound effects from assets/audio/MANIFEST.json, one ambient loop,
 // master volume and mute. Sounds are picked from the events of each world frame; nothing here changes game state.
 // If a file is missing or will not decode, a small synthesized stand-in is used, so the match is never silent by error.
 // The pure helpers are what tests/viewer3d-audio.test.mjs covers; createAudio is the Three.js part.
 import { STRUCTURE_KINDS, kindStats } from "../env/stats.mjs";
 
-const MUTE_KEY = "driftfall.muted";
+const MUTE_KEY = "ght.muted";
 // Used only when MANIFEST.json cannot be read, so every event still has a sound kind.
 const FALLBACK_EVENTS = {
   melee_hit: { kind: "impact" },
@@ -266,7 +266,7 @@ export function createAudio(ctx, opts = {}) {
   const unlockEvents = ["pointerdown", "keydown"];
   if (typeof window !== "undefined") unlockEvents.forEach((ev) => window.addEventListener(ev, unlock));
 
-  loadAll().catch((err) => console.warn("driftfall audio: could not load sounds", err));
+  loadAll().catch((err) => console.warn("ght audio: could not load sounds", err));
 
   function pickVoice() {
     const v = voices.find((x) => !x.sound.isPlaying);

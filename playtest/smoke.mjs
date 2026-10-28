@@ -1,8 +1,8 @@
-// Playwright-free smoke for Toaster Wars (PLAYABLE.md item 32). Owner: haiku (QA playtester).
+// Playwright-free smoke for GHT (PLAYABLE.md item 32). Owner: haiku (QA playtester).
 // Run: node playtest/smoke.mjs   (exit 0 = green, 1 = red; prints one line per check)
 // What it does, headless in node, with no browser and no DOM:
 //   1. boots the play modules (play/app.mjs, play/toaster-play.mjs) and checks the page title and the ?classic switch;
-//   2. builds the default Toaster Wars match (createToasterState, the same state the page uses) and drives it with the
+//   2. builds the default GHT match (createToasterState, the same state the page uses) and drives it with the
 //      easy bot (players/toaster-easy) on the human side idle, for 2 minutes of match time (2880 ticks at 24 tps);
 //   3. every 10 seconds it runs the play-side helpers the HUD uses (top bar, side panel, observeToaster) and fails on throw;
 //   4. fails on any console.error / console.warn, any unhandled rejection, any referee error, or a reject of the human's side.
@@ -35,8 +35,8 @@ process.on('unhandledRejection', (err) => consoleProblems.push(`unhandled reject
 
 // 1. Boot -------------------------------------------------------------------------------------------------------------
 log(typeof app.createLiveWorld === 'function' && typeof app.startGame === 'function', 'play/app.mjs imports in node');
-log(PAGE_TITLE === 'TOASTER WARS', 'page title is TOASTER WARS');
-log(toasterMode(new URLSearchParams('')) === true, 'default page is Toaster Wars');
+log(PAGE_TITLE === 'GHOSTIES, TOASTIES & BROSKIES', 'page title is GHOSTIES, TOASTIES & BROSKIES');
+log(toasterMode(new URLSearchParams('')) === true, 'default page is GHT');
 log(toasterMode(new URLSearchParams('classic=1')) === false, '?classic=1 keeps the old page');
 
 // 2. Match ------------------------------------------------------------------------------------------------------------

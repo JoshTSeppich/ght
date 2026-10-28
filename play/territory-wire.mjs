@@ -64,9 +64,9 @@ export function drawPowerOverlay(ov, state, side, selection, project, tick, { co
     ov.beginPath(); ov.moveTo(a.sx, a.sy); ov.lineTo(b.sx, b.sy); ov.stroke();
   }
   ov.setLineDash(faint ? [2, 6] : [4, 4]);
-  ov.strokeStyle = faint ? 'rgba(202,211,205,0.28)' : 'rgba(255,214,102,0.9)'; // faint (Toaster Wars): the neutral Reach border value
+  ov.strokeStyle = faint ? 'rgba(202,211,205,0.28)' : 'rgba(255,214,102,0.9)'; // faint (GHT): the neutral Reach border value
   ov.lineWidth = faint ? 1 : 1.5;
-  for (const r of faint && !cords ? [] : v.rings) { poly(r.vertices); ov.stroke(); } // Toaster Wars: only on inspect (Tab)
+  for (const r of faint && !cords ? [] : v.rings) { poly(r.vertices); ov.stroke(); } // GHT: only on inspect (Tab)
   ov.setLineDash([]);
   for (const s of v.sparks) {
     const p = project(s.x, s.y);

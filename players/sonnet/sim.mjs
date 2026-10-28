@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Team sonnet's match simulator and tuning harness.
 //
-// Runs REAL Driftfall matches (env/sim.mjs, env/state.mjs observe(), the same rules as the referee) with both
+// Runs REAL GHT matches (env/sim.mjs, env/state.mjs observe(), the same rules as the referee) with both
 // players in this process, so a 2000-tick match takes tens of milliseconds instead of the referee's worker-thread
 // round trip. Matches fan out over a pool of worker threads. Nothing here changes the rules: if you doubt the
 // harness, run `--check-referee` and it replays seeds through env/referee.mjs and compares results.
@@ -17,7 +17,7 @@
 //   bot            players/sonnet/bot.mjs            sample    players/sample-player.mjs
 //   <path>         any player module                 snap:NAME a frozen copy made with --snapshot NAME
 //   git:REV        players/sonnet at git revision REV (bot.mjs entry), e.g. git:HEAD~2
-// Frozen copies live in node_modules/.cache/driftfall-sim/ (git-ignored). Each gets a symlink to the repo's env/.
+// Frozen copies live in node_modules/.cache/ght-sim/ (git-ignored). Each gets a symlink to the repo's env/.
 //
 // Tuning knobs: --a-params '{"k":1}' / --b-params, or --sweep key=v1,v2,... (repeatable, cartesian product).
 // The bot receives them as createPlayer({ side, seed, stats, params }); a bot that wants to be tunable just reads
@@ -54,7 +54,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..');
 const SELF = fileURLToPath(import.meta.url);
-const CACHE = path.join(ROOT, 'node_modules', '.cache', 'driftfall-sim');
+const CACHE = path.join(ROOT, 'node_modules', '.cache', 'ght-sim');
 const RESULTS = path.join(HERE, 'results.json');
 
 const load = (rel) => import(pathToFileURL(path.join(ROOT, rel)).href);
@@ -251,7 +251,7 @@ export async function playMatch(task) {
   m.forfeit = forfeit;
   m.finalUnits = [0, 1].map((s) => state.units.filter((u) => u.owner === s).length);
   const out = { result, stats: m };
-  if (log) out.log = { format: 'driftfall-log', version: 1, seed: task.seed, initial, ticks: log.ticks, result };
+  if (log) out.log = { format: 'ght-log', version: 1, seed: task.seed, initial, ticks: log.ticks, result };
   return out;
 }
 
@@ -487,7 +487,7 @@ function gitRev() {
 }
 
 function saveResult(entry) {
-  let data = { format: 'driftfall-sonnet-results', version: 1, experiments: [] };
+  let data = { format: 'ght-sonnet-results', version: 1, experiments: [] };
   try {
     data = JSON.parse(fs.readFileSync(RESULTS, 'utf8'));
   } catch {

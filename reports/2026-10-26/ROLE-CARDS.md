@@ -1,6 +1,6 @@
-# Role cards — Toaster Wars fix waves (2026-10-26)
+# Role cards — GHT fix waves (2026-10-26)
 
-Source: the Claude doc "Toaster Wars — What's Missing (verified)", tab "Role cards". Evidence for every item is in reports/2026-10-26/verify-*.md and web-*.md.
+Source: the Claude doc "GHT — What's Missing (verified)", tab "Role cards". Evidence for every item is in reports/2026-10-26/verify-*.md and web-*.md.
 
 Standing rules for every builder: own only the files your card lists; tests first; never loosen, skip or delete a test; no git commit/push/checkout, no rm, no npm install; one plain command per Bash call (no && ; | chaining). Chat is in the repo root: `node read.mjs --since N` to read, `node say.mjs <haiku|sonnet> "text"` to post (under 700 chars). Post PLAN when you start, REVIEW? with files changed, then DONE (or BLOCKED) in plain words of what Joshua sees on /play. Shared files go in order: play/input.mjs (Controls, then HUD), play/app.mjs (Controls, then Match Flow), env/commands.mjs (Economy, then Construction, then the Controls rally order), play/teach.mjs (UX Writer, then HUD). If a file on that list is mid-edit by an earlier owner (check chat), touch only your own lines and say so in REVIEW?. The Mac's disk is tight: write no large files.
 
@@ -10,7 +10,7 @@ Mission: every match ends by a rule the player understands, and most end before 
 2. Timeout tie-break (env/referee.mjs:202, sideValue in env/stats.mjs:540): add a per-side "damage dealt to enemy buildings" counter (coordinate with Combat, which increments it) and use it before the Wheat bank; equal counters make a true draw.
 3. Territory win (env/territory.mjs:7): read the map's own target (winCountFor in maps/layout-sizes.mjs) instead of a fixed 14.
 4. Default length (env/stats.mjs:97): 2,000 ticks to 21,600; fix every test that leans on 2,000 (grep maxTicks).
-5. Replays (env/live.mjs:136): rerun() reads the log's rules and rebuilds a Toaster Wars state.
+5. Replays (env/live.mjs:136): rerun() reads the log's rules and rebuilds a GHT state.
 Tests first: tests/stalemate.test.mjs, tests/timeout-tiebreak.test.mjs, tests/territory-wincount.test.mjs, tests/rerun-toaster.test.mjs.
 Owns: env/sim.mjs, env/referee.mjs, env/territory.mjs, env/live.mjs, the match block of env/stats.mjs.
 Done when: in a 40-match bot league fewer than 4 end on the timer, and rerun() reproduces matches/room/latest.json exactly.
@@ -29,7 +29,7 @@ Done when: the new tests and the full suite pass.
 
 ## 3. Tech Tree Engineer — Haiku A now
 Mission: the tree the player sees is the tree the simulation enforces.
-1. env/sim-territory.mjs:199-207: under `noTiers`, check the Toaster Wars tiers (toasterTiers, env/stats.mjs:251-255) with a sim-side copy of kitchenLockReason (play/input.mjs:195). Refuse with `needs-toaster` or `needs-power`.
+1. env/sim-territory.mjs:199-207: under `noTiers`, check the GHT tiers (toasterTiers, env/stats.mjs:251-255) with a sim-side copy of kitchenLockReason (play/input.mjs:195). Refuse with `needs-toaster` or `needs-power`.
 2. Same check for place-power of a Relay Pylon (env/sim-territory.mjs:196).
 Tests first: tests/tier-sim-enforce.test.mjs (Four-Slice with no Windmill or Dam is refused; a Pylon with no Toaster is refused; bots still pass tests/bots*).
 Owns: tier checks in env/sim-territory.mjs, env/tiers.mjs.
@@ -56,7 +56,7 @@ Tests first: tests/bots-all-units.test.mjs (every unit kind appears over 10 seed
 
 ## 7. Controls Engineer — 2 Haiku (A: keys and camera, B: selection and orders)
 Mission: every key does what the card and SYSTEMS-DESIGN.md say, in both key profiles, and no browser shortcut leaks.
-A1. play/app.mjs:257 passes the Toaster Wars rows (rowOf) to createInput, so Hold and attack-move use real ranges (play/input.mjs:598, 626, 655).
+A1. play/app.mjs:257 passes the GHT rows (rowOf) to createInput, so Hold and attack-move use real ranges (play/input.mjs:598, 626, 655).
 A2. Saved cameras: wire cameraKeyAction and createCameraMarks (play/camera.mjs:80-104): F5-F8 recall, Ctrl+F5-F8 save, preventDefault so F5 never reloads; sandbox cheats move to Shift+F5-F8 (play/app.mjs:517).
 A3. Tab: move "inspect power" (play/app.mjs:526) to another key; Tab cycles unit types (play/input.mjs:499-510).
 A4. P: Patrol must be reachable on the classic profile (play/app.mjs:507); Pause moves to the F10 menu or only fires with nothing selected.
@@ -79,7 +79,7 @@ Owns: play/hud*.mjs, play/toaster-sounds.mjs, alerts in play/teach.mjs.
 
 ## 9. UX Writer — 1 Haiku
 1. Tooltips read rowOf, not STATS.units: Popper 20 damage, reach 4, 3.75 Wheat a minute (play/hud-tips.mjs:25, 40-44); check every unit.
-2. Upkeep reads the Toaster Wars 5% (play/hud-tips.mjs:25).
+2. Upkeep reads the GHT 5% (play/hud-tips.mjs:25).
 3. "One slice per three shots" (env/stats.mjs:438 text only, play/hud-tips.mjs:47).
 4. Flak Popper line without "flies" (play/hud-tips.mjs:51).
 5. Keys come from the active profile through a helper keyFor(action) reading HOTKEY_PROFILES: fence, Windmill, Dam, Extension Box, attack-move, idle key (play/hud-tips.mjs:58, play/hud-bar.mjs:69, play/tutorial.mjs:10-11, play/teach.mjs:53, 96, 99).
@@ -104,12 +104,12 @@ Tests first: tests/ghost-matches-sim.test.mjs, tests/cancel-build.test.mjs, test
 ## 12. Power and Bakery Engineer — 1 Haiku
 1. Mill Dam price: card and pre-check equal the charge (play/station-controls.mjs:11, env/power.mjs:209-211); one number in one table.
 2. One reach rule for cords and fences (env/power.mjs POWER.range and STATION links).
-3. Toast runs walk at the Toaster Wars Crumb speed (env/ammo.mjs:259 uses rowOf).
+3. Toast runs walk at the GHT Crumb speed (env/ammo.mjs:259 uses rowOf).
 4. Four-Slice ammo shows volleys, not slices (env/ammo.mjs:362 observeAmmo).
 Tests first: tests/station-price.test.mjs, tests/power-one-reach.test.mjs, tests/toast-run-speed.test.mjs, tests/four-slice-ammo.test.mjs.
 
 ## 13. Docs and Cleanup Engineer — 1 Haiku
-1. scripts/tech-tree-doc.mjs reads the Toaster Wars tiers (env/stats.mjs:251-255) and says /play has no research yet; regenerate TECH-TREE.md; flag only same-card hotkey clashes.
+1. scripts/tech-tree-doc.mjs reads the GHT tiers (env/stats.mjs:251-255) and says /play has no research yet; regenerate TECH-TREE.md; flag only same-card hotkey clashes.
 2. reports/2026-10-26/SWITCHED-OFF.md: one line each for the research card, alert history, first-minutes coach, toast moods (env/toast.mjs) and unused samples: wire (which expert) or delete. Delete nothing yourself.
 3. Stale comments: env/ammo.mjs:47, env/toast.mjs header, play/toaster-play.mjs:5 and 126, PLAYABLE.md:30, TERRITORY.md:51 versus 324-332.
 Tests first: tests/tech-tree-doc.test.mjs fails when TECH-TREE.md names a tier rule /play doesn't use.

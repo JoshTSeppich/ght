@@ -1,6 +1,6 @@
 // Repro for chat #833 (Claude, 04:45): a Well placed next to the home spring showed a green ghost, but Water stayed 0
 // for over 60 s. Test-shaped: each test states what should happen; a red test is a reproduced bug, a green one is not.
-// Real Toaster Wars state (createPlayableState, Wheatfield, seed 7). Read-only: nothing in the repo is edited.
+// Real GHT state (createPlayableState, Wheatfield, seed 7). Read-only: nothing in the repo is edited.
 // Run: node --test reports/2026-10-25/well-water.repro.test.mjs
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

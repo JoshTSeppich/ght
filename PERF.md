@@ -1,4 +1,4 @@
-# Driftfall performance budgets
+# GHT performance budgets
 
 Owner: Performance / Optimization Engineer (haiku). Test: `tests/perf.test.mjs`.
 

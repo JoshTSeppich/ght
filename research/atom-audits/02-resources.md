@@ -2,14 +2,14 @@
 
 Scope: research/STARCRAFT-ATOMS.md section 2 only, against NORTHSTAR.md and TERRITORY.md sections 8, 9, 12.
 Files read (by grep and short excerpts): env/stats.mjs (crystal, economy, resources), env/map.mjs (generateMapV4),
-maps/driftfall-v4.txt (tile counts), env/economy.mjs (gathering, chain, flow), env/state.mjs (observe), env/market.mjs
+maps/ght-v4.txt (tile counts), env/economy.mjs (gathering, chain, flow), env/state.mjs (observe), env/market.mjs
 (header), env/sim-territory.mjs and env/sim.mjs (imports only), env/drift.mjs, play/flow-panel.mjs, play/app.mjs (grep).
 
 Verdict key: HAVE / PARTIAL / MISSING / NOT FOR US, as in audit 01.
 
 ## Verdict table
 
-| # | Atom (section 2, as written) | Verdict | Evidence in Driftfall | Gap |
+| # | Atom (section 2, as written) | Verdict | Evidence in GHT | Gap |
 |---|---|---|---|---|
 | 2a | Two resources: a common one and a rarer one | HAVE (and more) | Shards and Flux (`env/stats.mjs` `STATS.resources`), plus Alloy and five rare resources (TERRITORY §12) | The rare five and the Trading House are specified; only Shards/Flux/Alloy run in the sim today |
 | 2b | Common resource from many small patches clustered at a base (about 8) | PARTIAL | `crystals` are single tiles with 400 each (`STATS.crystal`); the v4 map has 96 `S` and 40 `R` tiles in total, about 6 to 8 per base cluster | Nothing in the HUD or the base layout tells a new player "this cluster is your base's income"; no saturation rule (see 2k) |

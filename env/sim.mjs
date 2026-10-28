@@ -1,4 +1,4 @@
-// Driftfall simulation loop (ENV-SPEC.md §8 and §9).
+// GHT simulation loop (ENV-SPEC.md §8 and §9).
 //
 //   createMatch(seed)            -> fresh state at tick 0
 //   step(state, [cmds0, cmds1])  -> the tick's events (state is mutated in place)
@@ -132,7 +132,7 @@ function scoredEnd(state, reason, value, tick) {
 /** Stalemate rule: 120 s with no structure damage, no unit kill and no new structure (income does not count) warns; 60 s later the match ends. */
 export const STALEMATE = Object.freeze({ quietTicks: 24 * 120, countdownTicks: 24 * 60 });
 
-// On for Toaster Wars (territory) matches; state.stalemateRule true or false overrides either way.
+// On for GHT (territory) matches; state.stalemateRule true or false overrides either way.
 const stalemateOn = (state) => (state.stalemateRule === undefined ? !!state.territory : state.stalemateRule === true);
 
 /**

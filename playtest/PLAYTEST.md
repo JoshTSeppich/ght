@@ -1,7 +1,7 @@
-# Ghosties, Hosties, and Toasties playtest checklist (PLAYABLE.md item 32)
+# Ghosties, Toasties & Broskies playtest checklist (PLAYABLE.md item 32)
 
 Owner: haiku (QA playtester). Use this on http://localhost:4477/preview/rts/play/index.html (the default page is
-Toaster Wars; add `?classic=1` only to check the old page). Run it in a real browser with screenshots, then file every
+GHT; add `?classic=1` only to check the old page). Run it in a real browser with screenshots, then file every
 failure in the team chat as: **what I did, what I expected, what happened, screenshot path**.
 
 ## 0. Headless smoke first (no browser needed)
@@ -15,7 +15,7 @@ human command, or a referee error. Exit 0 means green. Run it before the browser
 
 ## 1. Start a match
 
-- [ ] The page loads with the title **TOASTER WARS**, no red errors in the console.
+- [ ] The page loads with the title **GHT**, no red errors in the console.
 - [ ] The top bar shows Wheat, Flour, Water, Toast, Power and Upkeep per minute; hover shows the income rate.
 - [ ] The camera opens on your base (the Power Strip), not on the enemy.
 - [ ] There is no Drift banner, no market or goods panel, no tier readout and no Supply readout in the default match.

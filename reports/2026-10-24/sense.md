@@ -1,4 +1,4 @@
-# reporter-sense: does Toaster Wars make sense? (2026-10-24)
+# reporter-sense: does GHT make sense? (2026-10-24)
 
 **Verdict: the bread chain, costs and upkeep work as written in the sim, and the passive wheat is an intended auto-gather (not a sim bug), but the game does not yet make sense end to end: wheat floods with nothing to spend on, a passive player can WIN a 15:00 timeout on hoarded wheat (against the classic builtin bot; the real page opponent was not run), the cord leash broke in one scripted setup, bots are told the match is 2000 ticks, and the screen explains very little.**
 
@@ -19,7 +19,7 @@ Honest scope: I ran the real modules (`createPlayableState`, `step`, `createLive
 | 7 | **Windmills and Dams need a Crumb to walk to a fixed pad; nothing on screen tells a stranger this.** The build command is `place-power`, and `build` with `kind: windmill` is rejected `wrong-kind`. | `env/power.mjs:190-205` (`doPlaceCord`: `too-far` if distance > 1, `not-a-site`). | `windmill paid 40`, `energy {"made":5,"used":0,"shed":0}` after walking a Crumb to pad (30,224). `REJECT ... "reason":"wrong-kind"` when sent as `build`. | S | fable/gpt (onboarding) | VERIFIED |
 | 8 | **Hunger resupply looked instant** (0.1 s), so a stranger may never see "Hungry". I did not find out why. | `env/ammo.mjs` stepAmmo run/lifeline path, not read. | Emptied Popper: `state hungry canFire false canMove true`; `resupplied after ticks 3 (0.1 s) state fed slices 6`. | S | sonnet | VERIFIED symptom; cause UNVERIFIED |
 | 9 | **Claude's "Well gave no water" (chat #833) did not reproduce.** | n/a | My Well at the home spring (18,230): `well: 17 events, first at 14.8 s, gaps(s) 12.0`; pantry water reached 6. If it fails on the page, the ghost and the bakery disagree about a different tile. | S | haiku (add the test #833 asked for) | VERIFIED sim works; page failure UNVERIFIED |
-| 10 | **Supply is hidden in Toaster Wars; the 40-unit cap is invisible.** | `play/hud-bar.mjs:98-103`: Supply chip only when the budget is off; Toaster Wars has a budget so it shows Upkeep instead. | HUD text `Wheat 2130 Flour 0 Water 0 Toast 8 Power 0/2 Upkeep 0/min 2:00`, no Supply. `ECONOMY.md`: "40 units is the hard limit". | S | sonnet | VERIFIED (code + HUD run) |
+| 10 | **Supply is hidden in GHT; the 40-unit cap is invisible.** | `play/hud-bar.mjs:98-103`: Supply chip only when the budget is off; GHT has a budget so it shows Upkeep instead. | HUD text `Wheat 2130 Flour 0 Water 0 Toast 8 Power 0/2 Upkeep 0/min 2:00`, no Supply. `ECONOMY.md`: "40 units is the hard limit". | S | sonnet | VERIFIED (code + HUD run) |
 | 11 | **Match end for a passive player is a 15:00 timeout nobody warns about.** Result text is "Time ran out; the stronger side wins." | `play/app.mjs:813`. | `ended ... "reason":"timeout","tick":21600` = 15.00 min both variants. | S | sonnet | VERIFIED (builtin bot) |
 | 12 | **Not done:** a scripted minimal-build full match; the real page opponent (toaster-easy) idle match; reading `hud-tips.mjs`, `research/COPY.md`, `play/teach.mjs`, `play/tutorial.mjs` for explanations; reading TERRITORY 16-20, COMBAT, ENV-SPEC, POWER-NETWORK, FANATICS in full. | Ran out of turns. | n/a | M | haiku | UNVERIFIED |
 
@@ -50,7 +50,7 @@ All VERIFIED by running the real play state (`createPlayableState`, seed 7, side
 | Toast | Ammo stack at the Strip. Hungry fighters cannot fire. | Hover: "Toast is ammo". Blinks at 0. |
 | Power `used/made` | Energy used by Toasters and fences / made by Strip, Windmills, Dams. | Hover explains; the chip shows no unit and no label for used vs made. Reads `0/2` all game until you build. |
 | Upkeep `N/min` | Wheat the army eats per minute. | Hover only; red when above income. |
-| Supply | Unit count / 40 cap. | Hidden in Toaster Wars (`hud-bar.mjs:98-103`). A stranger hits the cap with no warning. |
+| Supply | Unit count / 40 cap. | Hidden in GHT (`hud-bar.mjs:98-103`). A stranger hits the cap with no warning. |
 | Blinking missing-ingredient | Flour or Water chip pulsing at 0. | Only the chip blinks; no icon over the Toaster was checked (`hud-badges.mjs` not read: UNVERIFIED). |
 | Pilot light chip | Strip bakes 1 slice per 20 s while the stack is under 4. | Hover text exists and is good; the term "Pilot light" is never defined on screen otherwise. |
 

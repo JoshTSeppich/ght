@@ -1,7 +1,7 @@
 # StarCraft, atomically: every attribute of the classic and its sequel
 
-Research reference for Driftfall (Joshua, 22 Oct, 19:32). One idea per line. These are the *mechanics and qualities*
-that make the games what they are; Driftfall translates the lessons and never copies names, units, art or numbers.
+Research reference for GHT (Joshua, 22 Oct, 19:32). One idea per line. These are the *mechanics and qualities*
+that make the games what they are; GHT translates the lessons and never copies names, units, art or numbers.
 "BW" = the 1998 classic with its expansion; "SC2" = the sequel. Unmarked lines apply to both.
 
 ## 1. The core loop

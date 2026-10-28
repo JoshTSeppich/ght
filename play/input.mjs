@@ -1,4 +1,4 @@
-// Driftfall Classic: input -> commands (owner: sonnet, Playable Client).
+// GHT Classic: input -> commands (owner: sonnet, Playable Client).
 // Pure module: no DOM, no three.js, no clock. The page (play/app.mjs) feeds it clicks, boxes and keys in tile and
 // screen terms; it keeps the selection, control groups, modes and per-unit order plans, and each tick returns the
 // list of sim commands for this side (tick(state) -> commands).
@@ -49,7 +49,7 @@ export function gameTakesKey(k, { mod = false, cardKeys = [] } = {}) {
   return k === ' ' || k === 'Escape' || k === 'Tab' || cardKeys.includes(k.toLowerCase());
 }
 const RESERVED_KEYS = new Set(['a', 's', 'h', 'm', 'r', 'p', 'q', MUTE_KEY]);
-// The Driftfall pages (no key profile) keep today's letters on the universal row; Toaster Wars passes its profile table.
+// The GHT pages (no key profile) keep today's letters on the universal row; GHT passes its profile table.
 const LEGACY_KEYS = Object.freeze({ move: 'm', stop: 's', hold: 'h', patrol: 'p', amove: 'a', rally: 'r', lineRally: 'r' });
 const ROW1 = Object.freeze([['move', 'Move', 'move'], ['stop', 'Stop', 'stop'], ['hold', 'Hold', 'hold'], ['patrol', 'Patrol', 'patrol'], ['amove', 'Attack', 'amove']]);
 
@@ -176,11 +176,11 @@ export function placeCheck(state, stats, side, kind, x, y, ctx = null) {
 // The input controller
 // ---------------------------------------------------------------------------------------------------------------
 
-// rowOf(state, kind) gives the row a unit's range is read from (Toaster Wars: env/stats.mjs rowOf); without it, the STATS table.
+// rowOf(state, kind) gives the row a unit's range is read from (GHT: env/stats.mjs rowOf); without it, the STATS table.
 export function createInput({ side = 0, stats, hotkeys = null, grid = null, stations = false, placeContext = null, rowOf = null }) {
   const trainable = (s) => stats.structures[s.kind]?.trains ?? (s.kind === 'core' ? stats.core?.trains : null) ?? [];
   const buildKinds = Object.keys(stats.structures).filter((k) => stats.structures[k].cost !== undefined && k !== 'core');
-  // hotkeys: a { slot: key } profile table (Toaster Wars: grid or classic, play/toaster-play.mjs), else the first free letter.
+  // hotkeys: a { slot: key } profile table (GHT: grid or classic, play/toaster-play.mjs), else the first free letter.
   // grid: the same table's grid letters, which give each button its cell on the 5 x 3 card (the printed key may differ).
   const withTable = (keys) => { for (const k of Object.keys(keys)) if (hotkeys?.[k]) keys[k] = hotkeys[k]; return keys; };
   const buildKeys = withTable(assignHotkeys(buildKinds));
@@ -197,7 +197,7 @@ export function createInput({ side = 0, stats, hotkeys = null, grid = null, stat
     side,
     selection: [],                    // ids, in the order selected
     groups: {},                       // '1'..'9' -> [ids]
-    stationSel: [],                   // ids of the selected Power Stations (Toaster Wars)
+    stationSel: [],                   // ids of the selected Power Stations (GHT)
     mode: null,                       // null | { type: 'amove' | 'move' | 'rally' } | { type: 'place', kind }
     lastGroupKey: null, lastGroupAt: -Infinity,
     lastClickId: null, lastClickAt: -Infinity,
@@ -211,10 +211,10 @@ export function createInput({ side = 0, stats, hotkeys = null, grid = null, stat
     rally: new Map(),                 // structure id -> { type: 'move' | 'gather', x, y }
     known: null,                      // unit ids seen so far (for rally)
     outbox: [],                       // one-shot commands (train, build) sent on the next tick
-    firsts: { slice: false, power: false }, // Toaster Wars: the one-time kitchen toasts have fired
+    firsts: { slice: false, power: false }, // GHT: the one-time kitchen toasts have fired
   };
 
-  /** Toaster Wars only: why a card entry is locked for this side right now (the tier, then the Wheat), or null when open. */
+  /** GHT only: why a card entry is locked for this side right now (the tier, then the Wheat), or null when open. */
   function lockReason(state, entry) {
     if (!stations) return null;
     if (researchIdOf(entry.action)) return entry.reason ?? null; // research-card.mjs already judged the tier, the Wheat and the Flour
@@ -480,7 +480,7 @@ export function createInput({ side = 0, stats, hotkeys = null, grid = null, stat
         if (units.some((u) => u.kind === 'brute')) card.push(soon('shove', 'Shove', 'Four-Slice shove: no command yet'));
       }
     } else if (structs.length) {
-      // Toaster Wars shows one kind of building at a time, so one key never names two things.
+      // GHT shows one kind of building at a time, so one key never names two things.
       const same = stations ? structs.filter((s) => s.kind === structs[0].kind) : structs;
       const kinds = [...new Set(same.flatMap((s) => (s.complete ? trainable(s) : [])))];
       const keys = keyForKind(kinds);
@@ -497,7 +497,7 @@ export function createInput({ side = 0, stats, hotkeys = null, grid = null, stat
     } else if (stations && ui.stationSel.length) { // a Power Station pair (Box or Pylon): fence on/off, unplug
       card.push(btn('fence', { label: 'Fence', action: 'fence' }), soon('unplug', 'Unplug', 'unplug a station: no command yet'));
     }
-    // Toaster Wars: a locked entry stays on the card with its key; `locked` greys it and `reason` is its tooltip line.
+    // GHT: a locked entry stays on the card with its key; `locked` greys it and `reason` is its tooltip line.
     if (!stations) return card;
     return card.map((e) => {
       const reason = e.coming ?? lockReason(state, e);

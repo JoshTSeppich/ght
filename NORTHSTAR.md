@@ -1,4 +1,4 @@
-# GHOSTIES, HOSTIES, AND TOASTIES (Joshua, 20:42; formerly Toaster Wars): the game in one breath
+# GHT — GHOSTIES, TOASTIES & BROSKIES (Joshua, 20:42; formerly Toaster Wars): the game in one breath
 > "I'm making it Toaster Wars. They have to get the resources to make bread so their warriors don't go into battle
 > hungry. It's like StarCraft, but instead you have to collect wheat and make it into flour, and then water and
 > electricity, and the toasters can't go farther than their electrical cord."
@@ -9,7 +9,7 @@
    from a power source. Your reach on the map = your power network (TERRITORY.md section 20).
 3. **Control the land that powers and feeds you**: the river, the wheat, the generators, the outlets.
 
-# NORTH STAR: Ghosties, Hosties, and Toasties v0.1 (repo: driftfall), live and fun (Joshua, 19:21)
+# NORTH STAR: Ghosties, Toasties & Broskies v0.1 (repo: ght), live and fun (Joshua, 19:21)
 
 **Goal: a stranger opens one link, plays a full Toastinators-vs-Toastinators match against the built-in AI, understands
 everything without help, laughs at the art, and wants a rematch.** Every task you take must move that closer. If it
@@ -18,7 +18,7 @@ doesn't, don't do it; say so in the chat.
 ## Done means all of this is true on Joshua's screen (not just in tests)
 1. **It plays.** One page, one click to start. Edge-scroll, box-select, right-click smart commands, hotkey grid,
    control groups, minimap. The camera opens on your base. You can't lose before 3:00 to the default AI.
-2. **It's Driftfall.** Bigger maps (128/192/256, Large 192 default for watch mode), neutral camps that guard every
+2. **It's GHT.** Bigger maps (128/192/256, Large 192 default for watch mode), neutral camps that guard every
    Reach and drop items, ranked recurring troops with Recall and 2 item slots (TERRITORY.md section 14). The 128×128 map with 21 Reaches; claiming and holding them gates tier 2 and tier 3; the Drift
    (Bloom, Dry-out, Flood, Quake, Squall, The Fall) is announced 30 s ahead; mining grows from hand-carrying to
    Drills, Track lines and the Press; army upkeep with no supply cap and visible debt; the Trading House with

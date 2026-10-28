@@ -7,7 +7,7 @@ Nothing was run; verdicts come from reading. Verdict key: HAVE / PARTIAL / MISSI
 
 ## Verdict table
 
-| # | Atom (section 21, as written) | Verdict | Evidence in Driftfall | Gap |
+| # | Atom (section 21, as written) | Verdict | Evidence in GHT | Gap |
 |---|---|---|---|---|
 | 21a | Opening (0-4 min): builds, scouting, early pressure | PARTIAL | Built-in AI follows a build order (Workers, Forge, expansion; `ai.mjs` cfg) and a first wave from tick 2400 (1:40). TERRITORY section 5 puts tier 2 at 3:30-4:30; Bloom at 3:00 | Nothing protects the opening: bots kill the built-in Core in 14-33 s (FANATICS #1). Scouting has no reason to exist yet because fog is not hiding anything (FANATICS #4). No on-screen "what you should be doing now" |
 | 21b | Early-mid: first expansions, tier 2 tech, first attacks | PARTIAL | Claims gated by neutral camps (TERRITORY 14), tier 2 needs Hold >= 3 (`env/tiers.mjs`), AI `holdPlan` [2400,2],[4000,3] | All of it is territory-only, and the default page is not a territory match. On the default page there is no expansion pressure and no tier gate |
@@ -20,7 +20,7 @@ Nothing was run; verdicts come from reading. Verdict key: HAVE / PARTIAL / MISSI
 
 Counts across 8 rows: HAVE 1 (21f), PARTIAL 6 (21a, 21b, 21c, 21d, 21e, 21h), MISSING 1 (21g). Of the six section lines themselves: 5 PARTIAL, 1 HAVE. NOT FOR US: only "max supply" inside 21d, replaced by upkeep.
 
-## TOP 5 changes, ranked by how much they improve how Driftfall plays
+## TOP 5 changes, ranked by how much they improve how GHT plays
 
 1. **Make the opening survivable, so the phases actually happen** (same root as FANATICS #1).
    - What: a Core that cannot fall before about 3:00 (extra Core hp or damage reduction that fades, plus an attack cooldown so a 4-unit push is not a 1.5 s kill). Raise or remove the 2000-tick stats cap for territory runs.

@@ -1,4 +1,4 @@
-// Toaster Wars pacing (sonnet). A bot that plays the toaster rules must be able to reach the enemy Power Strip through
+// GHT pacing (sonnet). A bot that plays the toaster rules must be able to reach the enemy Power Strip through
 // Extension Boxes, and a whole match between two such bots must not end before 3:00. Short runs only; the 10-seed
 // length sweep is .sandbox/sonnet-pace/inproc.mjs (numbers in TERRITORY-PACING.md).
 import test from 'node:test';

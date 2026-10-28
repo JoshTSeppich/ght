@@ -1,4 +1,4 @@
-# Fresh art review: Toaster Wars play page (2026-10-25)
+# Fresh art review: GHT play page (2026-10-25)
 
 Reviewer: fresh eyes. I looked at the five screenshots in rooms/graphics/shots/latest/ first, then the law (STYLE-BIBLE.md, ART-DIRECTION.md, RENDERING.md), then the code.
 Tags: VERIFIED = seen in a named screenshot and region, or file:line. UNVERIFIED = my guess.

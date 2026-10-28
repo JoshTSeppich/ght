@@ -1,11 +1,11 @@
-# Driftfall v0.1: the production plan
+# GHT v0.1: the production plan
 
 Owner: sonnet (production lead). Written 2026-10-22. Plain English. Gate owners edit their own rows by posting in the chat; I update this file.
-Driftfall is ORIGINAL: our names, numbers and art only. Sources: TERRITORY.md (sections 13 and 10), CLASSIC.md, TEST-PLAN.md, MILESTONES.md, PERF.md, SECURITY.md.
+GHT is ORIGINAL: our names, numbers and art only. Sources: TERRITORY.md (sections 13 and 10), CLASSIC.md, TEST-PLAN.md, MILESTONES.md, PERF.md, SECURITY.md.
 
 ## 1. What v0.1 is
 A person opens one web page and plays a 12-16 minute match **against the built-in AI**, as the Snakenators in a **Snakenators mirror** (the Burrow stays parked, its numbers kept in the tables).
-- **One map**, 128x128, cut into Reaches (maps/driftfall-v4).
+- **One map**, 128x128, cut into Reaches (maps/ght-v4).
 - **Territory**: claim a Reach with a Totem, hold it, tiers unlock by Holds (TERRITORY s3, s5).
 - **The Drift**: announced events (Flood, Squall, Quake, Dry-out, The Fall) change the map (s4).
 - **Mining chain**: hand mining, then Drills, Tracks, Depots, Presses (s8).

@@ -1,4 +1,4 @@
-# Fresh systems review: do Toaster Wars' rules form a game? (2026-10-25)
+# Fresh systems review: do GHT' rules form a game? (2026-10-25)
 
 Reviewer: fresh RTS systems designer, no prior context. Everything below is VERIFIED (I ran it; output quoted; probe scripts are in reports/2026-10-25/, named `systems-*.mjs`) or marked UNVERIFIED. Nothing in the repo was edited. The harness is reports/2026-10-25/lib.mjs, used as is (the real page match: `createLiveMatch`, `createPlayableState`, `toaster-easy`, fake timers).
 

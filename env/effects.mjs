@@ -1,4 +1,4 @@
-// Driftfall — Drift effects that touch the world (Flood) and Burrow Tunnels (TERRITORY.md sections 4 and 6).
+// GHT — Drift effects that touch the world (Flood) and Burrow Tunnels (TERRITORY.md sections 4 and 6).
 // Owner: sonnet. Called from sim-territory.mjs; pure and deterministic, nothing runs unless the rules are on.
 //
 // Flood: the Reach's tiles join state.rockSet for 60 s (so movement, building and pathing already treat them as

@@ -43,17 +43,17 @@ Method: WebFetch where the page loaded. Many Liquipedia pages returned HTTP 403 
 - **Stalemate: three minutes with no income, no production and no destroyed structures ends the game in a draw:** PARTLY. Search excerpts (not fetched) say this has applied since patch 1.2.0 (2011), with a countdown shown to players. Liquipedia Stalemate Detection returned 404 and Blizzard pages 403 for other lookups. Ask for the primary page before relying on it.
 - **Warcraft III upkeep bands 0-50 food = 100%, 51-80 = 70%, 81+ = 40%:** PARTLY. Search excerpts from warcraft.wiki.gg and classic.battle.net (not fetched) match. Those bands are the TFT version. The excerpt says Reign of Chaos used 0-40 / 41-70 / 71+ (the report's bands are off by ten). Quote "High Upkeep is MEANT to be very punishing": UNVERIFIED.
 
-## Associations (web fact to Toaster Wars code)
+## Associations (web fact to GHT code)
 
-1. **Stalemate vs. the code's endings.** verify-D-endings.md says the code has no stalemate or draw rule. It ends on a Core kill, or on the 15:00 timeout scored by board value with a bank tie-break. The SC2 rule fires only when nobody has income. Toaster Wars keeps income running (Mills draw from the bank every 20 s, Crumbs keep mining), so the report's "stalemate after 2 min" in F2 would almost never fire. It needs a different trigger, such as no Strip damage for N minutes.
+1. **Stalemate vs. the code's endings.** verify-D-endings.md says the code has no stalemate or draw rule. It ends on a Core kill, or on the 15:00 timeout scored by board value with a bank tie-break. The SC2 rule fires only when nobody has income. GHT keeps income running (Mills draw from the bank every 20 s, Crumbs keep mining), so the report's "stalemate after 2 min" in F2 would almost never fire. It needs a different trigger, such as no Strip damage for N minutes.
 2. **Mining cap vs. Crumbs per tile.** The SC2 3-per-patch diminishing return (40/40/20) is the fix the report wants (E2 "6 per tile"). verify-C-economy.md (M4, A3) confirms the code has no per-tile cap and idle Crumbs all pile onto one tile. The SC2 curve is the model for a cap with diminishing returns, not a hard cap of 6.
-3. **Dec 2014 cut and finite fields.** Blizzard cut resources to 70% to force expansion. verify-C (M1, #2) shows the Toaster Wars home field (8 tiles, 14,400 Wheat) lasts about 86 min at six Crumbs, so nothing pushes the player out inside a match. A 70% style cut on home tiles is the lever. Note the coincidence: Toaster Wars' 1,800 per tile (env/map.mjs:12) is the same number SC2 cut to 1,600 on 22 June 2026. It is not a sourced value.
-4. **Upkeep.** The report's WC3 bands are a gold tax. verify-C (#8) shows Toaster Wars upkeep is a flat 5% on /play, and the in-game tip reads 10%. A banded tax would be a new design, not a copy of the code. Keep this in mind when the report's target is "30-45% of two-base income".
+3. **Dec 2014 cut and finite fields.** Blizzard cut resources to 70% to force expansion. verify-C (M1, #2) shows the GHT home field (8 tiles, 14,400 Wheat) lasts about 86 min at six Crumbs, so nothing pushes the player out inside a match. A 70% style cut on home tiles is the lever. Note the coincidence: GHT' 1,800 per tile (env/map.mjs:12) is the same number SC2 cut to 1,600 on 22 June 2026. It is not a sourced value.
+4. **Upkeep.** The report's WC3 bands are a gold tax. verify-C (#8) shows GHT upkeep is a flat 5% on /play, and the in-game tip reads 10%. A banded tax would be a new design, not a copy of the code. Keep this in mind when the report's target is "30-45% of two-base income".
 
 ## Summary of corrections for the report
 
 1. Add Patch 5.0.16 hotfix: geysers were cut to 2,000 on 30 June 2026 (Liquipedia 5.0.16 page). Add starting workers 12 to 8.
 2. Replace the David Kim 45-55% / Talking Balance quotes. The 2010 Blizzard article gives 55:45 and 60:40 with +/-5%.
 3. Upkeep bands are TFT; RoC was 0-40 / 41-70 / 71+.
-4. Stalemate detection: keep the 3-minute no-income rule as stated, with the caveat that Toaster Wars income never stops.
+4. Stalemate detection: keep the 3-minute no-income rule as stated, with the caveat that GHT income never stops.
 5. Mark UNVERIFIED: Marine 6/45 stats, Stimpack and Combat Shield SC2 costs/times, Concussive, Metabolic, Blink, Charge, the 5.0.13 cut, the Browder "minimum" quote, the 114 gas/min geyser rate.

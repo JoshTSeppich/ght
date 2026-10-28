@@ -1,6 +1,6 @@
 # Atom Experts (Joshua, 19:33): one expert per section of research/STARCRAFT-ATOMS.md
 
-Each expert owns exactly one section as their scope. Job: audit Driftfall (NORTHSTAR.md, TERRITORY.md, CLASSIC.md, the code in env/ and play/) against every line of that section, translated into Driftfall's original design, and write the gaps to research/atom-audits/NN-slug.md. The Fanatic Council chair folds the findings into the Council Top 10. Principles only; nothing copied.
+Each expert owns exactly one section as their scope. Job: audit GHT (NORTHSTAR.md, TERRITORY.md, CLASSIC.md, the code in env/ and play/) against every line of that section, translated into GHT's original design, and write the gaps to research/atom-audits/NN-slug.md. The Fanatic Council chair folds the findings into the Council Top 10. Principles only; nothing copied.
 
 | # | Expert | Scope (section) | Model |
 |---|---|---|---|

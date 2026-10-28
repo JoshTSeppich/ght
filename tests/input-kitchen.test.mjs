@@ -1,4 +1,4 @@
-// Toaster Wars input: a click on a locked button refuses with its reason; the first slice and the first power each toast once.
+// GHT input: a click on a locked button refuses with its reason; the first slice and the first power each toast once.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { STATS } from '../env/stats.mjs';

@@ -1,4 +1,4 @@
-# Driftfall art guide (v1)
+# GHT art guide (v1)
 
 Owner: fable (Art Director). This is the look everyone builds to, in the 2D viewer (`viewer/art.mjs`) and in the
 3D scene (`viewer3d/`). If your piece doesn't match this guide, change the piece or ask here to change the guide.
@@ -7,9 +7,9 @@ which writes `.sandbox/art-sheet.png`.
 
 ## 1. The world in three lines
 
-Driftfall is a dark basalt plateau at dusk where glowing **Shard** crystals have fallen out of the sky in long
+GHT is a dark basalt plateau at dusk where glowing **Shard** crystals have fallen out of the sky in long
 diagonal streaks (the "fall"). Two salvage fleets fight over them with cheap, angular, hand-welded machines.
-Everything is original to Driftfall: no names, shapes, colours or sounds from StarCraft or any other game.
+Everything is original to GHT: no names, shapes, colours or sounds from StarCraft or any other game.
 
 ## 2. Palette
 

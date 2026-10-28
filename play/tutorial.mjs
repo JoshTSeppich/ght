@@ -21,7 +21,7 @@ export const TUTORIAL_STEPS = tutorialSteps('grid');
 const KITCHEN = Object.freeze(['mill', 'well', 'toaster']);
 const MAX_CORE_HP = STATS.toaster?.coreHp ?? STATS.core.hp;
 
-/** The one-line objective under the top bar, always on screen in Toaster Wars. */
+/** The one-line objective under the top bar, always on screen in GHT. */
 export const OBJECTIVE = 'Feed your Toasties. Destroy the enemy Power Strip.';
 
 /** ?tutorial=0 turns the guide off; anything else (or no parameter) leaves it on. */

@@ -1,4 +1,4 @@
-// Driftfall — wiring of the territory rules into the sim (TERRITORY.md section 11). Owner: sonnet.
+// GHT — wiring of the territory rules into the sim (TERRITORY.md section 11). Owner: sonnet.
 //
 // Everything here is OFF unless the state carries the rule objects (state.territory, state.budget, state.drift).
 // createMatch() makes none of them, so the default game is unchanged; createTerritoryMatch() makes all three.
@@ -82,7 +82,7 @@ export function createTerritoryMatch(seed, opts = {}) {
   return state;
 }
 
-// Toaster Wars (Joshua, 09:27): toast is ammo in EVERY territory match. Fed / hungry / unpowered apply to every fighter
+// GHT (Joshua, 09:27): toast is ammo in EVERY territory match. Fed / hungry / unpowered apply to every fighter
 // (env/ammo.mjs), the Strip stores the toast, and the Mill -> Well -> Toaster kitchen makes it (env/bakery.mjs).
 // opts.hunger === false turns it all off (a few old tests want the bare rules). The Power Strip gets its toaster hp.
 export function enableHunger(state, waterKeys = null) {
@@ -191,7 +191,7 @@ function doLayTrack(state, player, c) {
   return reason === 'chain-off' ? 'bad-command' : reason;
 }
 
-// Toaster Wars (noTiers): the Kitchen tier of a kind, checked here so a scripted client cannot skip what the card greys out.
+// GHT (noTiers): the Kitchen tier of a kind, checked here so a scripted client cannot skip what the card greys out.
 const kitchenReason = (state, player, kind) => (state.noTiers ? kitchenRefuseReason(state, player, kind) : null);
 
 /** Take the rule commands (claim) out of one side's list and apply them. Returns the rest for commands.mjs. */

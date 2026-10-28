@@ -1,4 +1,4 @@
-// PLAYABLE.md item 28: the minimap marks for Toaster Wars (play/minimap-kitchen.mjs). Node-only, no DOM.
+// PLAYABLE.md item 28: the minimap marks for GHT (play/minimap-kitchen.mjs). Node-only, no DOM.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { generateMap } from '../env/map.mjs';
@@ -65,7 +65,7 @@ test('enemy damage does not ping your minimap', () => {
   assert.equal(pings.update(b, 0, 2).length, 0);
 });
 
-test('drawKitchenMinimap draws pads, the dam, the network and pings on a real Toaster Wars state', () => {
+test('drawKitchenMinimap draws pads, the dam, the network and pings on a real GHT state', () => {
   const state = createToasterState(3);
   const snap = observeToaster(state, 0);
   const ctx = stubCtx();

@@ -1,4 +1,4 @@
-// PLAYABLE.md items 3, 4, 27 on the real Toaster Wars match: auto-gather, rally flags, double-click, control groups.
+// PLAYABLE.md items 3, 4, 27 on the real GHT match: auto-gather, rally flags, double-click, control groups.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { step } from '../env/sim.mjs';

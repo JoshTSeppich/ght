@@ -43,9 +43,9 @@ Current Zerg row values from fetched Blizzard notes:
 - Protoss Shields (SNIPPET): L1 150/150, L2 200/200, L3 250/250, times 121.6/144.6/167.9 s. Matches report. A patch-history snippet says earlier values were 150/225/300 and later cut to 150/200/250. Verdict: PARTLY.
 
 ## Association (web fact to code and report)
-- Blizzard re-tuned Zerg Carapace costs twice in two patches: cut at 5.0.16, reverted at 5.0.17. This is a concrete instance of the report's "small changes, 45-55% balance" advice and of its own caveat that Liquipedia lags patches. Any Toaster Wars number copied from a patch table should carry a patch tag.
-- The Terran cut (-25 minerals at L2, -50 at L3) and the Armory gas cut (100 to 50) are the same kind of change: cheaper upgrades in exchange for faster access to the high-tier fights. That matches HIVE item 1 (/play has no research at all), so none of these SC2 costs change Toaster Wars until research is wired in.
-- The report's Toaster Wars "Hot Coils 100+10 Flour, 150+20, 200+30" rests on invented stats (HIVE item 6). The SC2 real figures for Terran/Protoss/Zerg upgrades are nearly all 100-250 per level. Pattern holds; the specific Toaster Wars values remain unsupported.
+- Blizzard re-tuned Zerg Carapace costs twice in two patches: cut at 5.0.16, reverted at 5.0.17. This is a concrete instance of the report's "small changes, 45-55% balance" advice and of its own caveat that Liquipedia lags patches. Any GHT number copied from a patch table should carry a patch tag.
+- The Terran cut (-25 minerals at L2, -50 at L3) and the Armory gas cut (100 to 50) are the same kind of change: cheaper upgrades in exchange for faster access to the high-tier fights. That matches HIVE item 1 (/play has no research at all), so none of these SC2 costs change GHT until research is wired in.
+- The report's GHT "Hot Coils 100+10 Flour, 150+20, 200+30" rests on invented stats (HIVE item 6). The SC2 real figures for Terran/Protoss/Zerg upgrades are nearly all 100-250 per level. Pattern holds; the specific GHT values remain unsupported.
 
 ## Summary counts
 - §1 rows: 26 claims. 0 fully verified on a building page. 3 snippet-level matches (Barracks, Tech Lab, Reactor). 1 PARTLY (Armory gas). Rest UNVERIFIED.

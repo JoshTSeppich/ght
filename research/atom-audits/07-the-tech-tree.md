@@ -7,8 +7,8 @@ env/vision.mjs (filterVisible: enemy pieces only on seen tiles), play/fog.mjs (e
 play/tier-readout.mjs, play/research-card.mjs, play/territory-hud.mjs, play/app.mjs (imports, by grep),
 env/effects.mjs (Tunnels, by grep), env/items.mjs (Shed Skin, by grep).
 
-Verdict key: HAVE = Driftfall already does an equivalent. PARTIAL = some of it exists, or it exists but is off on the
-live page. MISSING = not there. NOT FOR US = deliberately not in Driftfall, with the reason.
+Verdict key: HAVE = GHT already does an equivalent. PARTIAL = some of it exists, or it exists but is off on the
+live page. MISSING = not there. NOT FOR US = deliberately not in GHT, with the reason.
 
 **The key fact for this section:** the live page plays `createMatch` (env/sim.mjs:34), the classic match. Tiers,
 research, the tier readout and the Trading House are only in `createTerritoryMatch` (env/sim-territory.mjs), which the
@@ -18,7 +18,7 @@ below are therefore PARTIAL: the rule exists in code and tests, not on the page.
 
 ## Verdict table
 
-| # | Atom (section 7) | Verdict | Driftfall today (evidence) |
+| # | Atom (section 7) | Verdict | GHT today (evidence) |
 |---|---|---|---|
 | 7.1 | Buildings require other buildings: a dependency tree | PARTIAL | Tier 2 needs Foundry or Sanctum and Hold 3; Tier 3 needs Hangar and Hold 6 (env/stats.mjs:198-212, env/tiers.mjs:22-30). It is one level of building, not a tree. Foundry, Sanctum and Hangar are not in `STATS.structures` (stats.mjs:136-138 has only Forge and Turret), and tiers.mjs:26 drops any need the roster lacks, so today tier 2 is Hold-only and tier 3 is Hold-only. Territory mode only. |
 | 7.2 | Three rough tiers: early, mid, late | PARTIAL | Three tiers are defined (stats.mjs:198-212) with unlock lists and Hold counts. The readout (play/tier-readout.mjs) is not on the live page (app.mjs does not import it). |
@@ -43,7 +43,7 @@ Hold 0 / 3 for Tier 2" and the Brute button is locked until tier 2 opens.
   live match switches to `createTerritoryMatch` or only the gates are copied in; this is a design call for fable.
 
 **2. Build the tech buildings and make the gates bite (7.1).** Add Foundry, Sanctum and Hangar to `STATS.structures`
-with cost, hp and build time (Driftfall's own numbers, from fable's proposal), so the "roster lacks it, so do not block"
+with cost, hp and build time (GHT's own numbers, from fable's proposal), so the "roster lacks it, so do not block"
 rule in env/tiers.mjs:5 and tiers.mjs:26 stops swallowing the gate. Foundry and Sanctum both open tier 2, Hangar opens
 tier 3.
 - Owner: fable (numbers and which building opens what), sonnet (env/stats.mjs rows, env/tiers.mjs).

@@ -9,12 +9,12 @@ import { createPreviewServer } from '../scripts/preview.mjs';
 
 let dir, server, base;
 before(async () => {
-  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'driftfall-prev-'));
+  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ght-prev-'));
   fs.mkdirSync(path.join(dir, 'abcdef0123'));
   fs.writeFileSync(path.join(dir, 'index.html'), '<h1>hi</h1>');
   fs.writeFileSync(path.join(dir, 'abcdef0123', 'a.mjs'), 'export const a = 1;');
   fs.writeFileSync(path.join(dir, 'abcdef0123', 'a.mjs.gz'), zlib.gzipSync('export const a = 1;'));
-  fs.writeFileSync(path.join(dir, '..', 'driftfall-secret.txt'), 'nope');
+  fs.writeFileSync(path.join(dir, '..', 'ght-secret.txt'), 'nope');
   server = createPreviewServer(dir);
   await new Promise((r) => server.listen(0, '127.0.0.1', r));
   base = `http://127.0.0.1:${server.address().port}`;
@@ -39,7 +39,7 @@ test('missing files are 404 and ../ cannot leave dist', async () => {
   assert.equal((await fetch(`${base}/nope.js`)).status, 404);
   const raw = await new Promise((resolve) => {
     import('node:net').then(({ default: net }) => {
-      const s = net.connect(server.address().port, '127.0.0.1', () => s.write('GET /../driftfall-secret.txt HTTP/1.0\r\n\r\n'));
+      const s = net.connect(server.address().port, '127.0.0.1', () => s.write('GET /../ght-secret.txt HTTP/1.0\r\n\r\n'));
       let d = ''; s.on('data', (c) => { d += c; }); s.on('end', () => resolve(d));
     });
   });

@@ -1,4 +1,4 @@
-# Driftfall security review
+# GHT security review
 
 Written by the Security Engineer (team sonnet). Date of review: 2026-10-22. Scope: how players are sandboxed, what
 agents may touch, asset downloads, secrets, and the viewer pages. I did not read any `players/` folder. Findings
@@ -27,7 +27,7 @@ A worker thread shares the process user, the file system, the environment and th
 throwaway worker thread started from this repo directory: it read `ENV-SPEC.md` (18658 bytes), ran `id -un` through
 `child_process` (printed the real user name), listed 54 environment variables and had `fetch` available.
 
-What this means for Driftfall: a player module (they are loaded by file path and run any top-level code at import)
+What this means for GHT: a player module (they are loaded by file path and run any top-level code at import)
 can
 - read the opponent's player source or other repo files and use them (breaks "no reaching outside the API");
 - write to the repo, including `matches/`, `tests/` or another team's files;

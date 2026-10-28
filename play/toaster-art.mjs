@@ -1,7 +1,7 @@
-// Toaster Wars HUD art (owner: sonnet, Playable Client). Portraits and icons for the selection panel and the command card,
+// GHT HUD art (owner: sonnet, Playable Client). Portraits and icons for the selection panel and the command card,
 // built from the same data the 3D toasters use (play/toaster-models.mjs), so the HUD and the map show the same toasters.
 // Pure strings, no DOM and no canvas: each picture is an SVG data URL, made once and cached. play/icons.mjs asks this
-// module for pictures once the page installs it with setArtProvider(toasterArt) (Toaster Wars only; ?classic=1 keeps the old art).
+// module for pictures once the page installs it with setArtProvider(toasterArt) (GHT only; ?classic=1 keeps the old art).
 import { TOASTERS, COLORS, toasterKindOf } from './toaster-models.mjs';
 
 const INK = '#1d1a14';

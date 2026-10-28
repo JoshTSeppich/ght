@@ -1,12 +1,12 @@
-# Hosties — everyone has a guest list
+# Broskies — everyone has a guest list
 GPT art direction · 27 October 2026 · proposal, not simulation rules.
 
 ## Read of the old lab
-In rooms/graphics/shots/faction-lab-joshua.png, the Hosties share cube heads,
+In rooms/graphics/shots/faction-lab-joshua.png, the Broskies share cube heads,
 rectangular jackets and straight rectangular limbs. Tiny handheld planes cannot
 communicate six jobs. Keep the existing Host, Corkshot, Confetti-bomber, Bouncer,
 DJ and Hype-captain identities; replace the repeated anatomy and broaden their company.
-The companion play/hostie-lab.html is the proposed after: three shape studies and
+The companion play/broskie-lab.html is the proposed after: three shape studies and
 four enlarged applications. It does not replace the live fixture or restore model v2.
 
 ## Roster: twelve entries, not twelve kinds of drinking
@@ -57,7 +57,7 @@ fading tile marks and a sparse boundary, with a distinct broken state.
 
 This proposes replacing the earlier roads with the trail, pending Joshua's decision
 noted in FACTIONS.md. It does not silently add both bonuses. Unlike Ghosties,
-Hosties still fight off territory; unlike Toasties, they have no hard tether.
+Broskies still fight off territory; unlike Toasties, they have no hard tether.
 Their advantage rewards preparing a route and regrouping, with counterplay through
 cutting the party's supply and forcing it to move before setup finishes.
 

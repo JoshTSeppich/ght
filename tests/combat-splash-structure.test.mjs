@@ -11,7 +11,7 @@ const stat = (kind) => STATS.units?.[kind] ?? STATS.structures?.[kind] ?? STATS[
 const unit = (id, owner, kind, x, y) => ({ id, owner, kind, x, y, hp: stat(kind).hp, carrying: 0, order: null });
 const structure = (id, owner, kind, x, y) =>
   ({ id, owner, kind, x, y, hp: stat(kind).hp, progress: 0, complete: true, queue: [] });
-// Splash is a Toaster Wars rule (state.ammo on), so the world turns the ammo rules on and the numbers come from rowOf.
+// Splash is a GHT rule (state.ammo on), so the world turns the ammo rules on and the numbers come from rowOf.
 const world = ({ units = [], structures = [] }) => {
   const s = createTestState({ width: 20, height: 20, rocks: [], crystals: [], shards: [0, 0], units, structures });
   enableAmmo(s, {});

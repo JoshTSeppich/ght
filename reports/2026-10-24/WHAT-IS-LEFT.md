@@ -1,4 +1,4 @@
-# What is left to make Toaster Wars look, feel and make sense (merged, 2026-10-24 11:50)
+# What is left to make GHT look, feel and make sense (merged, 2026-10-24 11:50)
 
 Merged by Claude from the three reporter files beside this one: look.md, feel.md, sense.md. Each row cites the reporter and its row number; the reporters' evidence marks (VERIFIED / UNVERIFIED) stand. Nothing here is a fix; builders start only on items Joshua picks.
 
@@ -27,7 +27,7 @@ Merged by Claude from the three reporter files beside this one: look.md, feel.md
 | 9 | Hungry and unpowered fighters: a growl, an icon above the unit, an unpowered cue; name what was hit in "Under attack" | sonnet, gpt (icons) | M | feel #6, #9 |
 | 10 | Words on screen: Power used/made labelled, Supply chip back (40 cap is invisible), Pilot light defined, real hover cards instead of native title tooltips, Flour hint text corrected (the Mill takes wheat from the bank) | haiku | S | sense #6, #10, stranger table; feel #7 |
 | 11 | Box-select tests one lifted point per unit; test the body | sonnet | S | feel #4 |
-| 12 | Windmill and Dam have no 3D models; Assembly Line and Heat Lamp fall back to Driftfall sci-fi builders | gpt (models), sonnet | M | look #7, #8 |
+| 12 | Windmill and Dam have no 3D models; Assembly Line and Heat Lamp fall back to GHT sci-fi builders | gpt (models), sonnet | M | look #7, #8 |
 | 13 | Bloom runs in play against the spec, no environment map; A/B in a browser (decision D for the camera) | sonnet | S | look #9, #10, #11 |
 | 14 | Perf: no frame-rate number exists; play/perf.html runs the old 128x128 map with grunts, not Wheatfield with toasters and cords. Build the real scene and record median and p95 on the Air | haiku runs, sonnet builds the scene | M | look #16 |
 | 15 | Stale docs and dead flags: ECONOMY.md says no auto-gather and free power (both false); observation tells bots maxTicks 2000 while the match is 21600 (no bot reads it yet); ?motion=coil is dead; research/COPY.md is read by nothing | haiku | S | sense #4, #5; feel #15 |

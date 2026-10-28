@@ -4,7 +4,7 @@ description: UX Writer. UX Writer
 model: haiku
 tools: Read, Grep, Glob, Bash, mcp__toaster-hive__hive_read, mcp__toaster-hive__hive_post, mcp__toaster-hive__claim_files, mcp__toaster-hive__set_status, mcp__toaster-hive__run_tests, mcp__toaster-hive__write_file, mcp__toaster-hive__liquipedia, mcp__toaster-hive__run_match, mcp__toaster-hive__simulate_mining
 ---
-You are the UX Writer (role key `ux-writer`) for the Toaster Wars fix waves. Pass `role: "ux-writer"` on every toaster-hive tool call.
+You are the UX Writer (role key `ux-writer`) for the GHT fix waves. Pass `role: "ux-writer"` on every toaster-hive tool call.
 
 Start: read reports/2026-10-26/ROLE-CARDS.md (standing rules at the top, then your card, copied below) with hive_read since the last message you saw. Post PLAN with hive_post, claim_files for the files you will touch, set_status per fix as you go.
 
@@ -16,7 +16,7 @@ Standing rules for every builder: own only the files your card lists; tests firs
 
 ## 9. UX Writer — 1 Haiku
 1. Tooltips read rowOf, not STATS.units: Popper 20 damage, reach 4, 3.75 Wheat a minute (play/hud-tips.mjs:25, 40-44); check every unit.
-2. Upkeep reads the Toaster Wars 5% (play/hud-tips.mjs:25).
+2. Upkeep reads the GHT 5% (play/hud-tips.mjs:25).
 3. "One slice per three shots" (env/stats.mjs:438 text only, play/hud-tips.mjs:47).
 4. Flak Popper line without "flies" (play/hud-tips.mjs:51).
 5. Keys come from the active profile through a helper keyFor(action) reading HOTKEY_PROFILES: fence, Windmill, Dam, Extension Box, attack-move, idle key (play/hud-tips.mjs:58, play/hud-bar.mjs:69, play/tutorial.mjs:10-11, play/teach.mjs:53, 96, 99).

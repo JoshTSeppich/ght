@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Driftfall 3D viewer (owner: fable). Open as viewer3d/index.html?log=../matches/sample-7.json
+<!-- GHT 3D viewer (owner: fable). Open as viewer3d/index.html?log=../matches/sample-7.json
      Also ?playlist=a.json,b.json  ?tv=1 (full-screen auto camera, loops the playlist)  ?speed=2  ?quality=high|medium|low
      ?debug=1 (fps overlay on; press ` to toggle)  ?loop=1  ?mute=1  ?ortho=1 (fixed orthographic view, CLASSIC.md)
      Keys: space play/pause (hud), m mute (hud), v director / r reset view (camera), [ ] speed, , . step one tick,
@@ -8,7 +8,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Driftfall 3D</title>
+<title>GHT 3D</title>
 <script type="importmap">{ "imports": {
   "three": "../node_modules/three/build/three.module.js",
   "three/addons/": "../node_modules/three/examples/jsm/" } }</script>
@@ -29,7 +29,7 @@
 <body>
 <div id="stage"><canvas id="view"></canvas></div>
 <div id="hud"></div>
-<div id="boot"><b>DRIFTFALL</b><br>loading…</div>
+<div id="boot"><b>GHT</b><br>loading…</div>
 <div id="modules"></div>
 <script type="module">
 import * as THREE from 'three';
@@ -74,7 +74,8 @@ async function fetchLog(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
   const log = await res.json();
-  if (log.format !== 'driftfall-log') throw new Error(`${url}: not a driftfall log`);
+  // 'driftfall-log': logs recorded before the GHT rename (env/log.mjs LEGACY_LOG_FORMATS).
+  if (!['ght-log', 'driftfall-log'].includes(log.format)) throw new Error(`${url}: not a GHT match log`);
   return log;
 }
 
@@ -109,7 +110,7 @@ let systems = [];
 let currentWorld = null;
 
 async function loadMatch(url) {
-  boot.hidden = false; boot.classList.remove('error'); boot.innerHTML = `<b>DRIFTFALL</b><br>loading ${url}`;
+  boot.hidden = false; boot.classList.remove('error'); boot.innerHTML = `<b>GHT</b><br>loading ${url}`;
   const log = await fetchLog(url);
   const { width = 32, height = 32 } = log.initial ?? {};
   if (!engine) {
@@ -126,7 +127,7 @@ async function loadMatch(url) {
       try { engine.ctx.assets = (await assetsMod.loadAssets(engine.ctx)) ?? engine.ctx.assets; }
       catch (err) { console.warn('[index] loadAssets failed, using procedural fallbacks', err); }
     }
-    window.driftfall = { engine, ctx: engine.ctx, loaded };
+    window.ght = { engine, ctx: engine.ctx, loaded };
   } else {
     for (const s of systems) engine.remove(s), s.dispose?.();
     systems = [];
@@ -183,7 +184,7 @@ async function loadMatch(url) {
   }
   showModules();
   boot.hidden = true;
-  document.title = `Driftfall 3D — ${(log.players ?? []).join(' vs ')} (seed ${log.seed})`;
+  document.title = `GHT 3D — ${(log.players ?? []).join(' vs ')} (seed ${log.seed})`;
   engine.start();
 }
 
@@ -217,7 +218,7 @@ window.addEventListener('keydown', (e) => {
 function fail(err) {
   console.error(err);
   boot.hidden = false; boot.classList.add('error');
-  boot.innerHTML = `<b>DRIFTFALL</b><br>could not load the match<br><small>${String(err?.message ?? err)}</small>`;
+  boot.innerHTML = `<b>GHT</b><br>could not load the match<br><small>${String(err?.message ?? err)}</small>`;
 }
 
 loadMatch(playlist[index]).then(watchEnd).catch(fail);

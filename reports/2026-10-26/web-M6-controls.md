@@ -44,8 +44,8 @@ Code read: play/input.mjs, play/app.mjs, play/camera.mjs, play/command-card.mjs,
 ## Keys that do two things, and key collisions
 | # | Item | Verdict | Evidence |
 |---|---|---|---|
-| 26 | Tab cycles unit types in a selection | BUG (unreachable) | app.mjs:526: Tab toggles Inspect power and returns before input.key runs. cycleTypes (input.mjs:499-510) never fires in Toaster Wars. Blizzard describes Tab as cycling subgroups; the cycling here is the same idea. |
-| 27 | P is Patrol in the classic profile | BUG | app.mjs:507 handles 'p' as Pause and returns before input.key. The classic profile maps patrol to 'p' (toaster-play.mjs:88) and the Driftfall legacy page does too (input.mjs:32). Patrol is reachable only by clicking the button. Liquipedia: P = Patrol, and P = Pause in the main menu. |
+| 26 | Tab cycles unit types in a selection | BUG (unreachable) | app.mjs:526: Tab toggles Inspect power and returns before input.key runs. cycleTypes (input.mjs:499-510) never fires in GHT. Blizzard describes Tab as cycling subgroups; the cycling here is the same idea. |
+| 27 | P is Patrol in the classic profile | BUG | app.mjs:507 handles 'p' as Pause and returns before input.key. The classic profile maps patrol to 'p' (toaster-play.mjs:88) and the GHT legacy page does too (input.mjs:32). Patrol is reachable only by clicking the button. Liquipedia: P = Patrol, and P = Pause in the main menu. |
 | 28 | Modifiers ignored on letter hotkeys | BUG (by reading) | input.mjs:516-535 and app.mjs:530-533 fire card hotkeys on Ctrl or Cmd+letter. Ctrl+W (grid Stop) would order a Stop and block nothing. Ctrl+T arms attack-move. Ctrl+R (patrol, preventDefault) blocks reload. Browser behaviour not tested here. |
 | 29 | Grid card keys unique within one card | CORRECT | Crumb card keys (toaster-play.mjs:83) are unique. Shared letters across cards (a, s, d, f, r) are by design. |
 | 30 | Power Station keys match on classic | CORRECT | station-controls.mjs:9 (x, v, n, d) matches the classic table (toaster-play.mjs:90). The grid table overrides it (z, x, c, v). |

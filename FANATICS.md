@@ -3,7 +3,7 @@
 > "I want the AIs to face each other, and when playing the game, with the mindset of: INSTANTIATE THEM AS STARCRAFT
 > AND RTS FANATICS AND THEY KNOW WHAT NEEDS TO BE ADDED. Heed their advice."
 
-Four agents, one per team, each a lifelong RTS fanatic, play Driftfall against each other and against the built-in
+Four agents, one per team, each a lifelong RTS fanatic, play GHT against each other and against the built-in
 AI, then write what it needs. The chair merges them into the **Council Top 10**, which goes into NORTHSTAR.md right
 after "keep the build green" and "wire finished work into the live page". The swarm heeds it.
 
@@ -128,7 +128,7 @@ No browser run; `play/` judged from the code and the chat's live-page reports.
 
 Evidence: ran `node env/run-match.mjs` with built-in AI on both sides, seeds **7, 19, 43**, and `--max-ticks 23040`. Logs: `.sandbox/gpt-council-{seed}.json`. These are **normal AI, legacy 32×32 matches**, not the browser's easy setting or territory-enabled matches. Side 1 won all three by Core at ticks 2450/2452/2455 (about 1:42 at 24 tps); first combat was at ticks 409/362/374. Three seeds are a warning, not a balance verdict. Read `play/` source; no browser playtest or frame-rate measurement claimed. Existing input/app/teaching tests passed **24/24 before this documentation edit**.
 
-1. **Make the default match the actual territory game.** Wire the finished bigger map, claims, tiers and both victory conditions into the live driver and page together. Right now the caster sees a small-map army collision before Driftfall's first scheduled event can happen. **Done:** opening the ordinary link shows 128×128 land, 21 named Reaches, claim controls, Hold-gated tiers and a visible territory-win countdown; a full replay reaches a legal territory or Core victory.
+1. **Make the default match the actual territory game.** Wire the finished bigger map, claims, tiers and both victory conditions into the live driver and page together. Right now the caster sees a small-map army collision before GHT's first scheduled event can happen. **Done:** opening the ordinary link shows 128×128 land, 21 named Reaches, claim controls, Hold-gated tiers and a visible territory-win countdown; a full replay reaches a legal territory or Core victory.
 
 2. **Tune one real-time clock for economy, travel and combat.** Audit timings in seconds before adjusting individual unit strength. These mirrors finished before the intended first Bloom; a Core survived only 15 ticks after its first hit in each log. Players need time to scout, respond and retreat. **Done:** default easy cannot defeat an idle newcomer before 3:00; representative active matches usually last 12–16 minutes, with a visible, actionable Core-danger warning. Validate on the shipped map, not just this legacy harness.
 
@@ -148,9 +148,9 @@ Evidence: ran `node env/run-match.mjs` with built-in AI on both sides, seeds **7
 
 10. **Close the match with a reason to rematch.** Show the winning cause, decisive land loss or economy break, and a one-click fresh start. Add the Trading House only with visible quotes, stock and transaction feedback so its strategic purpose is understandable. **Done:** a finished browser match names Core destruction or territory control as the cause, offers a replay/rematch, and lets the player identify a decision to try differently; market trades visibly explain what was paid and received.
 
-## Round 2: Toaster Wars core
+## Round 2: GHT core
 
-Evidence: read NORTHSTAR.md (Toaster Wars core, Done-means list), TERRITORY.md sections 17, 18, 20 and the Toaster
+Evidence: read NORTHSTAR.md (GHT core, Done-means list), TERRITORY.md sections 17, 18, 20 and the Toaster
 rules, COMBAT.md sections 1–4, CLASSIC.md, ENV-SPEC-v3-draft.md and sonnet's `env/power.mjs` plan (#616). Judged on paper;
 no browser run and no code changed. Verdict: the core idea is strong (a visible leash, raids on cords, food you can
 see). Three things will break pacing or readability if they ship as written.

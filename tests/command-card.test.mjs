@@ -1,4 +1,4 @@
-// The Toaster Wars command card: a locked entry stays on its cell with its key, greyed, and says why on hover.
+// The GHT command card: a locked entry stays on its cell with its key, greyed, and says why on hover.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { STATS } from '../env/stats.mjs';

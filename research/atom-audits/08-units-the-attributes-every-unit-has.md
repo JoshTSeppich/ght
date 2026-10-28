@@ -38,10 +38,10 @@ as a v3 draft table, as item/upgrade data, or in vision.mjs, but combat.mjs neve
 | 27 | Hotkey for training | HAVE | command-card.mjs: classic 4x3 grid, hotkey in every tooltip. |
 | 28 | Clear role + counters | PARTIAL | Roles and a counters list are written in the draft (section 5), with a test planned. The player cannot see them: HUD shows only portrait and HP, no role line, no "good against / weak against". |
 
-Also not in the list but worth noting: ranks (3/8/15 kills, +10%) and 2 item slots (TERRITORY section 14) are Driftfall's
+Also not in the list but worth noting: ranks (3/8/15 kills, +10%) and 2 item slots (TERRITORY section 14) are GHT's
 own unit-attribute layer and are DESIGNED, ahead of the original on recurring troops.
 
-## TOP 5 changes (best for how Driftfall plays first)
+## TOP 5 changes (best for how GHT plays first)
 
 ### 1. Make combat read armour, and add a three-value armour class
 - What: in combat damage, subtract the target's armour (Hide level + item + Thick Hide) per hit, minimum 1. Give every

@@ -1,6 +1,6 @@
 # Atom audit 06: Buildings
 
-Audit of Driftfall against section 6 of `research/STARCRAFT-ATOMS.md` (Joshua, 19:33). Read by reading the code, not by
+Audit of GHT against section 6 of `research/STARCRAFT-ATOMS.md` (Joshua, 19:33). Read by reading the code, not by
 running it. Sources: `NORTHSTAR.md`, `TERRITORY.md` sections 3, 4, 5, 6, 8, 9, 14; `env/stats.mjs`, `env/commands.mjs`,
 `env/economy.mjs` (placeReason), `env/combat.mjs`, `env/movement.mjs`, `env/tiers.mjs`, `env/territory.mjs`,
 `env/effects.mjs`, `env/items.mjs`; `play/input.mjs`, `play/app.mjs`, `play/hud.mjs`, `play/teach.mjs`.
@@ -12,17 +12,17 @@ Trading House are specified in TERRITORY.md and have stats and placement code, b
 
 ## Verdict table
 
-Verdicts: **HAVE** (Driftfall has an equivalent), **PARTIAL**, **MISSING**, **NOT FOR US** (with why).
+Verdicts: **HAVE** (GHT has an equivalent), **PARTIAL**, **MISSING**, **NOT FOR US** (with why).
 
-| # | Atom (section 6) | Verdict | What Driftfall has (file) | What is missing or why not |
+| # | Atom (section 6) | Verdict | What GHT has (file) | What is missing or why not |
 |---|---|---|---|---|
 | 1 | Buildings are placed on a grid; some races need power or creep to place | **PARTIAL** | Grid placement with a green/red footprint preview: `env/economy.mjs` `placeReason` (~line 546), `play/app.mjs` ~534. Field-gated placement: a Drill must sit on a Shard tile, a Siphon on a Vent (`placeReason`). | Field gating exists only in the module (`placeReason` returns `chain-off` unless the chain is on) and no field-gated building is on the live card. Power and creep as such: NOT FOR US as copies. Our version is "build where the land gives you something" (Shard, Vent, Reach). |
 | 2 | Buildings have HP and armour; repair (Terran), shield regen (Protoss), HP regen (Zerg) | **PARTIAL** | HP on every structure: Forge 400, Turret 150, Core 1000 (`env/stats.mjs` 131-138), claims 300, Depot 300, Press 400 (lines 168-256). Attackers do a `structureMultiplier` against buildings (`env/combat.mjs` line 68). | **No structure armour.** **No repair:** nothing in `env/` or `play/` lets a Worker or any unit restore a building's HP. **No regen** for buildings. Repair is the main missing piece here. |
-| 3 | Terran buildings lift off and fly to a new spot | **MISSING** | Nothing for buildings. The closest idea is in TERRITORY.md section 6: the Snakenator **Shed Skin** upgrade (a claim can be packed up and moved). It is written in the design but not built (`env/items.mjs` `shed` is for units only). | Lift-off as such: NOT FOR US as a copy. Shed Skin is the Driftfall version and is the right one to build. |
+| 3 | Terran buildings lift off and fly to a new spot | **MISSING** | Nothing for buildings. The closest idea is in TERRITORY.md section 6: the Snakenator **Shed Skin** upgrade (a claim can be packed up and moved). It is written in the design but not built (`env/items.mjs` `shed` is for units only). | Lift-off as such: NOT FOR US as a copy. Shed Skin is the GHT version and is the right one to build. |
 | 4 | Buildings burn down when badly damaged (Terran) | **MISSING** | None. | Low priority: feel only (smoke and fire as damage shows). Not a rule the player needs to learn. Keep for polish after the top items. |
 | 5 | Buildings block movement and are used to wall off chokes | **PARTIAL** | Blocking: HAVE. Structures block the tile for units (`env/movement.mjs` line 40); a route with no way through is cleared and logged as `blocked` (movement.mjs line 15). | Walling off is MISSING for players: no wall piece exists in the live game. The Burrow's **Bank Up** dirt walls (TERRITORY.md section 6, `env/stats.mjs` line 82) are parked. |
 | 6 | Static defence buildings: anti-ground, anti-air, detection | **PARTIAL** | **Turret** (`env/stats.mjs` 138: damage 12, range 5, hp 150) fires at any enemy in range (`env/combat.mjs` `chooseTarget`, lines 39-50). | **Anti-air:** no ground/air split; a Turret shoots air and ground alike, and no building is air-only. **Detection:** nothing reveals a hidden or buried unit; `env/effects.mjs` Tunnels use underground movement, but nothing finds it. The Squall (TERRITORY.md section 4) blocks air and cuts sight, yet no building answers that. |
-| 7 | Losing all buildings loses the game, not units | **HAVE** | Losing the Core ends the match (`env/sim.mjs` line 79 finds the Core; Core hp 1000 in `env/stats.mjs` line 131). Units never end the game. The territory win (TERRITORY.md section 3) is the second way to win. | Driftfall ends on the Core alone, not on "all buildings". That is a deliberate simplification. Keep it. |
+| 7 | Losing all buildings loses the game, not units | **HAVE** | Losing the Core ends the match (`env/sim.mjs` line 79 finds the Core; Core hp 1000 in `env/stats.mjs` line 131). Units never end the game. The territory win (TERRITORY.md section 3) is the second way to win. | GHT ends on the Core alone, not on "all buildings". That is a deliberate simplification. Keep it. |
 | 8 | Footprints define walls and paths | **MISSING** | Nothing. Every structure is one tile: `env/commands.mjs` line 85 places a site at one x, y; `play/input.mjs` ~line 114 checks "one tile". | No multi-tile footprints, so a 2×2 block cannot wall a choke or reshape a path. Reach terrain (`maps/layout-v4.mjs`) already has footprints for land, not for buildings. |
 
 **Totals:** HAVE 2 (rows 5 blocking, 7) · PARTIAL 4 (1, 2, 5 walls, 6) · MISSING 3 (3, 4, 8) · NOT FOR US: power and creep
@@ -31,7 +31,7 @@ as copies (row 1), lift-off as a copy (row 3).
 ## TOP 5 changes (ranked by how much they improve play)
 
 **1. Put the economy and claim buildings on the live build card.** Right now a first-timer can build only a Forge and a
-Turret. Drill, Depot, Track, Press, Totem and Trading House are the Driftfall buildings; without them the Drift, the
+Turret. Drill, Depot, Track, Press, Totem and Trading House are the GHT buildings; without them the Drift, the
 claims and the flow panel have nothing to do.
 - **Change:** un-flag the live kinds so they are in `STATS.structures` (or the card reads both tables), give each a
   hotkey, cost and one plain sentence, and keep the field rules from `placeReason` on the placement preview.
@@ -75,7 +75,7 @@ read as a design, not a dot on the map. Last because it touches movement, placem
 - **Done when:** a 2×2 Depot blocks a 2-wide gap and the preview shows four tiles; test: a unit cannot step into any
   of the four tiles.
 
-Not in the top 5 but in the audit: Shed Skin (moving a claim, TERRITORY.md section 6) is the Driftfall answer to row 3;
+Not in the top 5 but in the audit: Shed Skin (moving a claim, TERRITORY.md section 6) is the GHT answer to row 3;
 burning buildings (row 4) is polish.
 
 ## Caveats

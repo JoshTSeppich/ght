@@ -1,5 +1,5 @@
 {
-  "about": "Maps Driftfall things to image files. Paths are relative to this file (assets/sprites/). All sprites are 64x64 PNG with transparency unless noted; the ground tile is opaque. Side 0 is cobalt blue, side 1 is ember orange, matching TEAM_COLORS. Licenses: see ../LICENSES.md (all CC0, Kenney).",
+  "about": "Maps GHT things to image files. Paths are relative to this file (assets/sprites/). All sprites are 64x64 PNG with transparency unless noted; the ground tile is opaque. Side 0 is cobalt blue, side 1 is ember orange, matching TEAM_COLORS. Licenses: see ../LICENSES.md (all CC0, Kenney).",
   "tileSize": 64,
   "units": {
     "worker": { "side0": "game/worker-s0.png", "side1": "game/worker-s1.png" },

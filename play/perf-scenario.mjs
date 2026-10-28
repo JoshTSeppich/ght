@@ -1,5 +1,5 @@
 // The 60 fps gate's scenario (owner: haiku, Performance). A pure builder, so node tests can check it without a browser:
-// the v4 map (128 x 128, maps/driftfall-v4.json through env/map.mjs), both Cores, and N units spread over open floor,
+// the v4 map (128 x 128, maps/ght-v4.json through env/map.mjs), both Cores, and N units spread over open floor,
 // split evenly between the two sides and point-mirrored. Half of them march across the map at once (the worst case for
 // the renderer: every unit moving, every frame), the other half stand still on their tile.
 //
@@ -65,7 +65,7 @@ export function buildPerfScenario({ seed = PERF_SEED, units = PERF_UNITS } = {})
   return { state, map, units: placed };
 }
 
-// --- The real scene: Toaster Wars on Wheatfield (owner: sonnet, PERF). The same match the page plays (createPlayableState,
+// --- The real scene: GHT on Wheatfield (owner: sonnet, PERF). The same match the page plays (createPlayableState,
 // the Wheatfield map through generateMap), with synthetic toasters, buildings and cords for the frame-rate measure.
 // Pure: no DOM, no three.js, so node tests can check it. play/perf-toaster.mjs mounts it in the browser.
 //

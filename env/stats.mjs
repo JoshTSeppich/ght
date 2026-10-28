@@ -135,7 +135,7 @@ export const STATS = deepFreeze({
     trains: ["worker"],
   },
 
-  // Buildable structures (spec section 4). Cost is paid when the build command is accepted. The Toaster-Wars kitchen
+  // Buildable structures (spec section 4). Cost is paid when the build command is accepted. The GHT kitchen
   // (TERRITORY.md section 18): a Mill grinds wheat (Shards) into flour, a Well draws water, a Toaster turns
   // flour + water + power into toast (env/bakery.mjs). The Forge stays the barracks (shown as the Assembly Line).
   structures: {
@@ -152,7 +152,7 @@ export const STATS = deepFreeze({
   },
 
   // Units (spec section 5). speed is ticks per step: 1 moves every tick, 2 moves on even ticks only.
-  // These are the classic-match numbers (createMatch, old tests and saves). The Toaster-Wars numbers (STATS.toaster
+  // These are the classic-match numbers (createMatch, old tests and saves). The GHT numbers (STATS.toaster
   // below) overlay them whenever hunger is on, which is every territory match. Broiler, Flak Popper and Bagel are new
   // kinds, so their rows here are already the toaster numbers.
   units: {
@@ -174,16 +174,16 @@ export const STATS = deepFreeze({
     crumpetBomber: { cost: 160, hp: 150, armor: 1, tags: ["Air", "Armored"], bonus: {}, attackStep: 1, layer: "air", hits: { ground: true, air: false }, minRange: 2, damage: 22, range: 6, speed: 5, trainTicks: 55, structureMultiplier: 1.5, splash: 1 },
   },
 
-  // Toaster Wars overlay (COMBAT.md, Joshua 09:27 "remember they're toasters?"). Applies when state.ammo is on: a shot is
+  // GHT overlay (COMBAT.md, Joshua 09:27 "remember they're toasters?"). Applies when state.ammo is on: a shot is
   // `shot.damage` every `shot.every` ticks (24 ticks = 1 s), not a hit every tick; `splash` = radius in tiles, neighbours
   // take half; `ammo: false` = needs power but no slices (Bagel). Slots (how many slices a body holds) live in
   // env/ammo.mjs ARMED. Speeds are ticks per step: 3 = 8 tiles a second (the old 1 was 24). Use rowOf(state, kind).
   toaster: {
-    upkeepPercent: 5, // Toaster Wars upkeep, % of a unit's cost a minute (the classic 10% stays in STATS.upkeep)
+    upkeepPercent: 5, // GHT upkeep, % of a unit's cost a minute (the classic 10% stays in STATS.upkeep)
     coreHp: 2400, // the Power Strip is not a 15 s target; 2400 so a fed siege takes minutes (pacing sweep, tests/toaster-pacing)
     units: {
       worker: { speed: 2, trainTicks: 40, shot: { damage: 2, every: 12 } },
-      // hp here is the ~3x Toaster Wars scale; the classic hp stays in STATS.units (rowOf picks this one when hunger is on).
+      // hp here is the ~3x GHT scale; the classic hp stays in STATS.units (rowOf picks this one when hunger is on).
       grunt: { hp: 180, range: 4, speed: 3, trainTicks: 30, shot: { damage: 20, every: 36 } },
       lancer: { hp: 120, range: 3, speed: 3, trainTicks: 40, shot: { damage: 18, every: 30 } },
       brute: { hp: 720, range: 5, speed: 4, trainTicks: 80, shot: { damage: 36, every: 30 } },
@@ -264,7 +264,7 @@ export const STATS = deepFreeze({
     },
   },
 
-  // Toaster Wars tiers (SYSTEMS-DESIGN.md section 2). The Driftfall `tiers` above stay for ?classic=1; this is the kitchen.
+  // GHT tiers (SYSTEMS-DESIGN.md section 2). The classic `tiers` above stay for ?classic=1; this is the kitchen.
   // A kind is open when its tier's need is met, judged on its own: `need` is 'toaster' (one complete Toaster of yours) or
   // 'power' (a Windmill or Dam of yours, standing). No Hold, no foundry, sanctum or hangar. A kind on no list is tier 1.
   // Windmill and Dam are tier 1 because they are the tier 3 need. Mill Dam (the big Dam site) is not a button yet.
@@ -280,7 +280,7 @@ export const STATS = deepFreeze({
   // Section 6: every upgrade, one flat list (see UPGRADES above for the rows and upgradeById for lookup).
   upgrades: UPGRADES,
 
-  // Toaster Wars research (build wave 2, M3; env/research.mjs builds the rows from this). Costs are Wheat + Flour [wheat, flour, seconds].
+  // GHT research (build wave 2, M3; env/research.mjs builds the rows from this). Costs are Wheat + Flour [wheat, flour, seconds].
   // levelCost: weapons and armor, levels 1 to 3. tracks: the Assembly Line ('forge') or Cooling Rack buys each. units: one-off unit
   // researches (mods are numbers the unit code reads with unitMod). flourCost: Flour for tier 2 and 3 kinds; basic kinds cost Wheat only.
   research: {
@@ -409,7 +409,7 @@ export const STATS = deepFreeze({
   },
 
   // Section 14: neutral camps. Every Reach but a Main holds a camp of three possible strengths (the minimap shows 1-3
-  // pips). Numbers are sonnet's proposal for env/neutrals.mjs; the creature names are original to Driftfall.
+  // pips). Numbers are sonnet's proposal for env/neutrals.mjs; the creature names are original to GHT.
   neutrals: {
     respawnSeconds: 240, respawnTicks: ticks(240), // unheld land goes wild again 4 minutes after the clear
     byRole: { main: 0, natural: 1, flank: 1, outer: 1, pocket: 1, vent: 2, rich: 2, mesa: 2, centre: 3 },
@@ -548,7 +548,7 @@ export function kindStats(kind) {
   return null;
 }
 
-// The stats row a state plays by: kindStats() merged with the Toaster-Wars overlay when hunger is on (state.ammo).
+// The stats row a state plays by: kindStats() merged with the GHT overlay when hunger is on (state.ammo).
 // Merged rows are built once, so this is cheap enough for the per-tick hot paths.
 const TOASTER_ROWS = new Map();
 for (const group of ["units", "structures"]) {

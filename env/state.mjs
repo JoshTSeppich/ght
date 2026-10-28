@@ -147,7 +147,7 @@ export function emit(state, event) {
 // What one player is allowed to see: a fresh deep copy shaped as in spec §10. Nothing else leaks through.
 export function observe(state, player) {
   const obs = baseObservation(state, player);
-  // Toaster Wars (a territory match with hunger on): your own kitchen and the map's spring wells, so a bot can place a
+  // GHT (a territory match with hunger on): your own kitchen and the map's spring wells, so a bot can place a
   // Well and see its toast. Nothing about the other side is added.
   if (state.bakery && state.toast) {
     obs.kitchen = {

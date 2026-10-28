@@ -1,12 +1,12 @@
-// Toast runs walk at the Toaster Wars Crumb speed (card 12, item 3). env/ammo.mjs read the classic worker row
-// (kindStats speed 1); a Toaster Wars state plays worker speed 2 (STATS.toaster.units.worker), so runs use rowOf.
+// Toast runs walk at the GHT Crumb speed (card 12, item 3). env/ammo.mjs read the classic worker row
+// (kindStats speed 1); a GHT state plays worker speed 2 (STATS.toaster.units.worker), so runs use rowOf.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createTestState } from '../env/state.mjs';
 import { rowOf } from '../env/stats.mjs';
 import { enableAmmo, stepAmmo } from '../env/ammo.mjs';
 
-test('a toast run takes as many ticks per tile as the Toaster Wars Crumb speed', () => {
+test('a toast run takes as many ticks per tile as the GHT Crumb speed', () => {
   const state = createTestState({
     width: 64, height: 64, shards: [0, 0],
     structures: [
@@ -25,6 +25,6 @@ test('a toast run takes as many ticks per tile as the Toaster Wars Crumb speed',
   const run = state.ammo.runs[0];
   assert.ok(run, 'a run starts');
   const perTile = rowOf(state, 'worker').speed;
-  assert.equal(perTile, 2, 'the Toaster Wars Crumb speed');
+  assert.equal(perTile, 2, 'the GHT Crumb speed');
   assert.equal(run.arrive - run.start, Math.ceil(6 * perTile), 'six tiles at that speed');
 });

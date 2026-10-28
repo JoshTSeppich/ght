@@ -88,20 +88,20 @@ What the index misses:
 | `play/hud-tips.mjs:50` | Broiler "brittle up close" | PARTLY (no mechanic) |
 | `play/hud-tips.mjs:51` | Flak "anything that flies" | WRONG |
 | `play/teach.mjs:11` | grunt "cheap, sturdy" | PARTLY (60 hp) |
-| `play/teach.mjs:12` | lancer "hits from a distance, keep behind grunts" | WRONG for Toaster Wars (Zapper 3, Popper 4); true of classic rows only |
+| `play/teach.mjs:12` | lancer "hits from a distance, keep behind grunts" | WRONG for GHT (Zapper 3, Popper 4); true of classic rows only |
 | `play/teach.mjs:78` coach set | grunt, lancer, brute | Omits howler, spiker, dart (minor) |
 | `SYSTEMS-DESIGN.md:18-19` | Tier 2 Popper/Zapper/Flak (Toaster); Tier 3 Four-Slice/Broiler/Bagel (Windmill or Dam) | MATCH `env/stats.mjs:251-255`, `env/tiers.mjs:49-76` |
 | `SYSTEMS-DESIGN.md:31`, `TECH-TREE.md:66-71` hotkeys | A Popper, S Zapper, D Flak, F Four-Slice, G Broiler, Z Bagel | MATCH `play/toaster-play.mjs:80-88` |
-| `TECH-TREE.md:25, 43-46` | Popper "none"; Four-Slice/Flak/Broiler/Bagel "Hold 3" | WRONG for Toaster Wars |
+| `TECH-TREE.md:25, 43-46` | Popper "none"; Four-Slice/Flak/Broiler/Bagel "Hold 3" | WRONG for GHT |
 | `TECH-TREE.md` (generated) | "what each tier unlocks" | Built from territory `STATS.tiers` (`scripts/tech-tree-doc.mjs:40`), not `toasterTiers`. Wrong tiers. |
 | `TECH-TREE.md:12` | "a fighter needs slices" | PARTLY (Bagel) |
-| `UNITS.md:11, 31-32` | Skyspike anti-air; Grunt/Lancer/Dart counters | Driftfall v3 draft; stale |
-| `players/builtin/ai.mjs:23-29` COUNTERS | vs grunt pick lancer x2.0 | Classic-era; inverted for Toaster Wars. Not the default: `play/opponent.mjs:16` picks toaster-easy or toaster-sonnet |
-| `players/toaster-easy/bot.mjs:506`, `players/toaster-sonnet/bot.mjs:479` | Build grunt and lancer | Only these two kinds are ever trained by the Toaster Wars bots |
+| `UNITS.md:11, 31-32` | Skyspike anti-air; Grunt/Lancer/Dart counters | GHT v3 draft; stale |
+| `players/builtin/ai.mjs:23-29` COUNTERS | vs grunt pick lancer x2.0 | Classic-era; inverted for GHT. Not the default: `play/opponent.mjs:16` picks toaster-easy or toaster-sonnet |
+| `players/toaster-easy/bot.mjs:506`, `players/toaster-sonnet/bot.mjs:479` | Build grunt and lancer | Only these two kinds are ever trained by the GHT bots |
 
 ## MISSED
 
-1. **TECH-TREE.md has the wrong unlock rule.** It is generated from territory tiers. Toaster Wars uses `STATS.toasterTiers` (Toaster, then Windmill or Dam). Largest doc error here.
+1. **TECH-TREE.md has the wrong unlock rule.** It is generated from territory tiers. GHT uses `STATS.toasterTiers` (Toaster, then Windmill or Dam). Largest doc error here.
 2. **Counters that exist:** power cords (an unpowered armed unit cannot move or fire, `canMove`/`canFire`); supply raids within `raidRange: 2` (`env/ammo.mjs:35-41`); Popper outranges Zapper; Broiler outranges all; splash on clumps; Four-Slice x2 and Broiler x1.5 vs buildings, Flak x0.5; high ground +1 reach; nearest-target rule (no type priority).
 3. **Not present:** type counters, armour, air/ground targeting, minimum range, attribute tags, combat-facing research, item damage in player combat.
 4. **Heat Lamp target priority** (`SYSTEMS-DESIGN.md:31`) is unbuilt.
@@ -109,4 +109,4 @@ What the index misses:
 6. **Classic vs Toaster rows invert the ranking.** Any text or weight from classic numbers flips Popper and Zapper.
 7. **Index blind spot:** it ranks raw stats and says nothing about toast, where Four-Slice is about 6 to 7 times worse per slice than a Popper.
 
-Not verified: whether `players/builtin` runs Toaster Wars beyond `?ai=builtin` (`play/app.mjs:220`). No test suite run.
+Not verified: whether `players/builtin` runs GHT beyond `?ai=builtin` (`play/app.mjs:220`). No test suite run.

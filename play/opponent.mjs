@@ -1,4 +1,4 @@
-// Opponent choice on the Toaster Wars play page (PLAYABLE.md item 12). Owner: sonnet. Pure helpers plus one tiny DOM mount.
+// Opponent choice on the GHT play page (PLAYABLE.md item 12). Owner: sonnet. Pure helpers plus one tiny DOM mount.
 //   ?difficulty=easy    players/toaster-easy (the default): slow kitchen, one small squad late, never a Strip kill before 10:00
 //   ?difficulty=normal  players/toaster-sonnet
 //   ?difficulty=none    sandbox: an idle enemy and the cheat keys (play/sandbox.mjs reads the same parameter)
@@ -12,7 +12,7 @@ export const opponentLevel = (q) => {
   return d === 'normal' || d === 'none' ? d : 'easy';
 };
 
-/** The ai name for app.mjs: ?ai wins, then the Toaster Wars bots by difficulty, else the classic built-in AI. */
+/** The ai name for app.mjs: ?ai wins, then the GHT bots by difficulty, else the classic built-in AI. */
 export const opponentAiName = (q, toasterOn) => q.get('ai') ?? (!toasterOn ? 'builtin' : opponentLevel(q) === 'normal' ? 'toaster-sonnet' : 'toaster-easy');
 
 /** The search string for a new choice: same page, same other options, difficulty replaced (mode=sandbox is dropped). */

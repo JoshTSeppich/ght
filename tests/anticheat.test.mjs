@@ -28,7 +28,7 @@ before(async () => {
   ({ STATS } = await import('../env/stats.mjs'));
   ({ validateLog } = await import('../env/log.mjs'));
   ({ replayTo } = await import('../viewer/replay.mjs'));
-  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'driftfall-anticheat-'));
+  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ght-anticheat-'));
 });
 
 after(() => {

@@ -1,4 +1,4 @@
-// The Toaster Wars frame-rate page's runner (owner: sonnet, PERF). Mounts the real Wheatfield scene with the same modules
+// The GHT frame-rate page's runner (owner: sonnet, PERF). Mounts the real Wheatfield scene with the same modules
 // play/app.mjs uses, on the synthetic state from play/perf-scenario.mjs.
 // Open play/perf-toaster.html (repo-root server). Query: ?units=200 (even), ?quality=high|balanced|low, ?frames=120 (measured),
 // ?mode=render (default: sim frozen, only engine render + instanced update timed) | ?mode=sim (one sim tick per frame, never catch-up).
@@ -315,7 +315,7 @@ async function run() {
   const aliveNote = line.alive === line.units ? '' : `  (${line.alive} alive at end)`;
   // A compact strip (top-left, 320 px): the spawned count, warm-up excluded, median and p95 against the budget, draws.
   say([
-    `GHOSTIES, HOSTIES, AND TOASTIES perf · ${quality} · ${mode}`,
+    `GHOSTIES, TOASTIES & BROSKIES perf · ${quality} · ${mode}`,
     `${line.units} spawned · ${inFrame} in frame${aliveNote}`,
     `warm-up excluded (${WARMUP_FRAMES}), ${frames} measured`,
     `median ${line.renderMedianMs}  p95 ${line.renderP95Ms} ms (budget ${FRAME_BUDGET_MS.toFixed(1)})`,

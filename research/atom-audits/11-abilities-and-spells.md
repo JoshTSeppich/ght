@@ -28,8 +28,8 @@ covers armour. Those are not repeated here.
 
 | # | Atom line | Verdict | Evidence / why |
 |---|---|---|---|
-| 1 | Spellcasters have energy; spells cost energy | NOT FOR US (v0.1) | A third meter beside Shards, Flux and Alloy works against "readable economy" (FANATICS.md item 5). Driftfall pays for things through the budget (TERRITORY.md section 9). Ability timers (row 8) do the job without a meter. |
-| 2 | Energy regenerates slowly; upgrades raise cap or start energy | NOT FOR US | Follows from row 1. Driftfall's upgrades change effects directly (Venom, Constrict, Hold Fast). |
+| 1 | Spellcasters have energy; spells cost energy | NOT FOR US (v0.1) | A third meter beside Shards, Flux and Alloy works against "readable economy" (FANATICS.md item 5). GHT pays for things through the budget (TERRITORY.md section 9). Ability timers (row 8) do the job without a meter. |
+| 2 | Energy regenerates slowly; upgrades raise cap or start energy | NOT FOR US | Follows from row 1. GHT's upgrades change effects directly (Venom, Constrict, Hold Fast). |
 | 3a | Damage area (storm) | MISSING | `env/combat.mjs` has no area hit. The Thumper "splash" exists only in the upgrade text (stats.mjs:85) and has no unit row. |
 | 3b | Disable (stasis, lockdown, fungal) | MISSING (data only) | Constrict's 4 s hold (stats.mjs:74-75), Rumble's stun (stats.mjs:85) and the Stormglass stun (stats.mjs:352, `stunOnHit`) are numbers. Nothing reads them, and `stunOnHit` is never called. |
 | 3c | Buff (stim, guardian shield) | PARTIAL | Fang Polish, Scale Plating and the Rattle Bell aura work through `unitMods()`, but only `neutrals.mjs` calls it. They buff creatures, not your troops. Sidewind (+50% speed) and Long Strike (+2 range) are data only. |
@@ -41,8 +41,8 @@ covers armour. Those are not repeated here.
 | 3i | Healing | MISSING | `combat.mjs` has no heal. The Glowmoss Pouch heal (items.mjs:200-207) runs in `stepItems()`, which is never called. The Shedder (healer) has no unit row. |
 | 4 | Some abilities cost HP instead of energy | NOT FOR US | A hidden cost the player can't read conflicts with NORTHSTAR "everything that can make you lose is visible". |
 | 5a | Siege mode | MISSING | No unit modes in `env/commands.mjs` (move, attack, stop, build, gather, train only). The siege role (Thumper) is Burrow-only and parked. |
-| 5b | Burrow (dig in) as a toggle | NOT FOR US | Driftfall's version is Tunnels (row 3g): a route, not a stance. |
-| 5c | Lift-off | NOT FOR US | Driftfall structures are fixed. The Drift takes the role of mobility. |
+| 5b | Burrow (dig in) as a toggle | NOT FOR US | GHT's version is Tunnels (row 3g): a route, not a stance. |
+| 5c | Lift-off | NOT FOR US | GHT structures are fixed. The Drift takes the role of mobility. |
 | 6 | Smart-casting (press once, one caster casts) | NOT FOR US (for now) | No multi-caster spells exist. Right-click smart commands (play/input.mjs) already cover move and attack. |
 | 7 | BW casting (select each caster by hand) | NOT FOR US | A skill test. NORTHSTAR wants a stranger to understand the game without help. |
 | 8 | Cooldown-based abilities | PARTIAL | There are no ability cooldowns and no cast button. Timers exist: Recall's `readyTick` (items.mjs:165), Tunnels' 3 s walk (effects.mjs:14), Quake's 30 s tunnel collapse (effects.mjs:114-116). |
@@ -52,7 +52,7 @@ covers armour. Those are not repeated here.
 
 No row is HAVE. The closest is Tunnels in the sim (3g), which has no button.
 
-## Top 5 changes, ranked by how much they improve how Driftfall plays
+## Top 5 changes, ranked by how much they improve how GHT plays
 
 Numbers are in ticks at 24 ticks a second (as in `env/effects.mjs`).
 

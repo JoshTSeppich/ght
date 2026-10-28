@@ -1,5 +1,5 @@
 // Power Strip saturation readout (card 8 item 6). Owner: HUD. Reads Economy's fieldSaturation (env/economy.mjs), so the
-// number here is the number the sim uses. Pure, no DOM: app.mjs puts the line in the Toaster Wars panel.
+// number here is the number the sim uses. Pure, no DOM: app.mjs puts the line in the GHT panel.
 import { fieldSaturation } from '../env/economy.mjs';
 
 /** One HTML line: Crumbs on wheat, Crumbs per field, and how full the open tiles beside the wheat are. '' when empty. */

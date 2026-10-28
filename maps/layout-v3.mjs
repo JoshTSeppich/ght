@@ -1,6 +1,6 @@
-// Driftfall v3 hand-drawn map (40 x 40), owned by the Level / Map Designer.
+// GHT v3 hand-drawn map (40 x 40), owned by the Level / Map Designer.
 // Only the top half is drawn here. The bottom half is the point mirror (x, y) -> (39 - x, 39 - y),
-// so the map is fair by construction. Run `node maps/layout-v3.mjs` to print it and write maps/driftfall-v3.txt.
+// so the map is fair by construction. Run `node maps/layout-v3.mjs` to print it and write maps/ght-v3.txt.
 //
 // Legend (one character per tile):
 //   .  open ground (low)          ^  open ground (high plateau)
@@ -87,7 +87,7 @@ for (let y = H / 2; y < H; y++) {
 }
 
 const text = grid.map((row) => row.join("")).join("\n") + "\n";
-fs.writeFileSync(new URL("./driftfall-v3.txt", import.meta.url), text);
+fs.writeFileSync(new URL("./ght-v3.txt", import.meta.url), text);
 
 // Quick counts the spec and tests can check against
 const count = (ch) => grid.flat().filter((c) => c === ch).length;
@@ -120,12 +120,12 @@ for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
 const workers0 = [[4, 3], [3, 4], [4, 4], [5, 5], [5, 3], [3, 5]].map(([x, y]) => ({ x, y }));
 const workers1 = workers0.map(({ x, y }) => ({ x: W - 1 - x, y: H - 1 - y }));
 const mapJson = {
-  format: "driftfall-map", version: 3, width: W, height: H,
+  format: "ght-map", version: 3, width: W, height: H,
   tiles, heights: high, ramps: rampAxis, shards, vents, rubble,
   cores: [{ x: 3, y: 3 }, { x: W - 1 - 3, y: H - 1 - 3 }],
   workers: [workers0, workers1],
 };
-fs.writeFileSync(new URL("./driftfall-v3.json", import.meta.url), JSON.stringify(mapJson));
+fs.writeFileSync(new URL("./ght-v3.json", import.meta.url), JSON.stringify(mapJson));
 
 if (process.argv[1] === new URL(import.meta.url).pathname) {
   process.stdout.write(text);

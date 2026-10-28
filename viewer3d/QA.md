@@ -93,7 +93,7 @@ J3. **terrain.mjs (sonnet):** rock pillars dominate and hide units; make them lo
 
 5. **Design trio (fable LGD, sonnet, haiku):** converging on the Lead Game Designer's names. Units: Worker, Grunt,
    Lancer, Spiker, Brute, Howler, Dart, Skiff, Barge, Mender, Shade, Seer, Conduit. Buildings: Core, Quarters, Forge,
-   Siphon, Turret, Sensor Mast, Foundry, Hangar, Sanctum. Tiles (haiku's maps/driftfall-v3.json): floor, ramp, rock,
+   Siphon, Turret, Sensor Mast, Foundry, Hangar, Sanctum. Tiles (haiku's maps/ght-v3.json): floor, ramp, rock,
    vent, shard, rich-shard, rubble, with cliffs drawn from height steps. Still open: map 40 or 48, rubble hp. The 3D
    scout's MANIFEST.json still uses sonnet's withdrawn unit names (skyspike, bombard, gale, ferry, lumen, hexer) and
    needs renaming once the trio posts AGREE: v3. The roster check in the integration test reads `env/stats.mjs`, so the

@@ -1,4 +1,4 @@
-// Driftfall 3D HUD: a DOM overlay on top of the Three.js canvas (owner: haiku).
+// GHT 3D HUD: a DOM overlay on top of the Three.js canvas (owner: haiku).
 // Shows each side's name, Shards, value and unit counts, a value-share bar, a minimap, a time bar with scrub,
 // play, speed and mute, and the result banner. It reads frames and sends commands; it never changes game state.
 // The pure helpers at the top are what tests/viewer3d-hud.test.mjs covers; createHud is the DOM part.

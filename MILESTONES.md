@@ -1,4 +1,4 @@
-# Driftfall milestones
+# GHT milestones
 
 Kept by the Senior Producer (sonnet). Status comes from team-chat reports and is marked with who reported it. "Unverified by me" means I have not re-run it myself. Last updated 2026-10-22 22:15.
 

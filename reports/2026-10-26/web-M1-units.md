@@ -1,6 +1,6 @@
 # Web check M1: units and how they behave (2026-10-26)
 
-Checker: haiku (web + code read-only). Scope: the seven Toaster Wars units, their real stats, and their behaviours (auto-acquire, attack-move, stop, hold, patrol, chase and give-up, focus fire, retreat, out of toast, death). Code read: env/combat.mjs, env/movement.mjs, env/ammo.mjs, env/stats.mjs, play/input.mjs, plus app.mjs:257 and power.mjs (enforceCords). Nothing edited.
+Checker: haiku (web + code read-only). Scope: the seven GHT units, their real stats, and their behaviours (auto-acquire, attack-move, stop, hold, patrol, chase and give-up, focus fire, retreat, out of toast, death). Code read: env/combat.mjs, env/movement.mjs, env/ammo.mjs, env/stats.mjs, play/input.mjs, plus app.mjs:257 and power.mjs (enforceCords). Nothing edited.
 
 ## Web sources and what they support
 - Blizzard "Game guide: basic unit controls", https://news.blizzard.com/en-us/article/4552956/game-guide-basic-unit-controls (fetched). Quoted: Stop "will ensure that your units will engage and chase enemies attacking them"; Hold Position "will not move to engage enemies in its sight range" but "will attack targets of opportunity with its own ranged attacks"; Patrol "effectively perform[s] an Attack-Move" between two points; Attack-Move "automatically engaging any enemy units or buildings that come into their range on the way to their destination", ignoring targets they cannot attack.

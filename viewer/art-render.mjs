@@ -1,4 +1,4 @@
-// Renders the Driftfall art to a PNG without a browser, using a tiny software canvas written here.
+// Renders the GHT art to a PNG without a browser, using a tiny software canvas written here.
 // Usage: node viewer/art-render.mjs [out.png] [cell]      (default .sandbox/art-sheet.png at 40 px; .sandbox is gitignored)
 // This is a development tool for checking the art; the viewer itself uses the real browser canvas.
 // The software context implements the subset of CanvasRenderingContext2D that art.mjs uses: paths, arcs,

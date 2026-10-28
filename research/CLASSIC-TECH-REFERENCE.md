@@ -1,7 +1,7 @@
 # Reference: how the 1998 classic paces tech, upgrades and expansions
 
-**Research only.** Nothing here goes into Driftfall by name, number or art. This file records the *structure* of the
-classic so Driftfall can copy the principles (see TERRITORY.md for our original design). Times are in-game time on
+**Research only.** Nothing here goes into GHT by name, number or art. This file records the *structure* of the
+classic so GHT can copy the principles (see TERRITORY.md for our original design). Times are in-game time on
 the fastest speed. Most come from published pro build orders; treat them as typical, not exact.
 
 ## 1. The shape of a game

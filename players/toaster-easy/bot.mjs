@@ -1,7 +1,7 @@
-// Toaster-EASY: the gentle opponent for Toaster Wars (PLAYABLE.md item 12), derived from toaster-sonnet v2 (same box-lane and
+// Toaster-EASY: the gentle opponent for GHT (PLAYABLE.md item 12), derived from toaster-sonnet v2 (same box-lane and
 // cord-wrap machinery, inlined because a player may read only its own file). It builds a slow kitchen, keeps Poppers home until
 // 8:00, then sends ONE small squad along the box chain, never a second wave while that one lives, and brings it home when the
-// toast runs low or when it is worth less than 0.7 of the visible enemy army. It trains a mix of every tier the kitchen has opened. Original header of toaster-sonnet v2: a bot that plays the Toaster Wars rules, cord-bending included. Crumbs mine wheat, it builds the kitchen
+// toast runs low or when it is worth less than 0.7 of the visible enemy army. It trains a mix of every tier the kitchen has opened. Original header of toaster-sonnet v2: a bot that plays the GHT rules, cord-bending included. Crumbs mine wheat, it builds the kitchen
 // (Mill, Well, Toaster) so its fighters have toast, an Assembly Line for Poppers and Zappers, and walks a chain of Extension
 // Boxes toward the enemy Power Strip (a cord reaches only so far, TERRITORY.md section 20). The army follows the chain and
 // sieges once the last box is in range. Player API only (plus the pure cord-wrap helpers); no clock or randomness, so

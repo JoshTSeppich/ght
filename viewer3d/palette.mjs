@@ -1,4 +1,4 @@
-// Driftfall 3D palette: every colour, emissive level and shared material preset in one place.
+// GHT 3D palette: every colour, emissive level and shared material preset in one place.
 //
 // The values are the ones in ART-GUIDE.md (Art Director sign-off): a near-black blue-grey basalt plateau at dusk,
 // teal Shards (teal only ever means "resource"), side 0 Cobalt and side 1 Ember. Hex strings here are the truth;

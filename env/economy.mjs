@@ -1,4 +1,4 @@
-// Driftfall — economy phases: production (training queues, construction sites), gathering
+// GHT — economy phases: production (training queues, construction sites), gathering
 // (mining, delivery, retargeting) and, when switched on, the mining chain of TERRITORY.md §8
 // (hand mining at 5 a trip, Drills and Siphons with buffers, Depots, Track lines, the Press and Alloy,
 // the flow summary). See ENV-SPEC.md §3, §4 and §8 steps 2 and 3 for the v2 rules.
@@ -161,7 +161,7 @@ export function stepGathering(state) {
 export const CONSTRUCTION = Object.freeze({ cancelRefund: 0.75 });
 export const REPAIR = Object.freeze({ hpPerTick: 2, wheatPerTick: 1 });
 
-/** The hit points a finished building of this kind is repaired up to (the Toaster Wars row when one applies). */
+/** The hit points a finished building of this kind is repaired up to (the GHT row when one applies). */
 export function repairMaxHp(state, kind) {
   return rowOf(state, kind)?.hp ?? kindStats(kind)?.hp ?? 0;
 }

@@ -121,7 +121,7 @@ function theaterFor(matches, { screen = screenWith(), holdMs = 1000, speed = 200
 }
 
 before(() => {
-  dir = fs.mkdtempSync(path.join(os.tmpdir(), "driftfall-live-"));
+  dir = fs.mkdtempSync(path.join(os.tmpdir(), "ght-live-"));
   logs[7] = runSample(7);
   logs[8] = runSample(8);
 });
@@ -133,14 +133,14 @@ after(() => {
 test("problemWith rejects things that are not a playable match log", () => {
   assert.match(LIVE.problemWith(null), /not a JSON object/);
   assert.match(LIVE.problemWith("hello"), /not a JSON object/);
-  assert.match(LIVE.problemWith({ format: "other" }), /not a Driftfall match log/);
-  assert.match(LIVE.problemWith({ format: "driftfall-log" }), /no starting state/);
-  assert.match(LIVE.problemWith({ format: "driftfall-log", initial: {} }), /no list of ticks/);
+  assert.match(LIVE.problemWith({ format: "other" }), /not a GHT match log/);
+  assert.match(LIVE.problemWith({ format: "ght-log" }), /no starting state/);
+  assert.match(LIVE.problemWith({ format: "ght-log", initial: {} }), /no list of ticks/);
   assert.equal(LIVE.problemWith(logs[7]), null);
 });
 
 test("createMatch throws a plain message for a bad log and never for a good one", () => {
-  assert.throws(() => LIVE.createMatch({ format: "driftfall-log" }), /no starting state/);
+  assert.throws(() => LIVE.createMatch({ format: "ght-log" }), /no starting state/);
   assert.doesNotThrow(() => LIVE.createMatch(logs[7], "seed 7.json"));
 });
 

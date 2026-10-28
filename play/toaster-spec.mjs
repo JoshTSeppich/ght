@@ -1,4 +1,4 @@
-// TOASTER WARS: Cute Geometry Build Spec v1.0 (GPT, 23 Oct 2026). Pure data, shared by the Design Studio and the
+// GHT: Cute Geometry Build Spec v1.0 (GPT, 23 Oct 2026). Pure data, shared by the Design Studio and the
 // live game, so both draw the SAME cute toasters. Source: research/CUTE-SPEC-GPT.md.
 // Coordinates: +X right, +Y up, +Z forward (toward the camera). Origin = bottom-centre of the body. CRUMB body width = 1.
 // Each part: [name, [w,h,d], [x,y,z], colour, pivot]. A part with mirror:true repeats at -x.
@@ -99,7 +99,7 @@ export const WHEELS = Object.freeze({
   lift: 0.55,            // body bottom sits at this fraction of wheel diameter above ground (wheels tuck under)
   sides: 5, tyre: 'charcoal', hub: 'cream', hubOfDiameter: 0.42,
 });
-// CORD: the hero of Toaster Wars, so make it BOLD. Every toaster trails a thick cord from the back of its body to its
+// CORD: the hero of GHT, so make it BOLD. Every toaster trails a thick cord from the back of its body to its
 // power point: a little coiled spring right at the body (it stretches when the unit nears its cord limit), then a
 // thick charcoal cable on the ground with a team-coloured glowing stripe and energy pulses running toward the toaster.
 export const CORD = Object.freeze({

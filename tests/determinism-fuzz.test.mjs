@@ -6,8 +6,8 @@
 // that tick, which is enough to reproduce it by hand.
 //
 // Knobs (environment variables, so a failing run can be rerun exactly):
-//   DRIFTFALL_FUZZ_META_SEED  picks the list of match seeds (default 20261022)
-//   DRIFTFALL_FUZZ_SEEDS      how many match seeds to try (default 12)
+//   GHT_FUZZ_META_SEED  picks the list of match seeds (default 20261022)
+//   GHT_FUZZ_SEEDS      how many match seeds to try (default 12)
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -17,8 +17,8 @@ import { createMatch, step } from '../env/sim.mjs';
 import { observe } from '../env/state.mjs';
 import { createLog, appendTick, finishLog, comparable, validateLog } from '../env/log.mjs';
 
-const META_SEED = Number(process.env.DRIFTFALL_FUZZ_META_SEED ?? 20261022);
-const SEED_COUNT = Number(process.env.DRIFTFALL_FUZZ_SEEDS ?? 12);
+const META_SEED = Number(process.env.GHT_FUZZ_META_SEED ?? 20261022);
+const SEED_COUNT = Number(process.env.GHT_FUZZ_SEEDS ?? 12);
 const MAX_TICKS = STATS.match.maxTicks;
 const MAP_W = STATS.map.width;
 const MAP_H = STATS.map.height;

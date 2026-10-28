@@ -37,8 +37,8 @@ Scope: Mill, Well, Toaster, pantry, toast and Crumb runs, power sources, cords, 
 
 ## Associations (web fact to code problem)
 - SC2 worker saturation (Team Liquid snippets: per-worker income flat to 16 workers, then falls) is the nearest analogue to the Well crowd curve in bakery.mjs. Both punish stacking on one resource. The Well formula is a linear falloff to 8 tiles; SC2's is a per-patch cap. Consider the same "one more costs you" message for the HUD.
-- SC2's Twilight Council rule (unpowered still counts as a prerequisite) contrasts with the Toaster Wars design, where a shed Toaster stops baking. If the report's tier-2 "needs a Toaster" should keep its rule, check whether prerequisite checks use structurePowered (not verified in this slice).
-- SC2 Assimilator and geyser amounts (2,250 to 2,500) back the report's geyser change, but Toaster Wars has no gas. Its power is energy by the building, not a per-geyser pool, so the 5.0.16 numbers do not transfer.
+- SC2's Twilight Council rule (unpowered still counts as a prerequisite) contrasts with the GHT design, where a shed Toaster stops baking. If the report's tier-2 "needs a Toaster" should keep its rule, check whether prerequisite checks use structurePowered (not verified in this slice).
+- SC2 Assimilator and geyser amounts (2,250 to 2,500) back the report's geyser change, but GHT has no gas. Its power is energy by the building, not a per-geyser pool, so the 5.0.16 numbers do not transfer.
 
 ## Left open
 - Liquipedia pages (blocked by 403): Pylon power radius and supply for LotV, Vespene per geyser for LotV, mining per-worker table, 16/24 worker counts.

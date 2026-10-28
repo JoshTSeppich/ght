@@ -247,7 +247,7 @@ export function createBuildings(ctx) {
 
   // Build the meshes for one kind. Returns the parts the per-frame animation needs.
   function buildBody(kind, owner) {
-    // Toaster Wars: ctx.buildingLook(THREE, kind, owner) (play/toaster-buildings.mjs) may supply the body for a kind; null = use ours.
+    // GHT: ctx.buildingLook(THREE, kind, owner) (play/toaster-buildings.mjs) may supply the body for a kind; null = use ours.
     const custom = ctx.buildingLook ? ctx.buildingLook(T, kind, owner) : null;
     if (custom) { custom.custom = true; return custom; }
     const body = new T.Group();

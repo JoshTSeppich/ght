@@ -1,8 +1,8 @@
-# Driftfall — environment spec v3 (DRAFT 2, proposed by fable; awaiting AGREE: v3 from sonnet and haiku)
+# GHT — environment spec v3 (DRAFT 2, proposed by fable; awaiting AGREE: v3 from sonnet and haiku)
 
 `ENV-SPEC.md` stays the v2 contract until sonnet, haiku and fable have all posted `AGREE: v3`; then this text replaces
 it. Everything in v2 not mentioned here stays as it is. Numbers live in `env/stats.mjs`; this file explains them.
-Every name is original to Driftfall. Credits: roster and rules by fable with sonnet's refinements (cooldown field,
+Every name is original to GHT. Credits: roster and rules by fable with sonnet's refinements (cooldown field,
 Mender limits, Shade linger, mode and transport events, per-layer tile check); terrain layout, air movement, the
 "within 2 always seen" rule, Rubble and the scatter rule by haiku; Flux, Vent, Siphon names shared by all three.
 
@@ -20,7 +20,7 @@ with more total value wins.
   side 1's `(39 - x, 39 - y)`. Side 0 top-left, side 1 bottom-right. The outer ring (`x` or `y` equal to 0 or 39) is
   rock.
 - **The layout is hand-drawn**, not generated: `maps/layout-v3.mjs` (owner haiku) draws the top half and mirrors it;
-  `node maps/layout-v3.mjs` writes `maps/driftfall-v3.json` (`format: 'driftfall-map', version: 3`) with `tiles`
+  `node maps/layout-v3.mjs` writes `maps/ght-v3.json` (`format: 'ght-map', version: 3`) with `tiles`
   (rows of type strings: `floor | ramp | rock | vent | shard | rich-shard | rubble`), `heights` (rows of 0/1),
   `ramps` (`{x, y, axis: 'ew'|'ns'}`), `shards` (`{x, y, amount, rich}`), `vents`, `rubble`, `cores`, `workers`.
   `env/map.mjs` loads that JSON; it is the single source of truth for the fixed layout. Summary for side 0:
@@ -283,7 +283,7 @@ row-major order (fixed first, then scattered pairs in placement order), then eve
 
 | file | exports |
 |------|---------|
-| `maps/layout-v3.mjs`, `maps/driftfall-v3.json` (haiku) | the hand-drawn layout; the JSON is what `env/map.mjs` loads |
+| `maps/layout-v3.mjs`, `maps/ght-v3.json` (haiku) | the hand-drawn layout; the JSON is what `env/map.mjs` loads |
 | `env/map.mjs` (sonnet) | `generateMap(seed)` returns `{ width, height, heights, ramps, rocks, crystals (with rich), vents, rubble, cores, workers }`; `mirror(x, y)`; `isConnected(map)` using the stepping rule |
 | `env/path.mjs` (sonnet) | `findPath({ width, height, blocked, canStep }, from, to, { within })`; `canStep(from, to)` optional, default always true |
 | `env/vision.mjs` (new) | `visionOf(state, player) -> rows`, `canSee(state, player, x, y)`, `isDetected(state, player, unit)`, `isTargetable(state, player, entity)` |

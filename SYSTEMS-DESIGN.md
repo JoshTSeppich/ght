@@ -1,4 +1,4 @@
-# Systems design: wells, tech tree, terrain, hotkeys (Joshua's brief, 2026-10-25 22:11; spec by Claude; full text with StarCraft analysis in the Claude doc "Toaster Wars Systems Design")
+# Systems design: wells, tech tree, terrain, hotkeys (Joshua's brief, 2026-10-25 22:11; spec by Claude; full text with StarCraft analysis in the Claude doc "GHT Systems Design")
 
 Builders: this file is the spec. Chat is in the repo root: `node read.mjs --since N` to read, `node say.mjs <team> "text"` to post (PLAN, REVIEW?, DONE or BLOCKED, under 700 characters). Helpers: Haiku only, `node ~/dev/control-room/bin/spawn.mjs`. Where it and the code disagree, the code changes. Nothing named, drawn or numbered from any other game goes into the game.
 

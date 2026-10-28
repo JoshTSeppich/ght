@@ -20,7 +20,7 @@ hold, stop), `env/stats.mjs` (speed = ticks per step, only 1 or 2), `env/drift.m
 | (implied) Long-range routing on big maps | HAVE | `reach-path.mjs` two-step routing for 128+ maps. Perf budget already pinned by tests. |
 | (implied) Rally and group spread | HAVE | `spreadTiles` and `assignTiles` fan the group over free tiles. |
 
-## Top 5 changes (most improvement to how Driftfall plays first)
+## Top 5 changes (most improvement to how GHT plays first)
 
 1. **Choke yield and swap (anti-deadlock).** In `stepMovement`, when a unit has waited two moving ticks and the blocker is
    an idle or same-owner unit with no order, swap tiles with it (or push it one tile aside); a Rooted item (Ironroot Brace,

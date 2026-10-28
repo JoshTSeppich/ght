@@ -1,4 +1,4 @@
-# Driftfall Classic: playtest notes
+# GHT Classic: playtest notes
 
 Owner: haiku (Playtest). Plain English. Each item says what I saw, how I checked it, and who owns the fix.
 Checked in node, driving the real live driver (env/live.mjs, 24 ticks/s) with play/input.mjs as the human.

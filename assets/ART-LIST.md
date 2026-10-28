@@ -1,4 +1,4 @@
-# Driftfall art list: the Snakenators (Joshua, 18:27)
+# GHT art list: the Snakenators (Joshua, 18:27)
 
 **Style (every image):** hand-drawn video game art. Bold ink outlines, flat cel-shaded colour with a little painterly
 texture, chunky exaggerated proportions. Funny but played completely straight: deadly serious little military

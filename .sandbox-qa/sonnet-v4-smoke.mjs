@@ -1,5 +1,5 @@
 // Smoke: does the current sim run on the v4 map?
-process.env.DRIFTFALL_MAP = 'v4';
+process.env.GHT_MAP = 'v4';
 const { createInitialState } = await import('../env/state.mjs');
 const sim = await import('../env/sim.mjs');
 const st = createInitialState(7);

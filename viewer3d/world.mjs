@@ -1,4 +1,4 @@
-// Driftfall 3D world: turns a match log into smooth frames the renderer can draw at any fractional tick.
+// GHT 3D world: turns a match log into smooth frames the renderer can draw at any fractional tick.
 // Pure module: no DOM, no clock, no three.js. Safe to import from node tests. Built on viewer/replay.mjs.
 //
 // createWorld(log) -> { ticks, start, end, map, stats, players, result, stateAt(tick), frame(t), facingAt(id, tick) }

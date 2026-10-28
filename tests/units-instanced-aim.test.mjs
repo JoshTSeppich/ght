@@ -29,7 +29,7 @@ test('makeUnitMaterial injects the shared edge band, skips emissive, and bumps t
   const { makeUnitMaterial } = await import('../play/units-instanced.mjs');
   const { TOY_EDGE_PX } = await import('../play/toy-render.mjs');
   const m = makeUnitMaterial();
-  assert.notEqual(m.customProgramCacheKey(), 'driftfall-instanced-units');
+  assert.notEqual(m.customProgramCacheKey(), 'ght-instanced-units');
   assert.match(m.customProgramCacheKey(), /edge/);
   const shader = {
     uniforms: {},

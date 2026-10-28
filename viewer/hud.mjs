@@ -1,4 +1,4 @@
-// Driftfall HUD: scoreboard (Shards, value share, unit counts), minimap, time bar (play / pause / speed / scrub
+// GHT HUD: scoreboard (Shards, value share, unit counts), minimap, time bar (play / pause / speed / scrub
 // with a value-lead ribbon) and a result banner. The data helpers are pure so node tests can run them; only
 // mountHud touches the DOM, and it injects its own CSS (classes start with df-).
 //

@@ -1,4 +1,4 @@
-// Driftfall Classic: the playable client (owner: sonnet, Playable Client).
+// GHT Classic: the playable client (owner: sonnet, Playable Client).
 // A human plays side 0 against a built-in bot (side 1) live in the browser. env/live.mjs runs the sim at a fixed
 // 24 ticks per second and the bot; input becomes commands on the next tick (play/input.mjs); the viewer3d systems
 // draw it through a "live world" that has the same frame() shape as viewer3d/world.mjs.
@@ -587,7 +587,7 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
     }
   }
 
-  window.driftfallPlay = { engine, ctx, game, input, rig, project, groundTile };
+  window.ghtPlay = { engine, ctx, game, input, rig, project, groundTile };
   engine.start();
   driver.start();
   els.boot.hidden = true;
@@ -611,7 +611,7 @@ function buildDom(root) {
     <div id="toast"></div>
     <div id="result" hidden></div>
     <div id="hud"></div>
-    <div id="boot"><b>DRIFTFALL</b><br>loading…</div>`;
+    <div id="boot"><b>GHT</b><br>loading…</div>`;
   const $ = (id) => root.querySelector('#' + id);
   return { canvas: $('view'), overlay: $('overlay'), minimap: $('minimap'), shards: $('shards'), supply: $('supply'), clock: $('clock'),
     alert: $('alert'), selection: $('selection'), card: $('card'), toast: $('toast'), result: $('result'), hud: $('hud'), boot: $('boot') };

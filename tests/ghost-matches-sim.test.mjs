@@ -15,7 +15,7 @@ const snapOf = (state, side) => Object.assign(observe(state, side), {
   shards: state.shards, rocks: [...state.rocks], structures: state.structures, units: state.units, crystals: state.crystals,
 });
 
-// Tries one build order in a fresh copy of the Toaster Wars match. Returns { chk, simOk } for the same tile and kind.
+// Tries one build order in a fresh copy of the GHT match. Returns { chk, simOk } for the same tile and kind.
 function verdicts(kind, x, y, { side = 0 } = {}) {
   const state = createToasterState(1);
   const builder = state.units.find((u) => u.owner === side && u.kind === 'worker');

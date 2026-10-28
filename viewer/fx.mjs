@@ -1,4 +1,4 @@
-// Driftfall effects: smooth movement between ticks plus short-lived overlays built from log events
+// GHT effects: smooth movement between ticks plus short-lived overlays built from log events
 // (attack beams and projectiles, hit rings, damage numbers, death bursts, spawn/done pulses, Shard pickups and
 // deliveries, construction progress). No DOM at import time; drawing functions take a canvas 2D context.
 //

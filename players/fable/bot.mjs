@@ -1,4 +1,4 @@
-// Team haiku's AI player for Driftfall (Phase 3). Plain JavaScript, no randomness, no clock: the same observation
+// Team haiku's AI player for GHT (Phase 3). Plain JavaScript, no randomness, no clock: the same observation
 // always gives the same commands, so matches stay reproducible.
 //
 // Plan, in order of priority each tick:

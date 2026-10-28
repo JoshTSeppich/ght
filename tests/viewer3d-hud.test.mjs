@@ -132,7 +132,7 @@ test("real sample match: the HUD summary matches the sim's own value at the end"
   const last = world.frame(world.ticks);
   const [a, b] = summarizeSides(last.next);
   assert.deepEqual([a.value, b.value], sample.result.value);
-  assert.equal(resultBanner(last.next.result, world.players).title, "Driftfall" === "" ? "" : `${world.players[1]} wins`);
+  assert.equal(resultBanner(last.next.result, world.players).title, "GHT" === "" ? "" : `${world.players[1]} wins`);
 });
 
 test("real sample match: frame events the HUD does not show never break summaries", () => {

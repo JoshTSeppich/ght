@@ -1,4 +1,4 @@
-# Driftfall swarm roles
+# GHT swarm roles
 
 Deep collaboration (every role): announce what you're starting in the team chat; ask the owner before touching their area; get every change reviewed by one role from a different team; answer questions addressed to you first; post a plain-English status at least every 15 minutes; disagree with a reason and an alternative, and settle it with AGREE; credit others' ideas.
 
@@ -10,7 +10,7 @@ Status: **core** = in the swarm now · **on-call** = spawned when its work comes
 | Role | Status | Scope | Owns |
 |---|---|---|---|
 | Live View Lead / Show Director | core | Decides what's on the TV and the main monitor at every moment: the newest playable build, the match, the swarm talking, who's working on what. Owns the live layout and when to switch scenes. | live/SHOW.md, live/index.html layout |
-| Live Build Compiler | core | Continuously rebuilds Driftfall from whatever the swarm has saved: runs the full test suite, checks every module loads, records a fresh match from the latest code, and publishes build status (green/red, what broke, who owns it) every few minutes. | live/compile.mjs, live/status.json, matches/latest-*.json |
+| Live Build Compiler | core | Continuously rebuilds GHT from whatever the swarm has saved: runs the full test suite, checks every module loads, records a fresh match from the latest code, and publishes build status (green/red, what broke, who owns it) every few minutes. | live/compile.mjs, live/status.json, matches/latest-*.json |
 | Swarm Discussion Curator | core | Turns the team chat into readable threads by topic, highlights decisions, open questions, disagreements and every AGREE, and keeps a plain-English 'what the swarm decided' summary live on screen. | live/threads.json, live/decisions.md |
 | Live View Engineer | core | Builds the live page: latest 3D render of the newest build, build status, test results, live chat threads, agent activity and terminals, all updating without reloads. | live/*.mjs, live/style.css |
 | Agent Spotlight Operator | core | Watches the Control Room map and terminals, and spotlights whichever agents are doing the most interesting work right now (with their live output), so Joshua always sees the action. | live/spotlight.mjs |
@@ -21,7 +21,7 @@ Status: **core** = in the swarm now · **on-call** = spawned when its work comes
 
 | Role | Status | Scope | Owns |
 |---|---|---|---|
-| Game Director | core | Owns the vision for Driftfall: what makes it fun, the final call when teams can't agree, and protecting scope so it ships. | VISION.md |
+| Game Director | core | Owns the vision for GHT: what makes it fun, the final call when teams can't agree, and protecting scope so it ships. | VISION.md |
 | Creative Director | core | Owns the feel and identity: original sci-fi world, tone, faction personality, making sure art, audio and design tell one story. | CREATIVE.md |
 | Executive Producer | on-call | Owns the big picture of time and cost for the whole swarm; decides when to grow or shrink teams. | PRODUCTION.md (budget section) |
 | Senior Producer | core | Runs the build plan: milestones, dependencies, who's blocked; keeps PLAN.json current and the swarm unblocked. | PLAN.json, MILESTONES.md |
@@ -47,7 +47,7 @@ Status: **core** = in the swarm now · **on-call** = spawned when its work comes
 | Co-op / Game Modes Designer | on-call | Owns extra modes (2v2, survival, puzzle maps). | MODES.md |
 | UI/UX Designer | core | Owns how a human reads and controls the game: HUD layout, selection, command card, feedback. | UX.md, HUD wireframes |
 | Tutorial / Onboarding Designer | on-call | Owns teaching a new player the game in the first minutes. | TUTORIAL.md |
-| Monetization / Live Ops Designer | n/a | No store or live economy in Driftfall. |  |
+| Monetization / Live Ops Designer | n/a | No store or live economy in GHT. |  |
 | Technical Designer | core | Owns data-driven content: stats tables, trigger/scripting hooks, the map editor's design. | env/stats.mjs structure, editor spec |
 
 ## Narrative
@@ -207,8 +207,8 @@ Status: **core** = in the swarm now · **on-call** = spawned when its work comes
 
 | Role | Status | Scope | Owns |
 |---|---|---|---|
-| Product Manager | on-call | Owns what Driftfall is for (demo, product, research) and its roadmap. | ROADMAP.md |
-| Marketing Director / Brand Manager | on-call | Owns how Driftfall is presented (name, tagline, trailer). |  |
+| Product Manager | on-call | Owns what GHT is for (demo, product, research) and its roadmap. | ROADMAP.md |
+| Marketing Director / Brand Manager | on-call | Owns how GHT is presented (name, tagline, trailer). |  |
 | PR Manager | n/a |  |  |
 | Partnerships / Business Development | n/a |  |  |
 | Legal / IP Counsel | core | Owns originality and licensing: no StarCraft or other franchise names, art or sounds; asset licenses valid. | LEGAL.md |

@@ -1,4 +1,4 @@
-# Driftfall: territory on a drifting world
+# GHT: territory on a drifting world
 
 > Joshua, 18:03: "Watch a game of StarCraft, write down all the upgrades and tiers of tech and timings and
 > incorporate this, but instead this game is about how to handle territory among an ever-changing environment."
@@ -32,7 +32,7 @@ ground fast; the Burrow (wombats) are best at holding ground and moving under it
   first.
 - **Hand-drawn at the Reach level, filled by seed.** `maps/layout-v4.mjs` draws each Reach's outline, height, ramps,
   fields and vents for the top half and mirrors it; the seed scatters rocks and Rubble inside the Reaches.
-  Output: `maps/driftfall-v4.json` (`version: 4`).
+  Output: `maps/ght-v4.json` (`version: 4`).
 - Distances grow ~3×: Main to Main is about 75 s for a normal ground unit (the classic is ~60–90 s). Sight and
   weapon ranges stay the same.
 - **Performance:** paths use the tile grid plus a coarse Reach graph (between Reaches first, then tiles inside), so
@@ -137,7 +137,7 @@ red.
 
 ## 7. Target timings (what a good game should look like)
 
-A Driftfall match is ~12–16 minutes; the classic's phases are compressed by about a quarter.
+A GHT match is ~12–16 minutes; the classic's phases are compressed by about a quarter.
 
 | Time | Event (a standard, safe game) |
 |---|---|
@@ -206,7 +206,7 @@ minute), shown on the HUD.
 
 ## 11. What changes in the code (owners settle in the accord)
 
-- `maps/layout-v4.mjs`, `maps/driftfall-v4.json`, `env/map.mjs`, `env/path.mjs`: the 128 × 128 map and Reach graph.
+- `maps/layout-v4.mjs`, `maps/ght-v4.json`, `env/map.mjs`, `env/path.mjs`: the 128 × 128 map and Reach graph.
 - `env/territory.mjs`: Reaches, claims, hold, Hold count, territory win.
 - `env/drift.mjs`: the seeded Drift schedule and its five events.
 - `env/economy.mjs`: Drills, Depots, Track, Presses, Alloy, flow.

@@ -6,7 +6,7 @@ Important context: the **live page still runs the classic match** (`createMatch`
 
 ## Verdict table
 
-| # | Line from section 4 | Driftfall today (file:line) | Verdict | Why |
+| # | Line from section 4 | GHT today (file:line) | Verdict | Why |
 |---|---|---|---|---|
 | 1 | Every unit costs supply; total supply is capped | Every unit (workers included) counts 1 against `STATS.match.unitCap = 40`, queued units too (env/commands.mjs:102, :119-122; env/stats.mjs:98). | HAVE | Equivalent exists in classic mode. The cost is a flat 1 per unit, not a per-unit weight. |
 | 2 | You raise the cap by building supply structures or units | Nothing raises the cap. The depot is a drop-off point (env/stats.mjs:250, play/teach.mjs:17), not supply. | NOT FOR US | TERRITORY section 9 replaces the cap with upkeep on purpose ("No supply cap... Quarters are removed"). A cap-raising building would bring back the thing we chose to remove. Caveat: until the territory economy is the live default, the live game has no way to grow the cap. |

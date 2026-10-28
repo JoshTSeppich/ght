@@ -57,7 +57,7 @@ describe('recompressPng', () => {
 describe('production build of the real game', () => {
   let out, info, files;
   before(async () => {
-    out = fs.mkdtempSync(path.join(os.tmpdir(), 'driftfall-dist-'));
+    out = fs.mkdtempSync(path.join(os.tmpdir(), 'ght-dist-'));
     info = await build({ root: ROOT, out, quiet: true });
     files = walk(out).map((f) => path.relative(out, f));
   });
@@ -138,7 +138,7 @@ describe('production build of the real game', () => {
   });
 
   test('the same sources give the same hash', async () => {
-    const out2 = fs.mkdtempSync(path.join(os.tmpdir(), 'driftfall-dist-'));
+    const out2 = fs.mkdtempSync(path.join(os.tmpdir(), 'ght-dist-'));
     const again = await build({ root: ROOT, out: out2, quiet: true });
     assert.equal(again.hash, info.hash);
   });

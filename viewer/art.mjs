@@ -1,6 +1,6 @@
-// Driftfall art: procedural canvas drawing for the map, structures and units.
+// GHT art: procedural canvas drawing for the map, structures and units.
 //
-// Everything here is drawn from code, nothing is loaded. The look is original to Driftfall: a dark drifting
+// Everything here is drawn from code, nothing is loaded. The look is original to GHT: a dark drifting
 // basalt world where glowing Shard crystals have fallen, fought over by two salvage fleets. Side 0 is the
 // Cobalt fleet (blue), side 1 is the Ember fleet (orange). Sprites are designed on a 20-unit grid and scaled
 // to the cell size, so they stay readable at 20 px and look sharp at 48 px.
