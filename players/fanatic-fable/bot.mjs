@@ -1,5 +1,5 @@
 // Fanatic-fable: a timing-attack opponent. Mines with ~10 Workers, drops a Forge early, then masses Lancers behind
-// Grunts and pushes as one ball once it has 8 fighters, re-sending reinforcements. Player API only; no clock or
+// Grunts and pushes as one ball once it has 6 fighters (fighters got dearer), re-sending reinforcements. Player API only; no clock or
 // randomness, so matches replay exactly.
 const dist = (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
 
@@ -70,7 +70,7 @@ export function createPlayer({ side, stats }) {
     // Push as a ball.
     const fc = foeCore || core;
     const rally = { x: Math.round((core.x * 2 + fc.x) / 3), y: Math.round((core.y * 2 + fc.y) / 3) };
-    const go = army.length >= 8 || (obs.tick > 4200 && army.length >= 4);
+    const go = army.length >= 6 || (obs.tick > 4200 && army.length >= 4);
     for (const u of army) {
       const near = foeU.filter((e) => dist(e, u) <= 7).sort((a, b) => dist(a, u) - dist(b, u) || a.id - b.id)[0];
       const t = near || (go ? foeCore : null);
