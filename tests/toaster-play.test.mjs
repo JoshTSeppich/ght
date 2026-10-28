@@ -12,7 +12,7 @@ test('GHT is the default; ?classic=1 keeps the old page', () => {
   assert.equal(toasterMode(q('')), true);
   assert.equal(toasterMode(q('classic=1')), false);
   assert.equal(toasterOptions(q('classic=1')).createState, undefined);
-  assert.equal(PAGE_TITLE, 'GHOSTIES, HOSTIES, AND TOASTIES'); // DECISIONS 7: official rename
+  assert.equal(PAGE_TITLE, 'GHOSTIES, TOASTIES & BROSKIES'); // DECISIONS 7: official rename
 });
 
 test('the match: Wheatfield Valley with power, ammo, bakery, fences and wrap on', () => {

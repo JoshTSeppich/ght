@@ -35,7 +35,7 @@ process.on('unhandledRejection', (err) => consoleProblems.push(`unhandled reject
 
 // 1. Boot -------------------------------------------------------------------------------------------------------------
 log(typeof app.createLiveWorld === 'function' && typeof app.startGame === 'function', 'play/app.mjs imports in node');
-log(PAGE_TITLE === 'GHT', 'page title is GHT');
+log(PAGE_TITLE === 'GHOSTIES, TOASTIES & BROSKIES', 'page title is GHOSTIES, TOASTIES & BROSKIES');
 log(toasterMode(new URLSearchParams('')) === true, 'default page is GHT');
 log(toasterMode(new URLSearchParams('classic=1')) === false, '?classic=1 keeps the old page');
 

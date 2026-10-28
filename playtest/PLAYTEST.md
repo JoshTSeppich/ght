@@ -1,4 +1,4 @@
-# Ghosties, Hosties, and Toasties playtest checklist (PLAYABLE.md item 32)
+# Ghosties, Toasties & Broskies playtest checklist (PLAYABLE.md item 32)
 
 Owner: haiku (QA playtester). Use this on http://localhost:4477/preview/rts/play/index.html (the default page is
 GHT; add `?classic=1` only to check the old page). Run it in a real browser with screenshots, then file every

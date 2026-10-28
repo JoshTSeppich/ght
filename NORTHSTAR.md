@@ -1,5 +1,5 @@
-# GHOSTIES, HOSTIES, AND TOASTIES (Joshua, 20:42; formerly GHT): the game in one breath
-> "I'm making it GHT. They have to get the resources to make bread so their warriors don't go into battle
+# GHT — GHOSTIES, TOASTIES & BROSKIES (Joshua, 20:42; formerly Toaster Wars): the game in one breath
+> "I'm making it Toaster Wars. They have to get the resources to make bread so their warriors don't go into battle
 > hungry. It's like StarCraft, but instead you have to collect wheat and make it into flour, and then water and
 > electricity, and the toasters can't go farther than their electrical cord."
 
@@ -9,7 +9,7 @@
    from a power source. Your reach on the map = your power network (TERRITORY.md section 20).
 3. **Control the land that powers and feeds you**: the river, the wheat, the generators, the outlets.
 
-# NORTH STAR: Ghosties, Hosties, and Toasties v0.1 (repo: ght), live and fun (Joshua, 19:21)
+# NORTH STAR: Ghosties, Toasties & Broskies v0.1 (repo: ght), live and fun (Joshua, 19:21)
 
 **Goal: a stranger opens one link, plays a full Toastinators-vs-Toastinators match against the built-in AI, understands
 everything without help, laughs at the art, and wants a rematch.** Every task you take must move that closer. If it

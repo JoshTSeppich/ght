@@ -1,4 +1,4 @@
-# Map: Wheatfield Valley (first real map of Ghosties, Hosties, and Toasties) — proposal by claude, 10-23 08:15
+# Map: Wheatfield Valley (first real map of Ghosties, Toasties & Broskies) — proposal by claude, 10-23 08:15
 
 **256 × 256, two players, point-mirrored** (side 1's tile (x, y) = side 0's (255 − x, 255 − y)). Style: STYLE-BIBLE.md
 section 8, "The Quiet Battlefield". Every rule of GHT has a place on it: wheat for flour, the river for

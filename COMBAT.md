@@ -1,4 +1,4 @@
-# Ghosties, Hosties, and Toasties combat (proposal by claude, reviewed and improved by GPT; Joshua approved 10-23 08:03)
+# Ghosties, Toasties & Broskies combat (proposal by claude, reviewed and improved by GPT; Joshua approved 10-23 08:03)
 Feel: very cute (a tiny-squad creature game meets the brightest stylised cartoon shooter), entirely our own.
 Rule book for looks: STYLE-BIBLE.md. **GPT's line:** "Make GHT recognisable in motion, not just in
 screenshots... unmistakably yours, even with every sound muted."

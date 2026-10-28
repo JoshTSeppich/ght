@@ -1,4 +1,4 @@
-# PLAYABLE.md: what's needed before Joshua can just mess around in Ghosties, Hosties, and Toasties (23 Oct, 21:17)
+# PLAYABLE.md: what's needed before Joshua can just mess around in Ghosties, Toasties & Broskies (23 Oct, 21:17)
 
 Joshua: "I just want to mess around in the game. Are the farming mechanics and costs of things all squared up?"
 

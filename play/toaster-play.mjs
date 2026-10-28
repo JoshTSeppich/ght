@@ -14,7 +14,7 @@ import { observe } from '../env/state.mjs';
 import { generateMap } from '../env/map.mjs';
 import { renderBar } from './hud-bar.mjs';
 
-export const PAGE_TITLE = 'GHOSTIES, HOSTIES, AND TOASTIES';
+export const PAGE_TITLE = 'GHOSTIES, TOASTIES & BROSKIES';
 
 /** GHT unless the page asks for ?classic=1. */
 export const toasterMode = (q) => q.get('classic') !== '1';

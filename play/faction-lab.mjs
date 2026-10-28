@@ -65,4 +65,4 @@ function aim() {
 aim(); addEventListener('resize', () => setTimeout(aim, 0));
 engine.start?.();
 const tris = rows.map(([f, ms]) => `${f.padEnd(9)} ${ms.map((m) => `${m.id}:${trianglesOf(m)}`).join(' ')}`).join('\n');
-setTimeout(() => { aim(); out.textContent = `Faction lab (fixture, no sim)  zoom ${zoom} tiles\nTop: Toasties   Middle: Ghosties   Bottom: Hosties\n${tris}\ndraw batches ${fu.draws}`; window.__lab = { ok: true, draws: fu.draws }; }, 800);
+setTimeout(() => { aim(); out.textContent = `Faction lab (fixture, no sim)  zoom ${zoom} tiles\nTop: Toasties   Middle: Ghosties   Bottom: Broskies\n${tris}\ndraw batches ${fu.draws}`; window.__lab = { ok: true, draws: fu.draws }; }, 800);

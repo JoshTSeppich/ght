@@ -315,7 +315,7 @@ async function run() {
   const aliveNote = line.alive === line.units ? '' : `  (${line.alive} alive at end)`;
   // A compact strip (top-left, 320 px): the spawned count, warm-up excluded, median and p95 against the budget, draws.
   say([
-    `GHOSTIES, HOSTIES, AND TOASTIES perf · ${quality} · ${mode}`,
+    `GHOSTIES, TOASTIES & BROSKIES perf · ${quality} · ${mode}`,
     `${line.units} spawned · ${inFrame} in frame${aliveNote}`,
     `warm-up excluded (${WARMUP_FRAMES}), ${frames} measured`,
     `median ${line.renderMedianMs}  p95 ${line.renderP95Ms} ms (budget ${FRAME_BUDGET_MS.toFixed(1)})`,

@@ -837,7 +837,7 @@ function buildDom(root, toasterOn = false) {
     <div id="toast"></div>
     <div id="result" hidden></div>
     <div id="hud"></div>
-    <div id="boot"><b>${toasterOn ? 'GHOSTIES, HOSTIES, AND TOASTIES' : 'GHT'}</b><br>loading…</div>`;
+    <div id="boot"><b>${toasterOn ? 'GHOSTIES, TOASTIES & BROSKIES' : 'GHT'}</b><br>loading…</div>`;
   const $ = (id) => root.querySelector('#' + id);
   return { canvas: $('view'), overlay: $('overlay'), minimap: $('minimap'), shards: $('shards'), supply: $('supply'), clock: $('clock'),
     top: $('top'), alert: $('alert'), selection: $('selection'), card: $('card'), toast: $('toast'), territory: $('territory'), result: $('result'), hud: $('hud'), boot: $('boot') };
