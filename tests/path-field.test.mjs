@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { findPath } from '../env/path.mjs';
-import { createFieldCache, findPathCached } from '../env/path-field.mjs';
+import { createFieldCache, findPathCached, findPathAround } from '../env/path-field.mjs';
 
 function rng(seed) {
   let s = seed >>> 0;
@@ -46,4 +46,41 @@ test('the cache forgets its fields when the map changes', () => {
   const b = findPathCached(cache, solid, 0, grid, { x: 0, y: 0 }, { x: 9, y: 0 }, 0);
   assert.deepEqual(b, findPath(grid, { x: 0, y: 0 }, { x: 9, y: 0 }));
   assert.ok(b.length > 9);
+});
+
+test('the walk around other units gives the same path whenever a shortest route survives', () => {
+  const r = rng(11);
+  let same = 0;
+  let cut = 0;
+  for (let round = 0; round < 60; round++) {
+    const width = 8 + Math.floor(r() * 30);
+    const height = 8 + Math.floor(r() * 30);
+    const solid = new Uint8Array(width * height);
+    for (let i = 0; i < solid.length; i++) solid[i] = r() < r() * 0.3 ? 1 : 0;
+    const grid = { width, height, blocked: (x, y) => solid[y * width + x] === 1, mask: solid };
+    const cache = createFieldCache();
+    for (let q = 0; q < 60; q++) {
+      const taken = new Uint8Array(width * height);
+      const crowd = r() * 0.25;
+      for (let i = 0; i < taken.length; i++) taken[i] = r() < crowd ? 1 : 0;
+      const from = { x: Math.floor(r() * width), y: Math.floor(r() * height) };
+      taken[from.y * width + from.x] = 0; // a unit's own tile is not an obstacle to itself
+      const to = { x: Math.floor(r() * width), y: Math.floor(r() * height) };
+      const within = Math.floor(r() * 3);
+      const crowded = { width, height, blocked: (x, y) => solid[y * width + x] === 1 || taken[y * width + x] === 1 };
+      const want = findPath(crowded, from, to, { within });
+      const free = findPath(grid, from, to, { within });
+      const got = findPathAround(cache, solid, 0, grid, taken, from, to, within);
+      if (got === undefined) {
+        cut++;
+        assert.ok(free && (!want || want.length > free.length), 'only gives up when every shortest route is cut');
+      } else if (got === null) {
+        assert.equal(free, null);
+      } else {
+        same++;
+        assert.deepEqual(got, want === null ? null : want, `round ${round} q ${q}`);
+      }
+    }
+  }
+  assert.ok(same > 500 && cut > 20, `same ${same} cut ${cut}`);
 });

@@ -75,7 +75,7 @@ const TWO_FACTIONS = ['coil', 'burrow'];
 
 test('chain off: a Worker still carries STATS.crystal.carry and the state gains no chain field', () => {
   const state = makeState({ crystals: [{ x: 6, y: 3, amount: 400 }] });
-  const events = run(state, 1 + STATS.crystal.mineTicks + 2, [{ type: 'gather', unit: WORKER, x: 6, y: 3 }]);
+  const events = run(state, 1 + STATS.economy.hand.mineTicks + 2, [{ type: 'gather', unit: WORKER, x: 6, y: 3 }]);
   const mine = events.find((e) => e.e === 'mine');
   assert.equal(mine.amount, STATS.crystal.carry);
   const deliver = events.find((e) => e.e === 'deliver');
@@ -145,7 +145,7 @@ test('enableChain sets factions from STATS.factions.sides, flux and alloy banks,
 test('hand mining carries 5 a trip when the chain is on', () => {
   const state = makeState({ crystals: [{ x: 6, y: 3, amount: 400 }] });
   enableChain(state);
-  const events = run(state, 1 + STATS.crystal.mineTicks + 2, [{ type: 'gather', unit: WORKER, x: 6, y: 3 }]);
+  const events = run(state, 1 + STATS.economy.hand.mineTicks + 2, [{ type: 'gather', unit: WORKER, x: 6, y: 3 }]);
   const mine = events.find((e) => e.e === 'mine');
   assert.equal(mine.amount, S.handCarry);
   assert.equal(mine.amount, 5);
@@ -164,8 +164,8 @@ test('a Worker delivers to the nearest own Depot instead of walking home to the 
   });
   enableChain(state);
   const before = state.shards[0];
-  // Walk ~15 tiles, mine 8 ticks, deliver next to the Depot, repeat: several trips in 60 ticks.
-  const events = run(state, 60, [{ type: 'gather', unit: WORKER, x: 20, y: 3 }]);
+  // Walk ~15 tiles, mine hand.mineTicks, deliver next to the Depot, repeat: several trips in three loads' time.
+  const events = run(state, 3 * (STATS.economy.hand.mineTicks + 60), [{ type: 'gather', unit: WORKER, x: 20, y: 3 }]);
   const delivers = events.filter((e) => e.e === 'deliver');
   assert.ok(delivers.length >= 1, 'a delivery happened');
   assert.ok(delivers.every((d) => d.amount === 5 && d.to === 'depot'), 'every load went to the Depot');
@@ -592,7 +592,7 @@ test('a Worker picks a rare deposit off the ground like Shards and brings it to 
   // The gather order is set by hand (commands.mjs only knows crystals; the sim wiring maps gather-on-deposit).
   const w = findEntity(state, WORKER);
   w.order = { type: 'gather', x: 6, y: 3, phase: 'toField', ticks: 0 };
-  const events = run(state, 1 + STATS.crystal.mineTicks + 3);
+  const events = run(state, 1 + STATS.economy.hand.mineTicks + 3);
   const mine = events.find((e) => e.e === 'mine');
   assert.equal(mine.resource, 'stormglass');
   assert.equal(mine.amount, 5);
@@ -604,7 +604,7 @@ test('a Worker picks a rare deposit off the ground like Shards and brings it to 
   assert.equal(depositAt(state, 6, 3).amount, 3);
   assert.equal(w.order.type, 'gather', 'goes back for the rest');
   // The rest: 3 more, then the pile is gone and the Worker goes idle (no other Stormglass).
-  const more = run(state, 40);
+  const more = run(state, STATS.economy.hand.mineTicks + 40);
   assert.equal(bankAmount(state, 0, 'stormglass'), 8);
   assert.equal(depositAt(state, 6, 3), null);
   assert.ok(more.some((e) => e.e === 'deposit' && e.amount === 0), 'the empty pile is announced');

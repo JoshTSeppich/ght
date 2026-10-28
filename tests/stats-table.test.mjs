@@ -3,14 +3,16 @@
 // STATS.crystal, STATS.referee.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { STATS, UNIT_KINDS, STRUCTURE_KINDS, valueOf, sideValue } from '../env/stats.mjs';
+import { STATS, UNIT_KINDS, STRUCTURE_KINDS, valueOf, sideValue, ECONOMY } from '../env/stats.mjs';
 
 const UNIT_FIELDS = ['cost', 'hp', 'damage', 'range', 'speed', 'trainTicks'];
+// Costs come from the ECONOMY table (re-priced for Toaster Wars); the other columns are spec section 5.
 const SPEC_UNITS = {
-  worker: { cost: 50, hp: 40, damage: 2, range: 1, speed: 1, trainTicks: 20 },
-  grunt: { cost: 50, hp: 60, damage: 8, range: 1, speed: 1, trainTicks: 15 },
-  lancer: { cost: 75, hp: 40, damage: 10, range: 4, speed: 1, trainTicks: 20 },
-  brute: { cost: 150, hp: 240, damage: 25, range: 1, speed: 2, trainTicks: 40 },
+  worker: { cost: ECONOMY.units.worker.wheat, hp: 120, // M2 Combat Scale (DECISIONS.md 1): 3x hp, 40 -> 120
+ damage: 2, range: 1, speed: 1, trainTicks: 20 },
+  grunt: { cost: ECONOMY.units.grunt.wheat, hp: 60, damage: 8, range: 1, speed: 1, trainTicks: 15 },
+  lancer: { cost: ECONOMY.units.lancer.wheat, hp: 40, damage: 10, range: 4, speed: 1, trainTicks: 20 },
+  brute: { cost: ECONOMY.units.brute.wheat, hp: 240, damage: 25, range: 1, speed: 2, trainTicks: 40 },
 };
 const SPEC_STRUCTURES = {
   forge: { cost: 150, hp: 400, buildTicks: 40 },
@@ -20,19 +22,28 @@ const SPEC_STRUCTURES = {
 const isPosNum = (v) => typeof v === 'number' && Number.isFinite(v) && v > 0;
 
 // The four spec units keep their classic numbers; the Toaster-Wars roster adds Broiler, Flak Popper and Bagel
-// (howler, spiker, dart) and the kitchen (mill, well, toaster). tests/toaster-roster.test.mjs covers those.
+// (howler, spiker, dart), the kitchen (mill, well, toaster), and the Air Layer (DECISIONS.md 3): Crouton Kite,
+// Waffle Wing, Crumpet Bomber and the Cooling Rack. tests/toaster-roster.test.mjs covers those.
 test('unit kinds list is the four spec units plus the three Toaster-Wars kinds', () => {
-  assert.deepEqual([...UNIT_KINDS].sort(), [...Object.keys(SPEC_UNITS), 'dart', 'howler', 'spiker'].sort());
+  assert.deepEqual(
+    [...UNIT_KINDS].sort(),
+    [...Object.keys(SPEC_UNITS), 'dart', 'howler', 'spiker', 'croutonKite', 'waffleWing', 'crumpetBomber'].sort(),
+  );
 });
 
 test('structure kinds list is the buildable ones; the Core is kept in STATS.core', () => {
-  assert.deepEqual([...STRUCTURE_KINDS].sort(), ['forge', 'mill', 'toaster', 'turret', 'well']);
+  assert.deepEqual([...STRUCTURE_KINDS].sort(), ['coolingRack', 'forge', 'mill', 'toaster', 'turret', 'well']);
 });
 
 test('every unit kind has every required field as a positive number', () => {
   for (const kind of UNIT_KINDS) {
     assert.ok(STATS.units[kind], `STATS.units.${kind} missing`);
     for (const f of UNIT_FIELDS) {
+      // The Crouton Kite is a true scout (DECISIONS.md 3): it carries no `damage` field at all, like the Core.
+      if (f === 'damage' && kind === 'croutonKite') {
+        assert.equal(STATS.units[kind].damage, undefined, 'the Crouton Kite scout has no attack');
+        continue;
+      }
       assert.ok(isPosNum(STATS.units[kind][f]), `STATS.units.${kind}.${f} = ${STATS.units[kind][f]}`);
     }
   }
@@ -69,7 +80,7 @@ test('structure numbers match spec section 4', () => {
 test('global numbers match the spec', () => {
   assert.equal(STATS.match.startShards, 100);
   assert.equal(STATS.match.unitCap, 40);
-  assert.equal(STATS.match.maxTicks, 2000);
+  assert.equal(STATS.match.maxTicks, 21600); // 15 minutes at 24 ticks a second (was 2000)
   assert.equal(STATS.match.queueMax, 5);
   assert.equal(STATS.crystal.amount, 400);
   assert.equal(STATS.crystal.mineTicks, 8);
@@ -116,8 +127,8 @@ test('sideValue adds Shards, units and complete buildings for that side only', (
       { id: 13, owner: 1, kind: 'turret', complete: true },
     ],
   };
-  assert.equal(sideValue(state, 0), 30 + 50 + 150 + 150);
-  assert.equal(sideValue(state, 1), 999 + 75 + 100);
+  assert.equal(sideValue(state, 0), 30 + ECONOMY.units.worker.wheat + ECONOMY.units.brute.wheat + STATS.structures.forge.cost);
+  assert.equal(sideValue(state, 1), 999 + ECONOMY.units.lancer.wheat + STATS.structures.turret.cost);
 });
 
 test('sideValue with nothing but Shards is just the Shards', () => {

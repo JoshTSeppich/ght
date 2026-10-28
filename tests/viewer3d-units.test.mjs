@@ -231,7 +231,7 @@ function fightFrames() {
   const state = createTestState({
     width: 12, height: 12, shards: [100, 100],
     units: [
-      { id: 1, owner: 0, kind: 'worker', x: 2, y: 2 },
+      { id: 1, owner: 0, kind: 'worker', x: 2, y: 2, hp: 40 }, // M2 Combat Scale (DECISIONS.md 1): a Crumb is 120 hp now and the Lancer kills the Grunts first, so this scene pins the weak Worker it was built around
       { id: 2, owner: 0, kind: 'lancer', x: 1, y: 3 },
       { id: 3, owner: 1, kind: 'grunt', x: 6, y: 2 },
       { id: 4, owner: 1, kind: 'grunt', x: 6, y: 3 },

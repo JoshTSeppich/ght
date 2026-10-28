@@ -8,7 +8,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const envDir = join(root, 'env');
 const samplePath = join(root, 'players', 'sample-player.mjs');
 
-const play = async (seed) => (await import('../env/referee.mjs')).runMatch({ seed, players: [samplePath, samplePath] });
+const play = async (seed) => (await import('../env/referee.mjs')).runMatch({ seed, players: [samplePath, samplePath], maxTicks: 2000 }); // the old 2,000-tick length: 15 minutes of real think time would make `late` events differ
 const withoutTiming = (log) => {
   const { timing, ...rest } = log;
   return JSON.stringify(rest);

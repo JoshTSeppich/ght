@@ -3,7 +3,7 @@
 // hunger rules end the old 15-second melee rush on their own.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { STATS, UNIT_KINDS, STRUCTURE_KINDS, ROSTER, canonKind, toasterName, rowOf } from '../env/stats.mjs';
+import { STATS, ECONOMY, UNIT_KINDS, STRUCTURE_KINDS, ROSTER, canonKind, toasterName, rowOf } from '../env/stats.mjs';
 import { createTerritoryMatch } from '../env/sim-territory.mjs';
 import { step } from '../env/sim.mjs';
 import { isAmmoOn, unitState, stockOf } from '../env/ammo.mjs';
@@ -41,8 +41,11 @@ test('the roster names all seven toasters and the Power Strip, and old kinds are
 test('every roster unit has a full data row, and the base is a Power Strip that costs the match', () => {
   for (const r of ROSTER.units) {
     const row = rowOf({ ammo: {} }, r.kind); // the Toaster-Wars numbers
-    for (const f of ['cost', 'hp', 'damage', 'range', 'speed', 'trainTicks']) assert.ok(Number.isFinite(row[f]), r.kind + '.' + f);
-    assert.ok(row.shot && row.shot.every >= 1 && row.shot.damage > 0, r.kind + ' has a shot');
+    // The Crouton Kite is a true scout (DECISIONS.md 3): no damage field, no shot, never attacks.
+    const fields = r.kind === 'croutonKite' ? ['cost', 'hp', 'range', 'speed', 'trainTicks'] : ['cost', 'hp', 'damage', 'range', 'speed', 'trainTicks'];
+    for (const f of fields) assert.ok(Number.isFinite(row[f]), r.kind + '.' + f);
+    if (r.kind === 'croutonKite') assert.equal(row.damage, undefined, r.kind + ' has no attack');
+    else assert.ok(row.shot && row.shot.every >= 1 && row.shot.damage > 0, r.kind + ' has a shot');
   }
   for (const k of ['mill', 'well', 'toaster']) assert.ok(STRUCTURE_KINDS.includes(k), k + ' is buildable');
   assert.ok(STATS.toaster.coreHp >= 2000, 'the Power Strip is not a 15 s target');
@@ -67,10 +70,12 @@ test('fed Popper fires, spends a slice per shot and goes hungry when empty', () 
   tick(s, 1);
   assert.equal(unitState(s, p), 'fed');
   const slots = s.ammo.slices[p.id];
-  tick(s, 60);
+  const pe = ECONOMY.units.grunt; // a slice feeds shotsPerSlice shots: run past one whole slice of fire
+  tick(s, Math.ceil(pe.shotsPerSlice * pe.shotEverySeconds * STATS.clock.ticksPerSecond) + 24);
   assert.ok(dummy.hp < 2000, 'the Popper hit something');
   assert.ok(s.ammo.slices[p.id] < slots, 'shots cost slices');
   s.ammo.slices[p.id] = 0;
+  s.ammo.rounds[p.id] = 0; // and no shots left in the slice it was firing
   const hpBefore = dummy.hp;
   s.ammo.stock = [0, 0]; s.toast.stack = [0, 0];
   tick(s, 24);
@@ -133,6 +138,7 @@ test('Mill, Well and Toaster turn wheat, water and power into toast', () => {
   site('mill', 3, 0); site('well', 3, 2); site('toaster', 3, 4);
   s.shards[0] = 500;
   s.bakery.water = null; s.bakery.springs = []; // this test's Well is not by water; the dry-Well rule has its own test
+  s.toast.stack[0] = 2; // DECISIONS.md 6: a Toaster only bakes for a hungry army (stack under 8) or Flour above the reserve
   const before = stockOf(s, 0);
   tick(s, 24 * 60);
   assert.ok(stockOf(s, 0) > before, 'toast stack grew: ' + before + ' -> ' + stockOf(s, 0));

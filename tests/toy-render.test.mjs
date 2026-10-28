@@ -6,7 +6,8 @@ import * as THREE from 'three';
 import {
   TOY_MATERIALS, makeToyMaterials, injectEdgeHighlight, planBatches, BATCH_TYPES, fitShadowFrustum,
   QUALITY_TIERS, createGovernor, toyEnabled, applyToyLook, createContactShadows,
-  applyToyEdges, createToyBoxInstances, snapShadowCentre, installToy, applyToyToUnits,
+  applyToyEdges, createToyBoxInstances, snapShadowCentre, installToy, applyToyToUnits, contactMaterial,
+  TOY_EDGE_PX, clampEdgePx,
 } from '../play/toy-render.mjs';
 
 test('material table matches RENDERING.md and builds one shared material per part', () => {
@@ -115,7 +116,29 @@ test('contact shadows: one instanced quad, one matrix per unit, no depth write',
   assert.equal(cs.mesh.count, 8, 'capacity caps the draw');
 });
 
-test('contact shadows are a 64px gaussian and depth goes in scale.z', () => {
+test('#54 contact decals are dark, solid near the centre and soft at the edge', () => {
+  const cs = createContactShadows({ THREE, scene: new THREE.Scene() });
+  const material = cs.mesh.material;
+  assert.ok(material.opacity >= 0.18 && material.opacity <= 0.34);
+  assert.ok(Math.abs(material.opacity - 0.32) < 0.01, 'peak opacity near 0.32');
+  const c = material.color.clone().convertLinearToSRGB();
+  assert.ok(255 * (0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b) < 60);
+  const { data, width } = material.map.image;
+  const alpha = (x, y) => data[(y * width + x) * 4 + 3];
+  assert.ok(alpha(32, 32) > alpha(0, 32));
+  assert.ok(alpha(44, 32) >= 250, 'inner footprint stays solid');
+  assert.equal(alpha(0, 0), 0);
+  cs.set([{ x: 0, y: 0, z: 0, width: 2, depth: 1 }]);
+  const m = new THREE.Matrix4(); cs.mesh.getMatrixAt(0, m);
+  const scale = new THREE.Vector3().setFromMatrixScale(m);
+  assert.ok(scale.x >= 2.2 && scale.x <= 2.3);
+  assert.ok(scale.z >= 1.1 && scale.z <= 1.15);
+  assert.ok(m.elements[13] > 0 && m.elements[13] < 0.02);
+  assert.equal(material.depthWrite, false);
+  cs.dispose();
+});
+
+test('contact shadows are a 64px radial texture and depth goes in scale.z', () => {
   const scene = new THREE.Scene();
   const cs = createContactShadows({ THREE, scene }, { capacity: 4 });
   assert.equal(cs.mesh.material.map.image.width, 64);
@@ -129,7 +152,7 @@ test('contact shadows are a 64px gaussian and depth goes in scale.z', () => {
 
 test('applyToyEdges: aHalf attribute, fwidth AA, guarded against reuse and missing aHalf', () => {
   const mat = new THREE.MeshStandardMaterial();
-  const h = applyToyEdges(mat, { band: 0.03, intensity: 0.2 });
+  const h = applyToyEdges(mat, { px: 3.2, intensity: 0.2 });
   assert.throws(() => applyToyEdges(mat), /already/);
   assert.throws(() => applyToyEdges(new THREE.MeshBasicMaterial()), TypeError);
   const shader = { uniforms: {}, vertexShader: '#include <common>\n#include <begin_vertex>', fragmentShader: '#include <common>\n#include <color_fragment>' };
@@ -137,8 +160,9 @@ test('applyToyEdges: aHalf attribute, fwidth AA, guarded against reuse and missi
   assert.match(shader.vertexShader, /attribute vec3 aHalf/);
   assert.match(shader.fragmentShader, /fwidth/);
   assert.match(shader.fragmentShader, /toyHas/, 'no aHalf means no edge');
-  assert.equal(shader.uniforms.uToyBand.value, 0.03);
-  h.setBand(0.05); assert.equal(shader.uniforms.uToyBand.value, 0.05);
+  assert.equal(shader.uniforms.uToyPx.value, 3.2);
+  h.setPx(9); assert.equal(shader.uniforms.uToyPx.value, 3.5, 'clamped to 3.5 px');
+  h.setPx(0.2); assert.equal(shader.uniforms.uToyPx.value, 2.5, 'clamped to 2.5 px');
   assert.ok(mat.customProgramCacheKey().includes('toy-edges'));
   const mesh = createToyBoxInstances([{ x: 0, y: 0, z: 0, width: 2, height: 1, depth: 4 }], mat);
   assert.deepEqual(Array.from(mesh.geometry.getAttribute('aHalf').array), [1, 0.5, 2]);
@@ -194,4 +218,126 @@ test('applyToyToUnits makes baked unit materials satin and receive shadows, once
   assert.equal(mat.roughness, 0.48); assert.ok(mat.metalness <= 0.08);
   assert.equal(mesh.receiveShadow, true);
   assert.equal(applyToyToUnits(root), 0, 'second pass is a no-op');
+});
+
+test('the edge band is measured in screen pixels: the mask is uToyPx times the per-pixel derivative, clamped 2.5 to 3.5 (3 px since #19)', () => {
+  assert.deepEqual(TOY_EDGE_PX, { min: 2.5, default: 3, max: 3.5 });
+  assert.equal(clampEdgePx(undefined), 3);
+  assert.equal(clampEdgePx(0.5), 2.5);
+  assert.equal(clampEdgePx(9), 3.5);
+  const mat = new THREE.MeshStandardMaterial();
+  applyToyEdges(mat);
+  const shader = { uniforms: {}, vertexShader: '#include <common>\n#include <begin_vertex>', fragmentShader: '#include <common>\n#include <color_fragment>' };
+  mat.onBeforeCompile(shader);
+  assert.match(shader.fragmentShader, /uToyPx \* aa/, 'band = pixels times fwidth, so it holds at every zoom');
+  assert.ok(!/uToyBand/.test(shader.fragmentShader), 'no model-unit band left');
+});
+
+test('the toy look turns bloom off (RENDERING.md part 10: ship without it)', () => {
+  const sun = new THREE.DirectionalLight(), rim = new THREE.DirectionalLight(), hemi = new THREE.HemisphereLight();
+  const renderer = { toneMapping: 0, toneMappingExposure: 1, outputColorSpace: '', shadowMap: { enabled: true, type: 0 } };
+  const bloom = { enabled: true };
+  applyToyLook({ THREE, scene: new THREE.Scene(), renderer, lights: { sun, rim, hemi }, passes: { bloom } });
+  assert.equal(bloom.enabled, false);
+});
+
+test('one shared contact-shadow material for every decal set; dispose of one set keeps it', () => {
+  const a = contactMaterial(THREE);
+  assert.equal(contactMaterial(THREE), a);
+  const cs = createContactShadows({ THREE, scene: new THREE.Scene() }, { capacity: 2 });
+  assert.equal(cs.mesh.material, a);
+  assert.equal(a.map.image.width, 64);
+  cs.dispose();
+  assert.equal(contactMaterial(THREE), a, 'still the same object after a dispose');
+});
+
+test('edge shader: band width comes from screen derivatives and a px uniform, not model units', () => {
+  const mat = new THREE.MeshStandardMaterial();
+  applyToyEdges(mat);
+  const shader = { uniforms: {}, vertexShader: '#include <common>\n#include <begin_vertex>', fragmentShader: '#include <common>\n#include <color_fragment>' };
+  mat.onBeforeCompile(shader);
+  assert.match(shader.fragmentShader, /uniform float uToyPx/);
+  assert.match(shader.fragmentShader, /fwidth\(d\)/);
+  assert.match(shader.fragmentShader, /uToyPx \* aa/, 'band = px x model-units-per-pixel');
+  assert.ok(!/uToyBand/.test(shader.fragmentShader), 'no fixed model-unit band');
+  assert.ok(shader.uniforms.uToyPx.value >= 2.5 && shader.uniforms.uToyPx.value <= 3.5);
+  const i = shader.uniforms.uToyIntensity.value;
+  assert.ok(i >= 0.35 && i <= 0.45, `ivory intensity ${i}`);
+  assert.equal(shader.uniforms.uToyInset.value, 0.12, 'charcoal inset darkens the face about 12 percent');
+});
+
+test('toy-render exports the shared edge GLSL used by instanced units', async () => {
+  const m = await import('../play/toy-render.mjs');
+  assert.match(m.TOY_EDGE_FUNC_GLSL, /toyEdgeMasks/);
+  assert.match(m.TOY_EDGE_FUNC_GLSL, /fwidth/);
+  const u = m.toyEdgeUniforms();
+  assert.equal(u.uToyPx.value, 3); assert.equal(u.uToyIntensity.value, 0.4); assert.equal(u.uToyInset.value, 0.12);
+});
+
+// #11 cause: /play toasters draw through play/toaster-units.mjs (applyToyEdges), not the baked makeUnitMaterial. Its tint
+// (#fff0d5) is nearly the cream chassis (#F2D7A6), so the albedo mix lightens the chassis by ~4 percent and lighting plus
+// tone mapping erase that. The fix lifts the OUTPUT colour toward white after tone mapping.
+test('#11 edge lift hits the output colour after tone mapping; the tint alone was too close to the chassis', () => {
+  const hex = (s) => [1, 3, 5].map((i) => parseInt(s.slice(i, i + 2), 16) / 255);
+  const lum = (c) => 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  const chassis = hex(TOY_MATERIALS.chassis.color), tint = hex('#fff0d5');
+  const albedoGain = (lum(tint) * 0.4 + lum(chassis) * 0.6) / lum(chassis) - 1;
+  assert.ok(albedoGain < 0.06, `albedo-only band lightens the chassis by only ${(albedoGain * 100).toFixed(1)}%`);
+  const mat = new THREE.MeshStandardMaterial();
+  applyToyEdges(mat);
+  const shader = { uniforms: {}, vertexShader: '#include <common>\n#include <begin_vertex>', fragmentShader: '#include <common>\n#include <color_fragment>\n#include <tonemapping_fragment>\n#include <colorspace_fragment>' };
+  mat.onBeforeCompile(shader);
+  const f = shader.fragmentShader;
+  const lift = shader.uniforms.uToyLift.value;
+  assert.ok(lift >= 0.3 && lift <= 0.5, 'chassis lift');
+  assert.match(f, /#include <tonemapping_fragment>\s*gl_FragColor\.rgb = mix\(gl_FragColor\.rgb, vec3\(1\.0, 0\.92, 0\.72\), toyMasks\.x \* uToyLift\)/);
+  assert.ok(f.indexOf('* uToyLift)') < f.indexOf('#include <colorspace_fragment>'), 'before sRGB encode');
+  const enc = (l) => 1.055 * Math.pow(l, 1 / 2.4) - 0.055;
+  assert.ok(enc(0.6 + 0.4 * lift) / enc(0.6) >= 1.12, 'edge at least 12 percent lighter than a mid face in output pixels');
+  const team = new THREE.MeshStandardMaterial();
+  applyToyEdges(team, { lift: 0.2 });
+  const s2 = { uniforms: {}, vertexShader: shader.vertexShader, fragmentShader: '#include <common>\n#include <color_fragment>' };
+  team.onBeforeCompile(s2);
+  assert.equal(s2.uniforms.uToyLift.value, 0.2, 'per-material lift keeps the cyan block unblown');
+});
+
+test('#18 edge band is max(model width, uToyPx screen pixels) via fwidth, and the material still compiles with it', async () => {
+  const m = await import('../play/toy-render.mjs');
+  assert.match(m.TOY_EDGE_FUNC_GLSL, /max\(uToyPx \* aa, vec3\(TOY_EDGE_MIN_MODEL\)\)/);
+  assert.match(m.TOY_EDGE_FUNC_GLSL, /#define TOY_EDGE_MIN_MODEL 0\.025/);
+  assert.match(m.TOY_EDGE_FUNC_GLSL, /fwidth\(d\)/);
+  assert.ok(m.TOY_EDGE_LIFT >= 0.5);
+  const mat = new THREE.MeshStandardMaterial();
+  m.applyToyEdges(mat);
+  const shader = { uniforms: {}, vertexShader: '#include <common>\n#include <begin_vertex>', fragmentShader: '#include <common>\n#include <color_fragment>\n#include <tonemapping_fragment>' };
+  mat.onBeforeCompile(shader);
+  assert.match(shader.fragmentShader, /TOY_EDGE_MIN_MODEL/);
+  assert.match(shader.fragmentShader, /fwidth/);
+});
+
+// #19: prove the crest mask, the ivory output lift and the charcoal inset are in the compiled fragment shader of the
+// materials the play scene really uses, and that vToyPos is object-space per instance.
+test('#19 applyToyEdges shader carries crest mask, ivory lift, charcoal inset and per-instance object-space vToyPos', async () => {
+  const m = await import('../play/toy-render.mjs');
+  const mat = new THREE.MeshStandardMaterial();
+  m.applyToyEdges(mat);
+  const shader = { uniforms: {}, vertexShader: '#include <common>\n#include <begin_vertex>', fragmentShader: '#include <common>\n#include <color_fragment>\n#include <tonemapping_fragment>' };
+  mat.onBeforeCompile(shader);
+  const f = shader.fragmentShader;
+  assert.match(f, /toyEdgeMasks\(vToyPos, max\(vToyHalf/, 'crest mask runs on vToyPos with the per-instance half extents');
+  assert.match(f, /vec3\(1\.0, 0\.92, 0\.72\), toyMasks\.x \* uToyLift/, 'ivory lift on the output');
+  assert.match(f, /1\.0 - toyMasks\.y \* uToyInset/, 'inset darkens the face');
+  assert.match(f, /vec3\(0\.10, 0\.11, 0\.13\)/, 'charcoal tint');
+  assert.match(f, /band \+ 1\.5 \* aa/, 'inset is 1.5 px wide');
+  assert.match(shader.vertexShader, /attribute vec3 aHalf/);
+  assert.match(shader.vertexShader, /vToyPos = position \* \(2\.0 \* aHalf\)/, 'object space, scaled by the instance half extents');
+  assert.equal(shader.uniforms.uToyLift.value, 0.5, 'lift stays at the 0.5 cap');
+  assert.equal(m.TOY_EDGE_LIFT, 0.5);
+});
+
+test('#19 injectEdgeHighlight body still compiles to a crest line (object-space vToyPos)', () => {
+  const shader = { uniforms: {}, vertexShader: '#include <begin_vertex>', fragmentShader: '#include <opaque_fragment>' };
+  injectEdgeHighlight(shader, { THREE });
+  assert.match(shader.vertexShader, /vToyPos = position;/);
+  assert.match(shader.fragmentShader, /uToyIntensity \* edge/);
 });

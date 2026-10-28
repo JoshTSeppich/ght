@@ -109,6 +109,16 @@ describe('production build of the real game', () => {
     for (const f of Object.values(m).filter(Boolean)) assert.ok(files.includes(`${info.hash}/assets/icons/snakenators/${f}`), f);
   });
 
+  test('ships the systems app.mjs loads through its wanted table (else the game draws placeholder balls)', () => {
+    for (const f of ['play/units-instanced.mjs', 'play/toaster-units.mjs', 'viewer3d/buildings.mjs', 'viewer3d/vfx.mjs', 'play/wheatfield-terrain.mjs'])
+      assert.ok(files.includes(`${info.hash}/${f}`), f);
+  });
+
+  test('ships every opponent bot and the model textures', () => {
+    for (const f of ['players/toaster-easy/bot.mjs', 'players/toaster-hard/bot.mjs', 'assets/models/td/Textures/colormap.png'])
+      assert.ok(files.includes(`${info.hash}/${f}`), f);
+  });
+
   test('does not ship unused assets (sprites, generated sheets, tools)', () => {
     assert.ok(!files.some((f) => /\/assets\/(sprites|generated|tools)\//.test(f)));
   });

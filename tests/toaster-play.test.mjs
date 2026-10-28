@@ -12,7 +12,7 @@ test('Toaster Wars is the default; ?classic=1 keeps the old page', () => {
   assert.equal(toasterMode(q('')), true);
   assert.equal(toasterMode(q('classic=1')), false);
   assert.equal(toasterOptions(q('classic=1')).createState, undefined);
-  assert.equal(PAGE_TITLE, 'TOASTER WARS');
+  assert.equal(PAGE_TITLE, 'GHOSTIES, HOSTIES, AND TOASTIES'); // DECISIONS 7: official rename
 });
 
 test('the match: Wheatfield Valley with power, ammo, bakery, fences and wrap on', () => {
@@ -23,10 +23,11 @@ test('the match: Wheatfield Valley with power, ammo, bakery, fences and wrap on'
   assert.ok(s.structures.some((x) => x.kind === 'core'));
 });
 
-test('top bar: Wheat Flour Water Toast Power, Supply, clock; no Shards/Flux/Alloy', () => {
+test('top bar: Wheat Flour Water Toast Power, Upkeep, clock; no Supply/Shards/Flux/Alloy', () => {
   const s = toasterOptions(q('')).createState(7);
   const html = toasterTopBar(s, { side: 0 });
-  for (const w of ['Wheat', 'Flour', 'Water', 'Toast', 'Power', 'Supply', '0:00']) assert.match(html, new RegExp(w));
+  assert.doesNotMatch(html, /Supply/); // the territory match has no unit cap
+  for (const w of ['Wheat', 'Flour', 'Water', 'Toast', 'Power', 'Upkeep', '0:00']) assert.match(html, new RegExp(w));
   assert.doesNotMatch(html, /Shards|Flux|Alloy/);
 });
 
@@ -45,7 +46,7 @@ test('side panel has no Trading House goods and no Flux/Alloy rows', () => {
   const s = toasterOptions(q('')).createState(7);
   const html = toasterPanel(s, 0);
   assert.doesNotMatch(html, /Trading House|glowmoss|stormglass|quakestone|ironroot|amberlight|Flux|Alloy|Shards/);
-  assert.match(html, /Tier/);
+  assert.equal(html, ''); // no tier readout or Drift in Toaster Wars (PLAYABLE.md item 10)
   assert.match(territoryPanel(s, 0), /Flux/); // the classic panel is untouched
 });
 

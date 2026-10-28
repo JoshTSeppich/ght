@@ -50,7 +50,7 @@ test('upkeep is drawn every tick, exactly one minute of it after 60 s', () => {
   addUnit(s, 0, 'brute', 1);
   s.shards = [1000, 1000];
   for (let i = 0; i < 60 * TPS; i++) { B.stepBudget(s); s.tick += 1; }
-  assert.equal(s.shards[0], 1000 - STATS.units.brute.cost * 0.1);
+  assert.equal(s.shards[0], Math.floor(1000 - STATS.units.brute.cost * 0.1)); // whole Shards; the half is the remainder in budget.acc
   assert.equal(s.shards[1], 1000);
 });
 

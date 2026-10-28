@@ -301,7 +301,7 @@ test('observe: no hidden state leaks (no rockSet, events, seed, nextId, result)'
   const s = createInitialState(6);
   const o = observe(s, 0);
   const allowed = new Set([
-    'tick', 'you', 'width', 'height', 'rocks', 'crystals', 'shards',
+    'tick', 'you', 'width', 'height', 'rocks', 'crystals', 'shards', 'wheat',
     'units', 'structures', 'unitCap', 'maxTicks',
   ]);
   for (const k of Object.keys(o)) assert.ok(allowed.has(k), `unexpected observation field "${k}"`);

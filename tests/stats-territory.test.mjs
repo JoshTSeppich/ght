@@ -36,8 +36,12 @@ function factionRows(heading) {
 const byName = (faction) => Object.fromEntries(UPGRADES.filter((u) => u.faction === faction).map((u) => [u.name, u]));
 
 test('the v2 kind lists are untouched, so the current game keeps playing', () => {
-  assert.deepEqual([...UNIT_KINDS].sort(), ['brute', 'dart', 'grunt', 'howler', 'lancer', 'spiker', 'worker']);
-  assert.deepEqual([...STRUCTURE_KINDS].sort(), ['forge', 'mill', 'toaster', 'turret', 'well']);
+  // Air Layer (DECISIONS.md 3) adds three flyers and the Cooling Rack on top of the v2 roster.
+  assert.deepEqual(
+    [...UNIT_KINDS].sort(),
+    ['brute', 'dart', 'grunt', 'howler', 'lancer', 'spiker', 'worker', 'croutonKite', 'waffleWing', 'crumpetBomber'].sort(),
+  );
+  assert.deepEqual([...STRUCTURE_KINDS].sort(), ['coolingRack', 'forge', 'mill', 'toaster', 'turret', 'well']);
   assert.equal(STATS.match.unitCap, 40);
 });
 
@@ -382,7 +386,7 @@ test('section 9: upkeep with no supply cap', () => {
 test('upkeepOf is 10% of a unit cost, both resources, Workers and structures free', () => {
   assert.deepEqual(upkeepOf({ cost: 150, flux: 0 }), { shards: 15, flux: 0 });
   assert.deepEqual(upkeepOf({ cost: 150, flux: 100 }), { shards: 15, flux: 10 });
-  assert.deepEqual(upkeepOf('brute'), { shards: 15, flux: 0 });
+  assert.deepEqual(upkeepOf('brute'), { shards: STATS.units.brute.cost * 0.1, flux: 0 });
   assert.deepEqual(upkeepOf('worker'), { shards: 0, flux: 0 });
   assert.deepEqual(upkeepOf('forge'), { shards: 0, flux: 0 });
   assert.deepEqual(upkeepOf('nope'), { shards: 0, flux: 0 });

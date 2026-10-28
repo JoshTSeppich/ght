@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createTestState } from '../env/state.mjs';
-import { STATS } from '../env/stats.mjs';
+import { STATS, ECONOMY } from '../env/stats.mjs';
 import {
   enableItems, ITEM_IDS, dropPickup, pickUp, dropFromUnit, stepItems, unitMods, effectiveRank, awardKill,
   onUnitDeath, recall, shedSkins, itemsOf, observeItems, isRooted, stunOnHit,
@@ -152,7 +152,7 @@ test('Recall costs half the price, takes the train time, and returns the unit wi
   const before = s.shards[0];
   const r = recall(s, 0, sk.id);
   assert.equal(r.ok, true);
-  assert.equal(before - s.shards[0], 25);
+  assert.equal(before - s.shards[0], Math.floor(ECONOMY.units.grunt.wheat * STATS.items.recall.costFraction));
   assert.equal(r.readyTick, s.tick + STATS.units.grunt.trainTicks);
   assert.equal(shedSkins(s, 0).length, 0, 'the skin is spent');
   while (s.tick < r.readyTick - 1) { s.tick++; stepItems(s); }

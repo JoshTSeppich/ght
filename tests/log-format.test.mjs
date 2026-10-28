@@ -46,6 +46,7 @@ async function value(rel, name) {
 const EVENT_KINDS = new Set([
   'spawn', 'move', 'hit', 'die', 'mine', 'deliver', 'spend', 'progress', 'done', 'queue', 'order',
   'blocked', 'reject', 'late', 'error', 'forfeit',
+  'field-empty', 'refund', // cards 4 and 11 added these sim events; env/log.mjs validates them
 ]);
 const RESULT_REASONS = new Set(['core', 'both-cores', 'timeout', 'forfeit']);
 
@@ -174,6 +175,7 @@ function simMatch() {
 
     const players = [makeTestPlayer(0, 'attacker', STATS), makeTestPlayer(1, 'defender', STATS)];
     const state = createMatch(SIM_SEED);
+    state.maxTicks = 2000; // this match was written for the old 2,000-tick default; the default is now 15 minutes (21,600)
     const initial = observe(state, 0);
     delete initial.you;
     const log = createLog({ seed: SIM_SEED, players: players.map((p) => p.name), stats: STATS, initial });

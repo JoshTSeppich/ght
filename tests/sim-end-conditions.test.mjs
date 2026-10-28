@@ -117,11 +117,12 @@ test('reaching maxTicks with a higher value for side 0 wins for side 0', () => {
 });
 
 test('an exact value tie at maxTicks is a draw with reason timeout', () => {
-  // Side 0: 100 Shards plus one Grunt. Side 1: Shards equal to that total and nothing else.
+  // Side 0: 100 Shards plus one Grunt. Side 1: 100 Shards plus one Grunt, so the boards are equal too and the
+  // timeout verdict (board first, bank only on a tie: timeout-value.test.mjs) is a tie as well.
   const total = 100 + STATS.units.grunt.cost;
   const state = matchState({
-    shards: [100, total],
-    units: [unit(3, 0, 'grunt', 10, 10)],
+    shards: [100, 100],
+    units: [unit(3, 0, 'grunt', 10, 10), unit(4, 1, 'grunt', 20, 20)],
   });
   state.tick = STATS.match.maxTicks - 1;
 

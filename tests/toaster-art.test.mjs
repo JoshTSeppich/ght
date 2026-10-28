@@ -34,7 +34,7 @@ test('every building the page can show has an icon, and they differ', () => {
     const s = structureIconSvg(k, 0);
     assert.match(s, /^<svg /); seen.add(s);
   }
-  assert.deepEqual([...STRUCTURE_ART_KINDS].sort(), ['core', 'forge', 'mill', 'turret', 'toaster', 'well'].sort());
+  assert.deepEqual([...STRUCTURE_ART_KINDS].sort(), ['coolingRack', 'core', 'extension', 'forge', 'mill', 'pylon', 'turret', 'toaster', 'well'].sort());
   assert.equal(seen.size, STRUCTURE_ART_KINDS.length);
   for (const a of ['amove', 'stop', 'hold', 'move', 'rally']) assert.match(actionIconSvg(a), /^<svg /);
 });
@@ -85,7 +85,7 @@ test('Toaster Wars card: proper names, costs and clean hotkeys; the old "forge" 
   input.ui.selection = [crumb.id];
   const card = input.commandCard(s);
   const builds = card.filter((c) => c.action === 'build');
-  assert.deepEqual(builds.map((c) => kindName(c.kind)).sort(), ['Assembly Line', 'Heat Lamp', 'Mill', 'Toaster', 'Well']);
+  assert.deepEqual(builds.map((c) => kindName(c.kind)).sort(), ['Assembly Line', 'Extension Box', 'Heat Lamp', 'Mill', 'Relay Pylon', 'Toaster', 'Well', 'Windmill', 'Dam'].sort());
   assert.equal(new Set(card.map((c) => c.key)).size, card.length, 'no two buttons share a key');
   for (const b of builds) { assert.ok(b.cost > 0); assert.equal(b.key, TOASTER_HOTKEYS[b.kind]); }
   const html = renderCard(card, { shards: 999 });

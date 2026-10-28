@@ -54,7 +54,7 @@ test("summarizeSides counts Shards, value, units and the Core on the empty start
   assert.equal(a.units.grunt, 1);
   assert.equal(a.units.brute, 0);
   assert.equal(b.units.lancer, 1);
-  assert.equal(a.value, 100 + 50 + 50 + 0);
+  assert.equal(a.value, 100 + STATS.units.worker.cost + STATS.units.grunt.cost);
   assert.equal(a.value, sideValue(state, 0));
   assert.deepEqual(a.buildings, { complete: 1, sites: 1 });
   assert.equal(a.coreHp, 800);

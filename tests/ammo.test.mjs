@@ -76,7 +76,7 @@ test('a unit that runs out is Powered+Hungry: it can move but cannot fire', () =
   enableAmmo(state, { stock: 0 });
   stepAmmo(state);
   const g = state.units[0];
-  for (let i = 0; i < ammoOf('grunt').slots; i++) assert.equal(spendShot(state, g, 11), true);
+  for (let i = 0; i < ammoOf('grunt').slots * ammoOf('grunt').shotsPerSlice; i++) assert.equal(spendShot(state, g, 11), true);
   assert.equal(unitState(state, g), 'hungry');
   assert.equal(canMove(state, g), true);
   assert.equal(canFire(state, g), false);

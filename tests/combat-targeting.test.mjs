@@ -103,14 +103,16 @@ test('equal distance: the lower enemy id is hit, whatever order the arrays are i
   assert.equal(hpOf(s, 8), stat('brute').hp);
 });
 
-test('equal distance between a unit and a structure: lower id wins', () => {
+// Combat card A3 (ROLE-CARDS): priority is armed units, then Crumbs, then buildings, so at equal distance the armed unit
+// is hit even though the structure has the lower id.
+test('equal distance between a unit and a structure: the armed unit wins on priority, not id', () => {
   const s = world({
     units: [unit(1, 0, 'lancer', 5, 5), unit(7, 1, 'brute', 7, 5)],
     structures: [structure(4, 1, 'forge', 3, 5)],
   });
   stepCombat(s);
-  assert.equal(hpOf(s, 4), stat('forge').hp - stat('lancer').damage);
-  assert.equal(hpOf(s, 7), stat('brute').hp);
+  assert.ok(hpOf(s, 7) < stat('brute').hp);
+  assert.equal(hpOf(s, 4), stat('forge').hp);
 });
 
 test('chooseTarget agrees: nearest first, lower id on a tie', () => {

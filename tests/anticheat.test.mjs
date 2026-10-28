@@ -122,7 +122,7 @@ export function createPlayer({ side }) {
   const { log } = await play(spy, idle, { maxTicks: 1 });
   const first = log.ticks[0].commands[0][0];
   const { shape } = first;
-  assert.deepEqual(shape.top, ['crystals', 'height', 'maxTicks', 'rocks', 'shards', 'structures', 'tick', 'unitCap', 'units', 'width', 'you']);
+  assert.deepEqual(shape.top, ['crystals', 'height', 'maxTicks', 'rocks', 'shards', 'structures', 'tick', 'unitCap', 'units', 'wheat', 'width', 'you']);
   assert.deepEqual(shape.unit, ['carrying', 'hp', 'id', 'kind', 'order', 'owner', 'x', 'y']);
   assert.deepEqual(shape.structure, ['complete', 'hp', 'id', 'kind', 'owner', 'progress', 'queue', 'x', 'y']);
   assert.deepEqual(shape.crystal, ['amount', 'x', 'y']);
