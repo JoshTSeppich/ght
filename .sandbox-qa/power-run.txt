@@ -1,0 +1,84 @@
+✖ sonnet bot: both sides raise 2 Windmill(s) on their pads and no Toaster goes dark (68135.093ms)
+✔ easy bot: both sides raise 1 Windmill(s) on their pads and no Toaster goes dark (42746.434583ms)
+✔ a Popper sent out of cord after the match limit still stops at the cord limit (reporter setup) (4738.285041ms)
+✔ a crowd on the way out does not let a unit leave its cord (32.201333ms)
+✔ a windmill (range 0) does not extend the cord (4.042333ms)
+✔ a unit whose only anchor is destroyed goes to battery (0.223666ms)
+✔ a long walk round a cliff with wrap on ends inside the cord (78.940959ms)
+✔ without wrap the straight line ignores the cliff (old rule) (6.101917ms)
+✔ with wrap the long way round the cliff uses up the cord and the Crumb stops short (8.615708ms)
+✔ the same walk is deterministic (144.80575ms)
+✔ an enemy fence blocks the cord: no tick leaves the cord running straight through an enemy wall (21.304167ms)
+✔ a clear straight cord has no bends and uses the plain distance (0.544042ms)
+✔ the segment test grazes corners but is stopped by a tile body (2.150708ms)
+✔ walking round the cliff wraps at its corner and every bend costs reach (7.391042ms)
+✔ swinging back across the corner unwraps it (0.332042ms)
+✔ moves stop at the cord length: cordMove refuses a step that would overstretch (0.50825ms)
+✔ a cord needing more than three wrap points is tangled and the move is refused (0.453ms)
+✔ the same walk always gives the same cord (1.369416ms)
+✔ a peg re-anchors the cord at a corner and frees the rest (0.647334ms)
+✔ cord range is wider than fence link reach for extension boxes (intended) (0.603083ms)
+✔ a pylon pair still links at 16 (0.106875ms)
+✔ a link spans only the smaller reach; pylons reach far only pylon to pylon (2.3755ms)
+✔ strip to extension within 6 links; extension chain stays lit (1.301959ms)
+✔ each station links to its nearest three; cycles are allowed and power links never block (0.230666ms)
+✔ ground lines need line of sight (0.087792ms)
+✔ high lines hop rocks and never count as ground lines (0.09675ms)
+✔ a fence is an explicit order; a dark network drops it (brown-out is local) (0.087125ms)
+✔ supercover is 4-connected with both sides at an exact corner (0.054167ms)
+✔ cord length goes through a lookup that knows the Toastinator names (0.035292ms)
+✔ walking past the cord leaves a refusal the owner can read (5.781333ms)
+✔ a new order clears nothing by itself, but a newer refusal replaces the old one (2.222625ms)
+✔ Relay Pylon: place-power kind pylon costs 60 and lands as a station (4129.68275ms)
+✔ set-fence turns a ground link into a fence and clears it again (765.032375ms)
+✔ boxes are low, pylons are tall, the high line runs at the pylon cap with a ground shadow (4422.324625ms)
+✔ a live fence is a thick team rail; a browned-out fence is grey and sparks (278.159791ms)
+✔ fenced land is a pentagon tint per tile and pegs are dots (0.244917ms)
+✔ the layer builds meshes, rebuilds only when the view changes, and disposes (252.425709ms)
+✔ pentagon: five vertices on a circle of the given radius (0.780459ms)
+✔ a state without power gives an empty view (0.594417ms)
+✔ your plugged units get a faint cord to their anchor; selected or ordered ones are bright (0.597125ms)
+✔ the Power Strip glows with its reach and whether it is lit (0.121625ms)
+✔ the cord-limit ring shows on selection, at the unit cord length (0.149042ms)
+✔ a cut shows sparks for a while, and the cut unit is listed as dark (7.960833ms)
+✔ fenceView: nothing without power; posts, fences, high lines and pegs when there is some (1.063459ms)
+✔ default matches have no power; the territory match turns it on (4541.696292ms)
+✔ cord limit: a Crumb stops 12 tiles from its Power Strip and the order is dropped (2.803791ms)
+✔ a completed Outlet extends the cord: the Crumb walks 12 tiles past it (0.976709ms)
+✔ an unfinished claim is not an Outlet (0.846917ms)
+✔ brown-out: an island network with no Generator is stuck; a Generator lights it (0.250125ms)
+✔ a cut cord: an enemy on the line puts the Crumb on a 10 s battery, then powers it down (34.155166ms)
+✔ a battery Crumb may still walk; a powered-down one may not (6.613541ms)
+✔ re-plug: a Crumb standing next to a cut unit plugs it in after 24 ticks (10.86275ms)
+✔ re-plug rules: only a cut unit, only from next to it, only by your own Crumb (0.276208ms)
+✔ Extension Box: placed next to a plugged Crumb, paid for, and it reaches further (2.179041ms)
+✔ place-power rejects: unplugged builder, no shards, too far, bad kind (0.52875ms)
+✔ Power Strip reserve: a side with no Crumbs and no Shards gets a free emergency Crumb, then a cooldown (1.072209ms)
+✔ stepVerdict is null when power is off, and plugged units inside the cord may step (0.155583ms)
+✔ deterministic: the same script gives the same match (3.49975ms)
+✔ an Extension Box carries a wrapped Crumb past the Strip cord (5.930167ms)
+✔ a cord bent round a cliff unwinds when a box has a clear line, and stays wrapped when only the cliff-side box is near (3.2935ms)
+ℹ tests 60
+ℹ suites 0
+ℹ pass 59
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 111124.826084
+
+✖ failing tests:
+
+test at tests/bots-windmills.test.mjs:24:3
+✖ sonnet bot: both sides raise 2 Windmill(s) on their pads and no Toaster goes dark (68135.093ms)
+  AssertionError [ERR_ASSERTION]: side 0 has 1 Windmills at 5:00
+      at TestContext.<anonymous> (file:///Users/joshuaseppich/dev/rts/tests/bots-windmills.test.mjs:27:14)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

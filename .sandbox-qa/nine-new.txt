@@ -1,0 +1,128 @@
+✔ normal on side 0: builds, trains, expands and attacks inside 5 minutes (882.542833ms)
+✔ normal on side 1: builds, trains, expands and attacks inside 5 minutes (1126.892584ms)
+✔ easy on side 0: builds, trains, expands and attacks inside 5 minutes (1896.0915ms)
+✔ easy on side 1: builds, trains, expands and attacks inside 5 minutes (1894.618416ms)
+✔ normal guards its expansion with a Turret (332.011083ms)
+✔ easy is slower than normal: first blow lands later, and it still plays legally when it thinks every 4th tick (1113.323ms)
+✔ a run is deterministic: same seed, same result and same final state (590.356375ms)
+✔ it does not give itself away to a real opponent: holds its own against the sample bots and thinks fast (518.18125ms)
+✔ the module is player-shaped: name, act, easy and normal helpers, unknown difficulty means normal (0.124833ms)
+▶ standard map
+  ✔ is 128 x 128 with 21 Reaches and a two-thirds win of 14 (0.629542ms)
+  ✔ Reach rooms never overlap and every gate joins two real Reaches (0.897875ms)
+  ✔ every layer is point-mirrored, including after the seeded scatter (169.726ms)
+  ✔ all open ground is one connected piece (ramps join the plateaus), for several seeds (156.660833ms)
+  ✔ fair starts: both Mains see the same distance to the Centre, their fields and every Reach (3.0355ms)
+  ✔ a fast lane through the middle: Main reaches the Centre quickly (about a minute at 3 tiles a second or less) (2.332542ms)
+  ✔ territory layout builds: every Reach claims tiles and the mirrors pair up (6.064458ms)
+  ✔ the file form round-trips (two-digit ids on the big maps) and the seed changes only the scatter (48.348584ms)
+  ✔ Reach routing on this size: same reachability as the plain search, and 200 paths inside one 24 ticks a second budget (39.783416ms)
+✔ standard map (428.393292ms)
+▶ large map
+  ✔ is 192 x 192 with 31 Reaches and a two-thirds win of 21 (0.131ms)
+  ✔ Reach rooms never overlap and every gate joins two real Reaches (0.94575ms)
+  ✔ every layer is point-mirrored, including after the seeded scatter (799.48725ms)
+  ✔ all open ground is one connected piece (ramps join the plateaus), for several seeds (932.002334ms)
+  ✔ fair starts: both Mains see the same distance to the Centre, their fields and every Reach (10.720041ms)
+  ✔ a fast lane through the middle: Main reaches the Centre quickly (about a minute at 3 tiles a second or less) (4.54875ms)
+  ✔ territory layout builds: every Reach claims tiles and the mirrors pair up (1.524792ms)
+  ✔ the file form round-trips (two-digit ids on the big maps) and the seed changes only the scatter (259.667834ms)
+  ✔ Reach routing on this size: same reachability as the plain search, and 200 paths inside one 24 ticks a second budget (73.063209ms)
+✔ large map (2082.409ms)
+▶ huge map
+  ✔ is 256 x 256 with 41 Reaches and a two-thirds win of 28 (0.149125ms)
+  ✔ Reach rooms never overlap and every gate joins two real Reaches (2.120875ms)
+  ✔ every layer is point-mirrored, including after the seeded scatter (4227.437667ms)
+  ✔ all open ground is one connected piece (ramps join the plateaus), for several seeds (3347.021167ms)
+  ✔ fair starts: both Mains see the same distance to the Centre, their fields and every Reach (11.591625ms)
+  ✔ a fast lane through the middle: Main reaches the Centre quickly (about a minute at 3 tiles a second or less) (10.891958ms)
+  ✔ territory layout builds: every Reach claims tiles and the mirrors pair up (6.535208ms)
+  ✔ the file form round-trips (two-digit ids on the big maps) and the seed changes only the scatter (1066.729792ms)
+  ✔ Reach routing on this size: same reachability as the plain search, and 200 paths inside one 24 ticks a second budget (213.714125ms)
+✔ huge map (8886.505792ms)
+▶ map names
+  ✔ MAP_SIZES, the v4 alias, and the legacy default (1130.901334ms)
+  ✔ Large and Huge specs are the ones the loader uses (0.058209ms)
+✔ map names (1131.076917ms)
+✖ six idle Crumbs leave 400-700 wheat in the bank after 120 s (2026.067792ms)
+✖ a Crumb brings about 25-30 wheat a minute, measured between 40 s and 110 s (601.139541ms)
+✔ same seed, same players: logs are byte-identical without timing (1350.333084ms)
+✔ same seed: comparable(log) is identical too (1130.999667ms)
+✔ timing is the only top-level field that may differ (1421.886666ms)
+✔ no millisecond numbers leak into events (549.166708ms)
+✔ different seeds give different logs (1308.877875ms)
+✔ env sources (except referee and player-worker) avoid nondeterministic APIs (3.075875ms)
+✔ a side whose Core dies loses with reason core (1.454375ms)
+✔ when side 1 Core dies, side 0 wins with reason core (0.132917ms)
+✔ both Cores dying on the same tick is a draw with reason both-cores (0.149625ms)
+✔ reaching maxTicks with a higher value wins with reason timeout (0.157792ms)
+✔ reaching maxTicks with a higher value for side 0 wins for side 0 (0.101042ms)
+✖ an exact value tie at maxTicks is a draw with reason timeout (0.500667ms)
+✔ nothing is reported before a Core dies or maxTicks is reached (0.157541ms)
+✔ a lone Grunt out of range of any Core reports nothing before the limit (0.0875ms)
+✔ the timeout is not reported one tick early (0.08225ms)
+ℹ tests 55
+ℹ suites 4
+ℹ pass 52
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12684.809375
+
+✖ failing tests:
+
+test at tests/passive-income.test.mjs:22:1
+✖ six idle Crumbs leave 400-700 wheat in the bank after 120 s (2026.067792ms)
+  AssertionError [ERR_ASSERTION]: wheat after 120 s is 2130
+      at TestContext.<anonymous> (file:///Users/joshuaseppich/dev/rts/tests/passive-income.test.mjs:26:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/passive-income.test.mjs:29:1
+✖ a Crumb brings about 25-30 wheat a minute, measured between 40 s and 110 s (601.139541ms)
+  AssertionError [ERR_ASSERTION]: 170.7 wheat per Crumb per minute
+      at TestContext.<anonymous> (file:///Users/joshuaseppich/dev/rts/tests/passive-income.test.mjs:32:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/sim-end-conditions.test.mjs:119:1
+✖ an exact value tie at maxTicks is a draw with reason timeout (0.500667ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== null
+  
+      at TestContext.<anonymous> (file:///Users/joshuaseppich/dev/rts/tests/sim-end-conditions.test.mjs:131:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

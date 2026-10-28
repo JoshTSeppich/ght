@@ -1,0 +1,13 @@
+✔ a Popper sent out of cord after the match limit still stops at the cord limit (reporter setup) (4557.80375ms)
+✔ a crowd on the way out does not let a unit leave its cord (14.565875ms)
+✔ a windmill (range 0) does not extend the cord (3.843125ms)
+✔ a unit whose only anchor is destroyed goes to battery (0.212041ms)
+✔ a long walk round a cliff with wrap on ends inside the cord (95.137833ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4828.870833
