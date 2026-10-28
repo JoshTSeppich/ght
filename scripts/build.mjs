@@ -19,7 +19,7 @@ const DEFAULT_ROOT = path.resolve(HERE, '..');
 // Opponent modules app.mjs imports by name at runtime (a template string, so the crawler cannot see them).
 const RUNTIME_ROOTS = ['players/sample-player.mjs', 'players/builtin/ai.mjs', 'players/sonnet/bot.mjs', 'players/haiku/bot.mjs', 'players/fable/bot.mjs'];
 // Assets that code builds paths for by name rather than by manifest.
-const ASSET_DIRS = ['assets/portraits'];
+const ASSET_DIRS = ['assets/portraits', 'assets/models/td/Textures']; // the .glb models load their colormap by relative path
 const ASSET_MANIFESTS = ['assets/icons/snakenators/manifest.json', 'assets/models/MANIFEST.json', 'assets/audio/MANIFEST.json'];
 const FORBIDDEN = /(^|\/)(tests|\.sandbox|\.git|\.github|\.claude|node_modules\/\.cache)(\/|$)|\.test\.mjs$|(^|\/)\.env/;
 const TEXT = /\.(mjs|js|json|html|css|svg)$/;
@@ -30,6 +30,22 @@ export function findImports(src) {
   const re = /(?:\bimport\s*(?:[\w*${}\s,]+?\s*from\s*)?|\bexport\s*(?:[\w*${}\s,]+?)\s*from\s*|\bimport\s*\(\s*)(['"])([^'"\n]+)\1/g;
   for (let m; (m = re.exec(src));) out.add(m[2]);
   return [...out];
+}
+
+// Relative .mjs paths written as plain string literals ('./units-instanced.mjs', '../viewer3d/vfx.mjs').
+export function findModuleStrings(src) {
+  const out = new Set();
+  for (const m of src.matchAll(/['"](\.{1,2}\/[\w./-]+\.mjs)['"]/g)) out.add(m[1]);
+  return [...out];
+}
+
+// Every players/<name>/bot.mjs: app.mjs loads the opponent by name (?ai=, the difficulty menu), so ship them all.
+function playerBots(root) {
+  try {
+    return fs.readdirSync(path.join(root, 'players'), { withFileTypes: true })
+      .filter((d) => d.isDirectory()).map((d) => `players/${d.name}/bot.mjs`)
+      .filter((r) => fs.existsSync(path.join(root, r)));
+  } catch { return []; }
 }
 
 const CRC_TABLE = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
@@ -93,7 +109,7 @@ export async function build({ root = DEFAULT_ROOT, out = path.join(root, 'dist')
   };
   const visit = (rel) => { if (!seen.has(rel)) { seen.add(rel); queue.push(rel); } };
   for (const spec of findImports(inline)) { const r = resolveSpec(spec, 'play/index.html'); if (r) visit(r); }
-  for (const r of RUNTIME_ROOTS) if (exists(r)) visit(r);
+  for (const r of [...RUNTIME_ROOTS, ...playerBots(root)]) if (exists(r) && !FORBIDDEN.test(r)) visit(r);
   while (queue.length) {
     const rel = queue.shift();
     if (!exists(rel)) throw new Error(`missing module: ${rel}`);
@@ -101,8 +117,12 @@ export async function build({ root = DEFAULT_ROOT, out = path.join(root, 'dist')
     if (!/\.m?js$/.test(rel)) continue;
     const src = files.get(rel).toString('utf8');
     for (const spec of findImports(src)) { const r = resolveSpec(spec, rel); if (r) visit(r); }
+    // module paths kept in plain strings and imported through a helper (app.mjs's `wanted` table: units, buildings,
+    // vfx, terrain). findImports cannot see these; missing them made the shipped game fall back to placeholder balls.
+    for (const r of findModuleStrings(src)) { const abs = resolveSpec(r, rel); if (abs && exists(abs) && !FORBIDDEN.test(abs)) visit(abs); }
     // literal asset paths in code
     for (const m of src.matchAll(/['"`]((?:\.\.\/)*assets\/[\w./-]+\.(?:png|jpg|jpeg|webp|glb|ogg|mp3|wav|json))['"`]/g)) {
+      if (/(^|\/)assets\/(sprites|generated|tools)\//.test(m[1])) continue; // old Snakenator sprites and source sheets do not ship
       for (const a of [posix(path.normalize(path.join(path.dirname(rel), m[1]))), m[1].replace(/^(\.\.\/)+/, '')]) if (exists(a)) { add(a); break; }
     }
   }
