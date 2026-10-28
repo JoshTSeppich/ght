@@ -1,6 +1,6 @@
-# Driftfall CI (owner: sonnet, shipping). On every push and pull request: install, run the tests, build dist/.
+# GHT CI (owner: sonnet, shipping). On every push and pull request: install, run the tests, build dist/.
 # It does not deploy anywhere. Pick a host in HOSTING.md first; the uploaded dist/ is available as an artifact.
-name: ci
+name: GHT CI
 
 on:
   push:
@@ -35,6 +35,6 @@ jobs:
           fi
       - uses: actions/upload-artifact@v4
         with:
-          name: driftfall-dist
+          name: ght-dist
           path: dist
           retention-days: 14
