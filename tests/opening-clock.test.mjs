@@ -1,4 +1,4 @@
-// Opening and clock (Council #1) on the Toaster Wars rules: nothing ends before 3:00, because toasters go hungry
+// Opening and clock (Council #1) on the GHT rules: nothing ends before 3:00, because toasters go hungry
 // and cannot leave their cord, so the old 15 s rush is gone. Runs the territory match (the game Joshua plays) for
 // exactly the 3:00 floor and checks that neither side has won by then. A territory bot match costs seconds of real
 // time per game minute, so the suite keeps two matches; scripts/opening-sweep.mjs holds the wide sweep.

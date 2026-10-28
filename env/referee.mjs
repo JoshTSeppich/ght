@@ -211,14 +211,14 @@ export async function runMatch(options = {}) {
   const maxTicks = options.maxTicks ?? DEFAULTS.maxTicks;
   const maxCommandChars = options.maxCommandChars ?? DEFAULTS.maxCommandChars;
 
-  // Toaster Wars: options.territory plays the territory match (hunger, cords, kitchen, Wheatfield). options.createState
+  // GHT: options.territory plays the territory match (hunger, cords, kitchen, Wheatfield). options.createState
   // lets a caller bring its own state; the default stays the classic match so the referee's own tests keep their numbers.
   const state = typeof options.createState === 'function' ? options.createState(seed)
     : options.territory ? createTerritoryMatch(seed, options.territoryOpts || {}) : createMatch(seed, { pacing: options.pacing === true });
   // A shorter match than the stats table (tests use this): sim.mjs reads state.maxTicks in its own end check,
   // so the timeout rule stays in one place.
   if (options.maxTicks !== undefined) state.maxTicks = maxTicks;
-  else if (state.territory) state.maxTicks = TERRITORY_MATCH_TICKS; // a Toaster Wars match runs the live 15 minutes
+  else if (state.territory) state.maxTicks = TERRITORY_MATCH_TICKS; // a GHT match runs the live 15 minutes
   const handles = [new PlayerHandle(0, players[0], seed), new PlayerHandle(1, players[1], seed)];
 
   try {

@@ -1,4 +1,4 @@
-// Toaster Wars buildings as blocky toys (owner: sonnet, Playable Client): the Power Strip (the base), the Mill, the Well and
+// GHT buildings as blocky toys (owner: sonnet, Playable Client): the Power Strip (the base), the Mill, the Well and
 // the Toaster. Cream and charcoal blocks, five-sided rounds, a team-colour block on each, and cute faces where a toaster
 // would have one. Same palette and proportions as the units (play/toaster-models.mjs), so a base reads as one family.
 // The materials are shared (one set per THREE namespace, not per building) and the boxes carry the toy edge band

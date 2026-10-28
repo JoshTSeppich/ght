@@ -1,4 +1,4 @@
-// Research on Toaster Wars (M3): the Assembly Line queues Ground Weapons 1, it costs Wheat + Flour, it finishes, and
+// Research on GHT (M3): the Assembly Line queues Ground Weapons 1, it costs Wheat + Flour, it finishes, and
 // upgradeLevel() reads the result. The /play state keeps state.research (it used to be deleted).
 import test from 'node:test';
 import assert from 'node:assert/strict';

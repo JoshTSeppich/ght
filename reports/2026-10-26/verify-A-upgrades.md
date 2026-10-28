@@ -11,9 +11,9 @@ Read-only crawl. No game file, test or doc was edited. Numbers come from `node -
    - The other 15 non-level rows are land, mining, Coil-wide or Burrow-wide upgrades.
 
 2. **PARTLY.** Entry points and what they do with research:
-   - `switchOffDriftfall` is called only from `createToasterState` (`play/toaster-play.mjs:28`). `createPlayableState` (`:37`) wraps it. Research is off on the /play path. Node: `createToasterState(7)` and `createPlayableState(7)` both have `research === undefined` and `drift === undefined`.
+   - `switchOffGht` is called only from `createToasterState` (`play/toaster-play.mjs:28`). `createPlayableState` (`:37`) wraps it. Research is off on the /play path. Node: `createToasterState(7)` and `createPlayableState(7)` both have `research === undefined` and `drift === undefined`.
    - **Research stays ON** in these paths:
-     - `createReplayState` (`play/toaster-play.mjs:60`). It does not call `switchOffDriftfall`. `play/app.mjs:231` uses it for replay when there is no last record. Node: `research true, drift true`.
+     - `createReplayState` (`play/toaster-play.mjs:60`). It does not call `switchOffGht`. `play/app.mjs:231` uses it for replay when there is no last record. Node: `research true, drift true`.
      - `createTerritoryMatch` (`env/sim-territory.mjs:74` calls `enableResearch`). Used by `env/referee.mjs:216` when `options.territory` is set, and by `play/territory-wire.mjs:12` for `?territory=1`.
    - **Research stays OFF** in `createMatch` (`env/sim.mjs`, the classic match). `env/live.mjs:137` and `:183` fall back to it, so the live compiler is off unless it passes `createState`.
    - Bots: `players/` has no `research`, `upgrade`, `Hide` or `Weapons` strings (grep empty). No bot emits a `research` command. The bots' territory matches have research on, but nothing uses it.
@@ -89,7 +89,7 @@ Truth column is for /play today.
 
 ## Missed
 
-- **The replay path keeps research and Drift on.** `createReplayState` (`play/toaster-play.mjs:60`) does not call `switchOffDriftfall`. `play/app.mjs:231` uses it for replay when there is no last record. The comment at `:44` does not mention replays.
+- **The replay path keeps research and Drift on.** `createReplayState` (`play/toaster-play.mjs:60`) does not call `switchOffGht`. `play/app.mjs:231` uses it for replay when there is no last record. The comment at `:44` does not mention replays.
 - **No UI can issue a research command, on any page.** `grep` finds no `research` command, card, hotkey or button in `play/` or `players/`. The only emitter is raw commands in tests. So "research is off on /play" is moot: no route to buy an upgrade exists, even in classic or territory.
 - **Hide and Weapons do nothing in combat, even with research on.** `env/combat.mjs` never reads them. Only Swimmers and Tunnels are read by id. The claim in the task implies the combat path is wired, and it is not.
 - **Five upgrades are dead even where research is on.** Drill Speed 1-3, Track Speed, Bigger Buffers, Cube Press and Twin Press write to `setChainMod`, and nothing calls that function.

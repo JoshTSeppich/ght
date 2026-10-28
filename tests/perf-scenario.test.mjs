@@ -1,4 +1,4 @@
-// The perf scenarios (owner: sonnet, PERF). The Toaster Wars scene the frame-rate page measures must be the real match with
+// The perf scenarios (owner: sonnet, PERF). The GHT scene the frame-rate page measures must be the real match with
 // the synthetic set on top: 200 toasters in the five kinds, half marching, 6 power points, 12 buildings. Pure node tests.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

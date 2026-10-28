@@ -1,4 +1,4 @@
-// Driftfall — tiers gated by territory, and research queues (TERRITORY.md sections 5 and 6). Owner: sonnet.
+// GHT — tiers gated by territory, and research queues (TERRITORY.md sections 5 and 6). Owner: sonnet.
 // Only active when the state carries the territory rules (see sim-territory.mjs). Pure and deterministic.
 //
 // A tier needs a building AND land: tier 2 = Foundry or Sanctum and Hold >= 3, tier 3 = Hangar and Hold >= 6.
@@ -43,14 +43,14 @@ export function kindTier(kind) {
 }
 
 /** Why this side cannot use something of this tier, or null. */
-export const tierReason = (state, side, tier) => (!state.noTiers && tier > sideTier(state, side) ? 'tier-locked' : null); // state.noTiers: Toaster Wars, every kind open from the start
+export const tierReason = (state, side, tier) => (!state.noTiers && tier > sideTier(state, side) ? 'tier-locked' : null); // state.noTiers: GHT, every kind open from the start
 
 // ---------------------------------------------------------------------------------------------
-// Toaster Wars kitchen tiers (SYSTEMS-DESIGN.md section 2). Judged per kind, no Hold: the card and the Kitchen panel call
+// GHT kitchen tiers (SYSTEMS-DESIGN.md section 2). Judged per kind, no Hold: the card and the Kitchen panel call
 // kitchenLockReason(state, side, kind); it reads the observation (power.view.points) or the sim (power.points) alike.
 // ---------------------------------------------------------------------------------------------
 
-/** The Toaster Wars tier of a kind: 1, 2 or 3. Kinds on no list are tier 1. */
+/** The GHT tier of a kind: 1, 2 or 3. Kinds on no list are tier 1. */
 export function toasterTierOf(kind) {
   for (const n of [3, 2]) if (STATS.toasterTiers[n].unlocks.includes(kind)) return n;
   return 1;

@@ -16,7 +16,7 @@
 //     and discarded; a throw, a non-array, a reply that is not plain JSON or holds a command longer than
 //     maxCommandChars is an `error` (empty commands, one strike); maxErrors strikes, or no reply within hardMs,
 //     is a `forfeit`. Same option names and messages as env/referee.mjs, so the two drivers judge alike.
-//   - driver.log is a standard driftfall-log (env/log.mjs), so every live game is a replay for free, and
+//   - driver.log is a standard ght-log (env/log.mjs), so every live game is a replay for free, and
 //     rerun(log) steps the same seed through the same commands and gives the same events and state.
 //   - The clock is injectable (now, setTimer, clearTimer) so tests run with a fake clock and stay deterministic.
 //     Nothing here is random. The clock never touches the sim: it only decides *when* tick() is called.
@@ -138,7 +138,7 @@ export function logRules(state, builder) {
 }
 
 // The state a log started from. A caller-supplied builder wins (play/toaster-play.mjs states live outside env/); then the
-// log's rules; for logs from before the rules field, the opening observation (power and kitchen only exist in Toaster Wars).
+// log's rules; for logs from before the rules field, the opening observation (power and kitchen only exist in GHT).
 function rebuildState(log, createState) {
   if (typeof createState === 'function') return createState(log.seed);
   const named = log.rules?.state;

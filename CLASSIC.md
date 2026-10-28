@@ -1,6 +1,6 @@
-# Driftfall Classic — Joshua's direction: "how fast and simple StarCraft 1 was — build basically that"
+# GHT Classic — Joshua's direction: "how fast and simple StarCraft 1 was — build basically that"
 
-Driftfall stays ORIGINAL (our units, names, numbers and art; nothing copied from StarCraft). We copy the *principles*
+GHT stays ORIGINAL (our units, names, numbers and art; nothing copied from StarCraft). We copy the *principles*
 that made the 1998 classic fast and simple. Everything below is a requirement unless the swarm agrees otherwise (AGREE).
 
 ## The principles

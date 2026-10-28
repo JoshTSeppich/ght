@@ -232,7 +232,7 @@ describe('wheatfield map', () => {
     assert.equal(TERRITORY_DEFAULT_MAP, 'wheatfield');
     assert.ok(isTerritoryMap('wheatfield'));
     assert.equal(WHEATFIELD.name, 'wheatfield');
-    assert.equal(chosenMap({ territory: true }), process.env.DRIFTFALL_MAP || 'wheatfield');
+    assert.equal(chosenMap({ territory: true }), process.env.GHT_MAP || 'wheatfield');
     assert.equal(generateMap(3, { map: 'v4' }).width, 128);
   });
 });

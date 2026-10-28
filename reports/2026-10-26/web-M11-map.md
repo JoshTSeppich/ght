@@ -64,7 +64,7 @@ So the HIVE line "8 generator sockets no code uses" is PARTLY right: the sockets
 - Winter's Gate LE (search snippet): 128 x 132 tiles, rush 41 s to the enemy natural.
 - Current 2026 ladder pool: UNVERIFIED (Liquipedia's Ladder Maps page returned 403; the Map page redirects to Maps and was not read).
 - Size gap: Wheatfield is 256 x 256 = 65,536 tiles, about 3.3 times the area of Ephemeron or Altitude (about 19,500 each), if their figures are tiles.
-- Rush distance: not converted. SC2 gives rush distance in seconds; Wheatfield's 302-step path is in tiles. A conversion needs Toaster Wars unit speed (not checked) — UNVERIFIED.
+- Rush distance: not converted. SC2 gives rush distance in seconds; Wheatfield's 302-step path is in tiles. A conversion needs GHT unit speed (not checked) — UNVERIFIED.
 - Xel'Naga towers: Blizzard's game guide (news.blizzard.com/en-us/article/4546768/game-guide-map-elements) says a tower is controlled by having units adjacent to it and grants vision over "a good chunk of the map". It does not give a count or placement. **Wheatfield has no tower or watchtower feature at all.** The Old Windmill 'X' is the closest thing and it does nothing in code.
 - Destructible rocks: SC2 uses them to gate expansions and backdoors (Ephemeron, Altitude, Blizzard guide). Wheatfield's dam rocks are '#' tiles that sit in the map, and env/rocks.mjs handles pushes generally. The map's rock layout does not gate any Reach.
 - Natural expansions: SC2 natural = the first expansion behind a choke. Wheatfield's Lower Farm is the natural in the doc; it has no choke feature beyond the creek and the gates (not counted).

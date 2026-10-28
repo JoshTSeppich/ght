@@ -9,7 +9,7 @@ cords as leash, Strip/Outlet/Extension, battery, re-plug.
 
 ## 1. What other games teach us
 
-| Game | Mechanic | Lesson for Toaster Wars |
+| Game | Mechanic | Lesson for GHT |
 |---|---|---|
 | StarCraft (pylons) | A pylon projects a power field; buildings only work inside it; kill the pylon and they go dark; pylons double as wall pieces at the ramp | Power points should be **targets** and **wall pieces** at once. Losing one should visibly switch things off. |
 | SC2 walling / force fields | Walls and force fields **change the terrain** temporarily; chokes decide fights | Lines should create **temporary chokes** the player builds. That is the "terrain changes" feeling. |

@@ -1,4 +1,4 @@
-// Driftfall map sizes (TERRITORY.md section 14), owned by sonnet: Standard 128 (21 Reaches), Large 192 (31) and
+// GHT map sizes (TERRITORY.md section 14), owned by sonnet: Standard 128 (21 Reaches), Large 192 (31) and
 // Huge 256 (41). Same drawing code as maps/layout-v4.mjs (drawV4 takes a spec); this file holds the Large and Huge
 // specs. Pure: no fs, no clock, no randomness (the seed only scatters rocks, see scatterV4).
 //

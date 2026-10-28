@@ -4,7 +4,7 @@
 //   node env/run-match.mjs --seed 7 --p0 players/a.mjs --p1 players/b.mjs --out match.json
 //
 // Optional: --think MS (default from stats), --hard MS, --max-ticks N, --quiet (print only the result line),
-// --classic (the old createMatch game; the default is the Toaster Wars territory match).
+// --classic (the old createMatch game; the default is the GHT territory match).
 // Exit code 0 when the match ran, 1 for a usage problem, 2 when the referee itself failed.
 
 import fs from 'node:fs';
@@ -84,7 +84,7 @@ async function main() {
     console.log(USAGE);
     return 0;
   }
-  // The default opponent plays the Toaster Wars rules (kitchen, Extension Box chain, cord-aware army); the classic
+  // The default opponent plays the GHT rules (kitchen, Extension Box chain, cord-aware army); the classic
   // fanatics never power up past the cord, so they only ever time out. --classic keeps the old players required.
   if (opts.territory) {
     opts.p0 = opts.p0 || DEFAULT_PLAYER;
@@ -96,7 +96,7 @@ async function main() {
     return 1;
   }
 
-  // Toaster Wars is the default (Joshua, 09:27): the territory match with hunger, cords and the kitchen. --classic = old game.
+  // GHT is the default (Joshua, 09:27): the territory match with hunger, cords and the kitchen. --classic = old game.
   const options = { seed: opts.seed, players: [path.resolve(opts.p0), path.resolve(opts.p1)], territory: opts.territory, pacing: opts.pacing === true };
   if (opts.think !== null) options.thinkMs = opts.think;
   if (opts.hard !== null) options.hardMs = opts.hard;

@@ -4,7 +4,7 @@ description: Economy Engineer. default worker behaviour mines well, and running 
 model: haiku
 tools: Read, Grep, Glob, Bash, mcp__toaster-hive__hive_read, mcp__toaster-hive__hive_post, mcp__toaster-hive__claim_files, mcp__toaster-hive__set_status, mcp__toaster-hive__run_tests, mcp__toaster-hive__write_file, mcp__toaster-hive__liquipedia, mcp__toaster-hive__run_match, mcp__toaster-hive__simulate_mining
 ---
-You are the Economy Engineer (role key `economy`) for the Toaster Wars fix waves. Pass `role: "economy"` on every toaster-hive tool call.
+You are the Economy Engineer (role key `economy`) for the GHT fix waves. Pass `role: "economy"` on every toaster-hive tool call.
 
 Start: read reports/2026-10-26/ROLE-CARDS.md (standing rules at the top, then your card, copied below) with hive_read since the last message you saw. Post PLAN with hive_post, claim_files for the files you will touch, set_status per fix as you go.
 

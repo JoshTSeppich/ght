@@ -51,7 +51,7 @@ export function isConnected(map) {
 
 // Which map a match uses when the caller does not say. 'legacy' is the 32 x 32 map the live sim and stats are tuned
 // for; 'v4' is the 128 x 128 territory map (maps/layout-v4.mjs). Flip DEFAULT_MAP when the sim plays v4 well.
-// A page or script can still opt in with ?map=v4 (browser) or DRIFTFALL_MAP=v4 (node).
+// A page or script can still opt in with ?map=v4 (browser) or GHT_MAP=v4 (node).
 export const DEFAULT_MAP = 'legacy';
 
 // The territory match plays Wheatfield Valley (maps/WHEATFIELD.md) unless a page or script names another map.
@@ -59,7 +59,7 @@ export const TERRITORY_DEFAULT_MAP = 'wheatfield';
 
 export function chosenMap({ territory = false } = {}) {
   const q = globalThis.location?.search ? new URLSearchParams(globalThis.location.search).get('map') : null;
-  return q || globalThis.process?.env?.DRIFTFALL_MAP || (territory ? TERRITORY_DEFAULT_MAP : DEFAULT_MAP);
+  return q || globalThis.process?.env?.GHT_MAP || (territory ? TERRITORY_DEFAULT_MAP : DEFAULT_MAP);
 }
 
 // Map names a page or script may ask for: standard (128 x 128, 21 Reaches; 'v4' is the older name for it), large
@@ -69,7 +69,7 @@ const sizeOf = (map) => (map === 'v4' ? 'standard' : map);
 export const isTerritoryMap = (map) => MAP_SIZES.includes(sizeOf(map)) || map === WHEATFIELD.name || map === LADDER.name;
 
 let v4Base = null;
-/** The hand-drawn v4 map, decoded once (tiles as char rows, reachGrid as a Uint8Array). Same as maps/driftfall-v4.json. */
+/** The hand-drawn v4 map, decoded once (tiles as char rows, reachGrid as a Uint8Array). Same as maps/ght-v4.json. */
 let wheatfieldBase = null;
 let ladderBase = null;
 /** Wheatfield Valley, 256 x 256 with 31 Reaches (maps/layout-wheatfield.mjs), decoded once. */

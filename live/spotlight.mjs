@@ -1,4 +1,4 @@
-// live/spotlight.mjs — Agent Spotlight panel for the Driftfall live view. Owner: fable (Agent Spotlight Operator).
+// live/spotlight.mjs — Agent Spotlight panel for the GHT live view. Owner: fable (Agent Spotlight Operator).
 //
 // Picks the 3–4 most interesting agents right now and shows them large with their live output.
 // Everything shown comes from the Control Room's records at the same origin:
@@ -485,5 +485,5 @@ if (typeof document !== "undefined") {
   for (const el of document.querySelectorAll("[data-spotlight]")) {
     if (!el.__spotlight) el.__spotlight = mountSpotlight(el, { count: Number(el.dataset.count) || DEFAULTS.count });
   }
-  globalThis.DriftfallSpotlight = { mountSpotlight, scoreAgent, pickSpotlight, classifyLine };
+  globalThis.GhtSpotlight = { mountSpotlight, scoreAgent, pickSpotlight, classifyLine };
 }

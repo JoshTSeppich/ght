@@ -1,4 +1,4 @@
-// Records a Toaster Wars match between two toaster-sonnet bots for the TV (watch mode). Owner: sonnet.
+// Records a GHT match between two toaster-sonnet bots for the TV (watch mode). Owner: sonnet.
 //   node play/replay/record.mjs <seed> [out.json]     (writes play/replay/toaster-seed-<seed>.json.gz by default)
 // The match runs on createReplayState(seed), the state the TV page builds, with both bots acting every tick.
 // Only the non-empty command lists are kept: the sim is deterministic, so seed + commands replay the whole match.

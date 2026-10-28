@@ -1,4 +1,4 @@
-// Driftfall Classic renderer (owner: fable, Classic renderer). See CLASSIC.md principle 4: a fixed tilted camera
+// GHT Classic renderer (owner: fable, Classic renderer). See CLASSIC.md principle 4: a fixed tilted camera
 // over the grid, instanced units so 200 hold 60 fps, big silhouettes, team colours, selection circles, health bars,
 // short crisp effects, fog of war. Reuses viewer3d's engine, terrain, buildings and vfx as they are; units come from
 // play/units-instanced.mjs.

@@ -1,4 +1,4 @@
-// Driftfall 3D engine (owner: fable). See VISUAL-3D.md for the shared contract.
+// GHT 3D engine (owner: fable). See VISUAL-3D.md for the shared contract.
 //
 //   createEngine(canvas, opts) -> { ctx, add(system), remove(system), start(), stop(), resize(), dispose(), setWorld(world) }
 //   ctx = { THREE, scene, camera, renderer, composer, clock, palette, assets, gridToWorld(x, y, h) -> Vector3, tileSize,
@@ -156,7 +156,7 @@ export function defaultCameraPose(width, height, tileSize = 1) {
 
 // Vignette: darkens the corners. Runs in linear HDR space before OutputPass applies tone mapping and sRGB.
 export const VignetteShader = {
-  name: 'DriftfallVignette',
+  name: 'GhtVignette',
   uniforms: {
     tDiffuse: { value: null },
     strength: { value: 0.42 },

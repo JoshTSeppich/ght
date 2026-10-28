@@ -1112,7 +1112,7 @@ test('Studio cleanup uses Cute spec for individual entries and attacks, removes 
  }
 });
 
-test('buildings scene lays out four distinct Toaster Wars bodies in a row at the /play camera', async () => {
+test('buildings scene lays out four distinct GHT bodies in a row at the /play camera', async () => {
   const { BUILDING_ROW, GAME_VIEW } = await import('../play/style-lab/lab.mjs');
   const lab = createLab(); lab.setShape('buildings');
   const row = lab.units[0];

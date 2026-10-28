@@ -26,7 +26,7 @@ Scope: play/app.mjs, play/results-card.mjs, play/opponent.mjs, play/sandbox.mjs,
 
 ## Surrender, victory, defeat, draw (what triggers each)
 - Surrender: Menu, Surrender, then "Really surrender?" (two clicks). Calls driver.resign(); AI wins with reason `forfeit` (env/live.mjs:517-522).
-- Core kill: reason `core`. One Core (Power Strip in Toaster Wars) gone = the other side wins (env/sim.mjs:110-112).
+- Core kill: reason `core`. One Core (Power Strip in GHT) gone = the other side wins (env/sim.mjs:110-112).
 - Both cores on the same tick: DRAW, reason `both-cores` (env/sim.mjs:110).
 - Timeout at tick >= maxTicks (21600 = 15:00 at 24 tps): higher sideValue wins; sideValue = units at cost + complete structures at cost + Power Strip hp (env/sim.mjs:114-137). An exact tie on value falls back to the wheat bank (state.shards). If the bank also ties, DRAW (env/sim.mjs:117-118).
 - AI forfeits (env/live.mjs:277-303): a single hard timeout (hardMs 1000) forfeits at once; 50 cumulative errors (throwLimit) forfeit. A reply over thinkMs (50 ms) is "late" and its commands are dropped, not forfeited.
@@ -36,7 +36,7 @@ Scope: play/app.mjs, play/results-card.mjs, play/opponent.mjs, play/sandbox.mjs,
 - env/ and play/ contain NO stalemate or idle-end rule (grep for stalemate, sudden-death, tie-break: no hits). A match where both sides idle runs to 15:00 and is decided by value, then bank.
 - See SC2 comparison below.
 
-## Score / results card (Toaster Wars)
+## Score / results card (GHT)
 - Shows: DRAW / VICTORY / DEFEAT, one reason line, Winner, Time, Wheat gathered, Slices baked, Toasters lost, one tip line, Restart, Watch replay, Play again on Normal, Enter restarts (play/results-card.mjs:54-66; app.mjs:815-821).
 - Stats are for YOUR side only (createMatchStats(side)). The enemy's numbers are not shown.
 
@@ -54,17 +54,17 @@ Scope: play/app.mjs, play/results-card.mjs, play/opponent.mjs, play/sandbox.mjs,
 - Watch end shows a winner or Draw; the replay-over screen offers Play again only.
 
 ## SC2 comparison (Liquipedia not fetched; WebSearch snippets only)
-- **Stalemate:** search snippet says patch 1.2.0 (Jan 2011) ended the game in a tie for all remaining players after 3 consecutive minutes with no income, no production and no structure destroyed, with a countdown shown. A melee option could switch the check off. Modern rules UNVERIFIED. Toaster Wars has no such rule; idle sides sit to 15:00. This is a gap to decide on, not a bug.
-- **Timeout:** SC2 has no fixed time limit; Toaster Wars' 15:00 limit is a design choice. Its tie-break (value, then wheat bank) differs from SC2's tie.
-- **Surrender:** SC2 surrender ends one player. Toaster Wars does the same and adds a two-step confirm: good.
-- **Replays:** SC2 saves .SC2Replay files and a replay library. Toaster Wars keeps one session-scoped record. Gap, not an error.
-- **Pause:** SC2 single player pauses via the game menu. Toaster Wars pauses only via P and does not pause on the menu (see above).
-- **Speed:** Liquipedia's speed list (Slower to Faster, Faster default for ladder) UNVERIFIED. Toaster Wars has no speed control for players.
-- **Score screen:** a patch-note snippet mentions a Technology column on the Score Summary tab; SC2 shows both players. Toaster Wars shows only your side.
-- **Replay viewer:** snippets mention speed change and rewind; pause not found in sources. Toaster Wars watch mode has P.
+- **Stalemate:** search snippet says patch 1.2.0 (Jan 2011) ended the game in a tie for all remaining players after 3 consecutive minutes with no income, no production and no structure destroyed, with a countdown shown. A melee option could switch the check off. Modern rules UNVERIFIED. GHT has no such rule; idle sides sit to 15:00. This is a gap to decide on, not a bug.
+- **Timeout:** SC2 has no fixed time limit; GHT' 15:00 limit is a design choice. Its tie-break (value, then wheat bank) differs from SC2's tie.
+- **Surrender:** SC2 surrender ends one player. GHT does the same and adds a two-step confirm: good.
+- **Replays:** SC2 saves .SC2Replay files and a replay library. GHT keeps one session-scoped record. Gap, not an error.
+- **Pause:** SC2 single player pauses via the game menu. GHT pauses only via P and does not pause on the menu (see above).
+- **Speed:** Liquipedia's speed list (Slower to Faster, Faster default for ladder) UNVERIFIED. GHT has no speed control for players.
+- **Score screen:** a patch-note snippet mentions a Technology column on the Score Summary tab; SC2 shows both players. GHT shows only your side.
+- **Replay viewer:** snippets mention speed change and rewind; pause not found in sources. GHT watch mode has P.
 
 ## Association (to the research)
-- The HIVE correction on "15:00 timeout" is confirmed in code: a Toaster Wars match with no fighting lasts 21600 ticks and is decided by sideValue, not by economy. Any design that wants the SC2-style stalemate rule needs a new check in env/sim.mjs checkEnd (idle for 3 min, no income, no production, no kill).
+- The HIVE correction on "15:00 timeout" is confirmed in code: a GHT match with no fighting lasts 21600 ticks and is decided by sideValue, not by economy. Any design that wants the SC2-style stalemate rule needs a new check in env/sim.mjs checkEnd (idle for 3 min, no income, no production, no kill).
 
 ## Summary
 - No start screen; URL query is the only option set.

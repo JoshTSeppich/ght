@@ -9,7 +9,7 @@ The map is a hand-drawn, point-mirrored board of 21 Reaches (Standard), with roc
 
 ## Verdict table
 
-Verdicts: HAVE (Driftfall has an equivalent that works in the sim), PARTIAL (some of it works, the rest is missing or not on screen), MISSING, NOT FOR US (with the reason).
+Verdicts: HAVE (GHT has an equivalent that works in the sim), PARTIAL (some of it works, the rest is missing or not on screen), MISSING, NOT FOR US (with the reason).
 
 | Atom line (section 13) | Verdict | Evidence / why |
 |---|---|---|

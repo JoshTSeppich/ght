@@ -1,4 +1,4 @@
-// Tests for the 128 x 128 Reach map (TERRITORY.md section 2): maps/layout-v4.mjs, maps/driftfall-v4.json and the
+// Tests for the 128 x 128 Reach map (TERRITORY.md section 2): maps/layout-v4.mjs, maps/ght-v4.json and the
 // v4 branch of env/map.mjs. Real modules, nothing stubbed.
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
@@ -180,8 +180,8 @@ describe('v4 seed scatter and the JSON file', () => {
     }
   });
 
-  test('maps/driftfall-v4.json is the output of the layout (run node maps/build-v4.mjs after editing the layout)', () => {
-    const file = JSON.parse(fs.readFileSync(new URL('../maps/driftfall-v4.json', import.meta.url), 'utf8'));
+  test('maps/ght-v4.json is the output of the layout (run node maps/build-v4.mjs after editing the layout)', () => {
+    const file = JSON.parse(fs.readFileSync(new URL('../maps/ght-v4.json', import.meta.url), 'utf8'));
     assert.equal(file.version, 4);
     assert.deepEqual(file, JSON.parse(JSON.stringify(encodeV4(drawV4()))));
     assert.deepEqual(decodeV4(file).reachGrid, base.reachGrid);

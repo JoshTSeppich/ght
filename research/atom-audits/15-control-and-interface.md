@@ -33,7 +33,7 @@ Checked against play/input.mjs, play/app.mjs, play/camera.mjs, play/minimap.mjs,
 
 Tally: HAVE 7, PARTIAL 11, MISSING 6, NOT FOR US 2 (plus 2 extras).
 
-## Top 5 changes (ranked by effect on how Driftfall plays)
+## Top 5 changes (ranked by effect on how GHT plays)
 
 1. **Jump keys: Home = my Core, F2-F4 = saved camera spots, Space cycles the last 5 alerts.**
    - Add: `Home`/`Backspace` centres on the player's main; Ctrl+F2..F4 saves, F2..F4 recalls; Space steps back through a ring of alerts instead of one. Add new alert kinds: Drift 30 s warning, Reach lost/contested, Core hit, army idle.

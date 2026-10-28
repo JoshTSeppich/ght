@@ -1,4 +1,4 @@
-# Toaster Wars feel report (reporter-feel, 2026-10-24)
+# GHT feel report (reporter-feel, 2026-10-24)
 
 **Verdict: the game works, but it does not yet feel like a finished RTS in the hands. It has no teacher on screen, an unreadable command card that hides the Windmill, no visible shots, and no sound or icon for hunger or no-power. The guide is built but not plugged in, and almost every polish item was shipped "not eyeballed in a browser".**
 
@@ -43,7 +43,7 @@ Sound facts. Two audio systems run together: the file player from `assets/audio/
 
 ## 4. Hotkeys and the command card
 
-- The Crumb card has 13 entries but the grid has 12 cells. **The Windmill (N) button is dropped.** VERIFIED: I ran `createInput` with the Toaster Wars options and `layoutCard`: 13 entries, 12 placed, Windmill absent. `layoutCard` (`command-card.mjs:23-35`) discards the overflow while its comment says "nothing is lost". The N key still works (`input.mjs:379-381`) but nobody can see it, and Windmills are the gate for a second Toaster (#827, 04:11Z).
+- The Crumb card has 13 entries but the grid has 12 cells. **The Windmill (N) button is dropped.** VERIFIED: I ran `createInput` with the GHT options and `layoutCard`: 13 entries, 12 placed, Windmill absent. `layoutCard` (`command-card.mjs:23-35`) discards the overflow while its comment says "nothing is lost". The N key still works (`input.mjs:379-381`) but nobody can see it, and Windmills are the gate for a second Toaster (#827, 04:11Z).
 - Buttons sit on cells that do not match their key: Hold (H) on the Q cell, Move (M) on E, Heat Lamp (L) on R, Mill (I) on Z, Toaster (T) on C. VERIFIED by the same run. This is what Claude saw in the pane. The classic grid teaches nothing.
 - Hotkeys come from `TOASTER_HOTKEYS` (`toaster-play.mjs:78-81`): Mill I, Toaster T, Heat Lamp L, Well W, Dam D, Windmill N, Extension X, Pylon V, Assembly Line F. Units: Crumb C, Popper O, Zapper Z, Four-Slice F, Bagel E, Broiler B, Flak K. Mill I, Popper O, Bagel E and Flak K are odd mnemonics. F means Assembly Line on a Crumb, Four-Slice on the Line, and fence when a station is selected. T for Toaster clashes with no unit name. VERIFIED.
 - Missing: no Patrol, no select-all-army key, no home key. F1 idle Crumb, Ctrl+1..9 and double-tap centre exist (`input.mjs:364-370`). The Mac Ctrl+digit risk is still open (PLAYTEST.md item 8). UNVERIFIED.
@@ -65,7 +65,7 @@ Sound facts. Two audio systems run together: the file player from `assets/audio/
 - On /play, VERIFIED by code: the Coil motion graph always runs for units (`toaster-units.mjs:187,236-240`: strike, hit flinch, knock-back, shatter, expressions), bread-life sacks, Mill sails, Well bucket, Toaster slices, toast stacks (#819), thick cords with a flash near the limit, hit ring, shake.
 - `coilEnabled()` for `?motion=coil` is defined but nothing calls it (grep), so the flag is dead code.
 - Studio only: the five-beat attack grammar with a visible slice arc, Hot Coil bolt, Quad Volley spread, Bread Shell lob, Crouton Flak, Bagel roll (COMBAT.md section 3, `style-lab/*`).
-- `drift-banner.mjs` is reached only through `toasterPanel`, which returns nothing in Toaster Wars (`toaster-play.mjs:113`). Squad salute on select and the victory hop dance are UNVERIFIED on screen.
+- `drift-banner.mjs` is reached only through `toasterPanel`, which returns nothing in GHT (`toaster-play.mjs:113`). Squad salute on select and the victory hop dance are UNVERIFIED on screen.
 
 ## RANKED: what is left
 

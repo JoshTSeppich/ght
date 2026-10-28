@@ -1,10 +1,11 @@
 // Per-match stats for the balance and live view teams.
-// Reads every driftfall match log in matches/ (format: ENV-SPEC.md section 12) and writes analytics/summary.json.
+// Reads every ght match log in matches/ (format: ENV-SPEC.md section 12) and writes analytics/summary.json.
 // Usage: node analytics/matches.mjs [matchesDir] [outFile]
 // Read-only on the logs. No Date or Math.random, so the same logs always give the same summary.
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { isLogFormat } from "../env/log.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const MATCHES_DIR = process.argv[2] ?? path.join(HERE, "..", "matches");
@@ -192,7 +193,7 @@ function findings(agg) {
   return out;
 }
 
-// Read every driftfall log in the folder. Anything that is not a driftfall log goes into `skipped`.
+// Read every ght log in the folder. Anything that is not a ght log goes into `skipped`.
 export function summariseDir(dir) {
   const matches = [];
   const skipped = [];
@@ -206,15 +207,15 @@ export function summariseDir(dir) {
       skipped.push({ file, reason: `not readable JSON (${err.message})` });
       continue;
     }
-    if (log.format !== "driftfall-log" || !Array.isArray(log.ticks)) {
-      skipped.push({ file, reason: "not a driftfall-log" });
+    if (!isLogFormat(log.format) || !Array.isArray(log.ticks)) {
+      skipped.push({ file, reason: "not a GHT match log" });
       continue;
     }
     matches.push(analyseMatch(log, file));
   }
   const agg = aggregate(matches);
   return {
-    format: "driftfall-analytics-summary",
+    format: "ght-analytics-summary",
     version: 1,
     ticksPerMinute: TICKS_PER_MINUTE,
     rateNote: "ENV-SPEC.md has no tick rate; per-minute numbers assume 8 ticks per second (viewer3d default).",

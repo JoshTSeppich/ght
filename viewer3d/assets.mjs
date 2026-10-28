@@ -1,5 +1,5 @@
-// Driftfall 3D assets: loads the CC0 models and sounds the scouts listed in assets/models/MANIFEST.json and
-// assets/audio/MANIFEST.json, re-paints models to the Driftfall palette per team, scales them to the tile, and
+// GHT 3D assets: loads the CC0 models and sounds the scouts listed in assets/models/MANIFEST.json and
+// assets/audio/MANIFEST.json, re-paints models to the GHT palette per team, scales them to the tile, and
 // hands out an original procedural placeholder for anything missing, broken or not yet modelled. Nothing in the
 // scene should ever be blank because a file is absent.
 //
@@ -124,7 +124,7 @@ export function soundUrl(manifest, entry, base = ASSET_ROOT) {
 }
 
 // ---------- re-painting loaded models ----------
-// The CC0 kits use a handful of named flat materials. Each name maps to a Driftfall role; the role picks one of the
+// The CC0 kits use a handful of named flat materials. Each name maps to a GHT role; the role picks one of the
 // shared palette materials, so a loaded rover and a procedural Grunt wear exactly the same paint.
 export const MATERIAL_ROLES = Object.freeze({
   metalred: 'team', red: 'team', accent: 'team', team: 'team', paint: 'team',

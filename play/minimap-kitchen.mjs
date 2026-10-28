@@ -1,4 +1,4 @@
-// Toaster Wars minimap marks (PLAYABLE.md item 28): windmill pads, the Mill Dam site, your power network as team-colour
+// GHT minimap marks (PLAYABLE.md item 28): windmill pads, the Mill Dam site, your power network as team-colour
 // lines, and attack pings. Pure helpers plus a 2d-canvas drawer, so a node test can drive it with a stub context. The land
 // itself (gold wheat, navy water) is the base image from play/wheatfield-terrain.mjs; this only adds the marks on top.
 

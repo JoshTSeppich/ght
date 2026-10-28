@@ -6,12 +6,12 @@ env/budget.mjs (upkeep, debt), env/combat.mjs (attacks), env/drift.mjs (clock), 
 (maxTicks, forfeit), env/stats.mjs (match block), play/app.mjs (result screen, pause, AI default, territory flag),
 play/flow-panel.mjs, players/builtin/ai.mjs (claim logic, by grep only).
 
-Verdict key: HAVE = Driftfall already does an equivalent. PARTIAL = some of it exists, or it exists but is off on the
-live page. MISSING = not there. NOT FOR US = deliberately not in Driftfall, with the reason.
+Verdict key: HAVE = GHT already does an equivalent. PARTIAL = some of it exists, or it exists but is off on the
+live page. MISSING = not there. NOT FOR US = deliberately not in GHT, with the reason.
 
 ## Verdict table
 
-| # | Atom (section 1, as written) | Verdict | Evidence in Driftfall | Gap |
+| # | Atom (section 1, as written) | Verdict | Evidence in GHT | Gap |
 |---|---|---|---|---|
 | 1a | Gather resources | HAVE | `env/economy.mjs` `stepGathering` (Workers mine and deliver); Drills, Tracks and Press in TERRITORY §8 | Mining is wired on the live page; a regression was reported at 19:32 and is under NORTHSTAR priority 1 |
 | 1b | Spend them | HAVE | `env/budget.mjs` draws cost during training; construction and research pay through the same budget | none |
@@ -29,7 +29,7 @@ live page. MISSING = not there. NOT FOR US = deliberately not in Driftfall, with
 Counts across the 12 rows: HAVE 5 (1a, 1b, 1c, 1d, 1k; 1d has a balance problem noted above), PARTIAL 3 (1e, 1f, 1j),
 MISSING 1 (1h), NOT FOR US 3 (1g, 1i, 1l).
 
-## TOP 5 changes, ranked by how much they improve how Driftfall plays
+## TOP 5 changes, ranked by how much they improve how GHT plays
 
 1. **Give the combat loop a cooldown and a 3:00 Core floor** (FANATICS Council #1).
    - What: add an attack cooldown per unit kind in `env/combat.mjs` and `env/stats.mjs`, so a 4-unit push cannot take a Core in about 1.5 s. Add an early-game rule so no Core can fall before 3:00.

@@ -5,9 +5,9 @@ Commands run (all read-only): `node scripts/tech-tree-doc.mjs --check` (prints "
 Profile note: "grid" is the /play default (play/toaster-play.mjs HOTKEY_PROFILES.grid); "classic" is `?keys=classic`.
 
 ## 1. TECH-TREE.md tiers: CONFIRMED (old tiers), gate detail below
-- TECH-TREE.md:37 "Needs Hold 3 ... Foundry or Sanctum"; :54 "Needs Hold 6 ... Hangar". Those are the Driftfall rules in env/stats.mjs:232-244 (`tiers`). The generator reads `STATS.tiers` (scripts/tech-tree-doc.mjs tierSection).
-- The Toaster Wars tiers (env/stats.mjs:251-255, `toasterTiers`: Kitchen = one complete Toaster, Powered = a Windmill or Dam) appear nowhere in TECH-TREE.md.
-- Research lines (TECH-TREE.md:20, 39, 56: "Ground Weapons 1" ...) describe a system /play turns off: play/toaster-play.mjs:47-50 `switchOffDriftfall` deletes `state.research` and sets `state.noTiers`.
+- TECH-TREE.md:37 "Needs Hold 3 ... Foundry or Sanctum"; :54 "Needs Hold 6 ... Hangar". Those are the GHT rules in env/stats.mjs:232-244 (`tiers`). The generator reads `STATS.tiers` (scripts/tech-tree-doc.mjs tierSection).
+- The GHT tiers (env/stats.mjs:251-255, `toasterTiers`: Kitchen = one complete Toaster, Powered = a Windmill or Dam) appear nowhere in TECH-TREE.md.
+- Research lines (TECH-TREE.md:20, 39, 56: "Ground Weapons 1" ...) describe a system /play turns off: play/toaster-play.mjs:47-50 `switchOffGht` deletes `state.research` and sets `state.noTiers`.
 - Gate, which exists only in the UI: env/tiers.mjs:72-76 `kitchenLockReason` is called only from play/input.mjs:195 (the card's lockReason). Greyed and clickable, with a reason line (play/command-card.mjs:62, :40-44).
 - Gate in the sim: NOT enforced. env/sim-territory.mjs:199 and :207 call `tierReason`, which returns null when `state.noTiers` is set (env/tiers.mjs:46). `stepTiers` only runs under `if (state.research)` (env/sim-territory.mjs:248), so it never runs in /play. Nothing else in env/ calls `kitchenLockReason`. Reading the code: a train or build command for a Four-Slice (brute) with no Windmill is accepted by the sim. A runtime test was not run; the test that would settle it is a sim-level `train` of `brute` with no Windmill.
 - Panel: the Hold readout is blank in /play (play/toaster-play.mjs:130 `if (!state.drift && !state.research) return ''`).
@@ -66,7 +66,7 @@ SYSTEMS-DESIGN.md also has no section 5 (goes 4 to 6). Cosmetic.
 ## 6. ECONOMY.md: CONFIRMED
 - `node scripts/economy-doc.mjs --check`: "ECONOMY.md is up to date".
 - Hand spot checks against raw sources:
-  1. Crumb 50 Wheat, 40 hp, 1.67 s train: ECONOMY gives 1.67; the Toaster Wars overlay is trainTicks 40 = 1.67 s at 24 tps (env/stats.mjs:169). The raw classic value is 20 ticks (stats.mjs:152), which the doc correctly does not use.
+  1. Crumb 50 Wheat, 40 hp, 1.67 s train: ECONOMY gives 1.67; the GHT overlay is trainTicks 40 = 1.67 s at 24 tps (env/stats.mjs:169). The raw classic value is 20 ticks (stats.mjs:152), which the doc correctly does not use.
   2. Toaster 100 Wheat, 250 hp, 2.5 s build: buildTicks 60 / 24 = 2.5 (stats.mjs toaster row).
   3. Power Strip 2400 hp: env/stats.mjs:167 coreHp 2400.
   4. Field tile 1800 Wheat: env/map.mjs:12 WHEAT_AMOUNT = 1800.

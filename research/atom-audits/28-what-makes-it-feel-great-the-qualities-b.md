@@ -7,7 +7,7 @@ research/atom-audits/21 and 25 and the team chat. Nothing was run; verdicts come
 
 ## Verdict table
 
-| # | Quality (section 28) | Verdict | Evidence in Driftfall | Gap |
+| # | Quality (section 28) | Verdict | Evidence in GHT | Gap |
 |---|---|---|---|---|
 | 28a | Speed: everything responds instantly | PARTIAL | Live driver ticks at a computed schedule with bounded catch-up (`env/live.mjs`); `play/feel.mjs` gives hit flashes (160 ms) and selection cues; haiku's ANIM plan has button press 80 ms. | The sim only moves on tick edges, so an order shows no change until the next tick. No order acknowledgement (click ring, unit "yes" flinch) and no button press or refusal feedback yet. Haiku's UI motion section is planned, not built. |
 | 28b | Readability: tell what is happening at a glance | PARTIAL | Team colours cyan/orange, hand-drawn art, hit rings, Drift banner 30 s ahead (`drift-banner.mjs`), tier readout, territory HUD, minimap. | Fog is drawn by `fog.mjs` but `app.mjs` does not call it, so no hidden or remembered information. Unit identity and counters are muddy (4 live kinds; audit 19). No health or cooldown readout for fights. Placeholder shapes remain in 3D. |
@@ -24,7 +24,7 @@ research/atom-audits/21 and 25 and the team chat. Nothing was run; verdicts come
 
 Counts across 12 rows: HAVE 1 (28k), PARTIAL 11, MISSING 0, NOT FOR US 0 as whole lines (only the "distinct" half of 28l is NOT FOR US for v0.1: one faction, a mirror).
 
-## TOP 5 changes, ranked by how much they improve how Driftfall plays
+## TOP 5 changes, ranked by how much they improve how GHT plays
 
 1. **Make every order and button answer within one frame (28a).**
    - Add: a click ring where you right-click (cyan for move, red for attack, gold for mine/claim), a 2-frame unit "nod" (scale squash) on the first selected unit, an 80 ms button press and a 120 ms deny jolt on refused clicks (not enough Sap, no tier). All presentation-only, no sim change; use haiku's ANIM numbers so there is one timing set.

@@ -1,4 +1,4 @@
-process.env.DRIFTFALL_MAP = 'v4';
+process.env.GHT_MAP = 'v4';
 const { createLiveMatch } = await import('../env/live.mjs');
 const { createTerritoryMatch } = await import('../env/sim-territory.mjs');
 const d = createLiveMatch({ seed: 7, human: 0, ai: { name: 'x', act: () => [] }, maxTicks: 100 });

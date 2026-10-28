@@ -1,4 +1,4 @@
-// Driftfall Classic: instanced units (owner: fable, Classic renderer). See CLASSIC.md principle 4.
+// GHT Classic: instanced units (owner: fable, Classic renderer). See CLASSIC.md principle 4.
 //
 //   createInstancedUnits(ctx, opts) -> { name: 'units', update(frame, dt), dispose(), positionOf(id),
 //                                        setSelection(ids), setVisibility(fn | null), live(), count, draws, kinds }
@@ -141,7 +141,7 @@ export function bakeKind(kind, { markers = makeMarkerMaterials() } = {}) {
 // strips and visors glow by aEmit, and a per-instance aState = (flash, glow) whitens a hit unit for a few frames.
 export function makeUnitMaterial(opts = {}) {
   const m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0.3, ...opts });
-  m.customProgramCacheKey = () => 'driftfall-instanced-units|edge-v4';
+  m.customProgramCacheKey = () => 'ght-instanced-units|edge-v4';
   const edge = toyEdgeUniforms();
   m.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, edge);

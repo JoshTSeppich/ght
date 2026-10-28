@@ -1,4 +1,4 @@
-// Build changelog writer. Watches the Driftfall folder and keeps two outputs up to date:
+// Build changelog writer. Watches the GHT folder and keeps two outputs up to date:
 //   live/changelog.json  newest first; the on-screen panel reads this
 //   CHANGELOG.md         the same story for the repo
 // Every entry says what changed, who made it, and why, and links to the chat message that explains it.
@@ -207,7 +207,7 @@ function record(state, events, chat, rules, now) {
 
 function renderMarkdown(state) {
   const out = [
-    "# Driftfall changelog",
+    "# GHT changelog",
     "",
     "Written by the Build Changelog Writer (`live/changelog.mjs`). Newest first. Each line says what changed, who made it, and why. The chat message that explains it is named as `channel.jsonl #N`, the number that `node read.mjs` prints.",
     "",

@@ -28,7 +28,7 @@ const isStructure = (e) => e.kind === "core" || STRUCTURE_KINDS.includes(e.kind)
 const byId = (a, b) => a.id - b.id;
 
 // Stats row for a unit or buildable structure. The Core has no row with damage, so it never attacks.
-// With hunger on (state.ammo) this is the Toaster-Wars overlay row: toaster ranges and shots.
+// With hunger on (state.ammo) this is the GHT overlay row: toaster ranges and shots.
 function statsOf(entity, state) {
   return rowOf(state, entity.kind);
 }
@@ -83,7 +83,7 @@ function canHit(state, attacker, target) {
 // One hit of `attacker` on `target`. A splash neighbour takes the half shot with no building multiplier and no tag bonus.
 function hitDamage(state, attacker, target, base, splash = false) {
   const row = statsOf(attacker, state);
-  // Classic matches (hunger off) keep the old flat numbers: armor, tags, bonus and upgrades are Toaster Wars rules.
+  // Classic matches (hunger off) keep the old flat numbers: armor, tags, bonus and upgrades are GHT rules.
   if (!state.ammo) return isStructure(target) ? base * (row.structureMultiplier ?? 1) : base;
   const trow = statsOf(target, state) ?? {};
   const mods = state.items ? unitMods(attacker, state) : null;

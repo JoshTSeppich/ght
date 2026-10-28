@@ -21,7 +21,7 @@ function fakeCtx() {
 
 const unit = (id, owner, kind, x, y, hp) => ({ id, owner, kind, x, y, hp, carrying: 0, order: null });
 const fightLog = {
-  format: 'driftfall-log', version: 1, seed: 0, players: ['a', 'b'],
+  format: 'ght-log', version: 1, seed: 0, players: ['a', 'b'],
   stats: { units: { lancer: { range: 4, cost: 75 }, grunt: { range: 1, cost: 50 } }, structures: { forge: { buildTicks: 40, cost: 150 }, core: {} } },
   initial: {
     tick: 0, width: 16, height: 16, rocks: [], crystals: [], shards: [0, 0],

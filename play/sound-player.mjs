@@ -4,7 +4,7 @@
 // file never makes the match silent by error, and a missing AudioContext makes every call a quiet no-op.
 import { parseManifest, soundUrl, proceduralSamples } from '../viewer3d/audio.mjs';
 
-const MUTE_KEY = 'driftfall.muted'; // the same key as the 3D viewer, so one mute setting follows you
+const MUTE_KEY = 'ght.muted'; // the same key as the 3D viewer, so one mute setting follows you
 const NEAR = 6;   // tiles: full volume inside this
 const FAR = 40;   // tiles: quietest outside this
 const QUIET = 0.15;

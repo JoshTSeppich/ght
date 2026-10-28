@@ -3,7 +3,7 @@
 Audited by haiku against `research/STARCRAFT-ATOMS.md` section 20 (7 lines). Scope: that section, NORTHSTAR.md, and the
 env/ and play/ files that implement combat. Nothing was edited except this file.
 
-Verdicts: **HAVE** (Driftfall already does an equivalent), **PARTIAL**, **MISSING**, **NOT FOR US** (with reason).
+Verdicts: **HAVE** (GHT already does an equivalent), **PARTIAL**, **MISSING**, **NOT FOR US** (with reason).
 
 ## Evidence used
 
@@ -24,7 +24,7 @@ Verdicts: **HAVE** (Driftfall already does an equivalent), **PARTIAL**, **MISSIN
 
 ## Verdict table
 
-| # | Line from section 20 | Verdict | Driftfall now | Why |
+| # | Line from section 20 | Verdict | GHT now | Why |
 |---|---|---|---|---|
 | 1 | Fights are short and decisive; one bad engagement can lose the game | **PARTIAL** | Fights are decisive but too fast to read. A grunt kills a grunt in 8 ticks (about 0.33 s). A lancer kills a worker in 4 ticks. | Attacks land every tick (`combat.mjs` step 2) because player units have no cadence. Neutrals already use `attackEvery`, so the field pattern exists. |
 | 2 | Engagement positioning: concave, flanks, chokes | **PARTIAL** | Chokes exist as terrain: ramps (`=`, `\|`) and gates in `env/map.mjs`. Flanks exist as a Reach role. | Nothing rewards a position. Combat ignores map heights, so there is no high-ground bonus and no concave or flank logic. Auto-fight only hits what is already in range; nothing moves a unit to a better spot. |
@@ -39,7 +39,7 @@ Verdicts: **HAVE** (Driftfall already does an equivalent), **PARTIAL**, **MISSIN
 NOT FOR US: **travelling projectiles in the simulation.** Instant hits keep the 24-tick sim deterministic and cheap at 200
 units. The visible shot can be a tracer drawn on the client (top 5, item 4) with no change to the sim.
 
-## Top 5 changes, ranked by how much they improve how Driftfall plays
+## Top 5 changes, ranked by how much they improve how GHT plays
 
 1. **Give player units an attack cadence** (lines 1 and 3). Add a per-kind `attackEvery` (in ticks) to the unit rows
    in `env/stats.mjs`, and have `env/combat.mjs` honour it the way neutrals already do. Aim for a grunt-vs-grunt fight

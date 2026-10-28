@@ -1,5 +1,5 @@
-// UX Writer (ROLE-CARDS section 9): every number and key the player reads matches the Toaster Wars rows, the
-// Toaster Wars upkeep rate, the ammo rule and the active key profile. Evidence: reports/2026-10-26/verify-E-docs.md,
+// UX Writer (ROLE-CARDS section 9): every number and key the player reads matches the GHT rows, the
+// GHT upkeep rate, the ammo rule and the active key profile. Evidence: reports/2026-10-26/verify-E-docs.md,
 // verify-B-roster.md, web-M7-hud.md.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -15,11 +15,11 @@ import { IDLE_KEY } from '../play/teach.mjs';
 import { reasonText } from '../play/placement-ghost.mjs';
 import { mountSoundControls } from '../play/toaster-sounds.mjs';
 
-const TW = { ammo: {} }; // the Toaster Wars state shape rowOf() reads (env/stats.mjs rowOf)
+const TW = { ammo: {} }; // the GHT state shape rowOf() reads (env/stats.mjs rowOf)
 const UNITS = ['worker', 'grunt', 'lancer', 'brute', 'howler', 'spiker', 'dart'];
 const tipOf = (kind) => tipFor({ action: 'train', kind, key: 'x', cost: rowOf(TW, kind).cost });
 
-test('tooltips: the Popper quotes its Toaster Wars shot, reach and upkeep, not the classic table', () => {
+test('tooltips: the Popper quotes its GHT shot, reach and upkeep, not the classic table', () => {
   const row = rowOf(TW, 'grunt');
   assert.equal(row.shot.damage, 20);
   const tip = tipOf('grunt');
@@ -35,7 +35,7 @@ test('tooltips: every unit tip quotes the row rowOf() gives for it', () => {
   }
 });
 
-test('tooltips: upkeep uses the Toaster Wars rate the sim charges (5 percent), not the default 10', () => {
+test('tooltips: upkeep uses the GHT rate the sim charges (5 percent), not the default 10', () => {
   assert.equal(STATS.toaster.upkeepPercent, 5);
   assert.equal(numbersOf().upkeepPercent, STATS.toaster.upkeepPercent);
 });

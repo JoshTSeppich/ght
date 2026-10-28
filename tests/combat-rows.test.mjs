@@ -1,4 +1,4 @@
-// Combat Scale rows (M2): the real Toaster Wars rows carry armor, tags, bonus, hits, minRange and ~3x hp, and fights follow them.
+// Combat Scale rows (M2): the real GHT rows carry armor, tags, bonus, hits, minRange and ~3x hp, and fights follow them.
 import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { rowOf, STATS, UNIT_KINDS } from '../env/stats.mjs';

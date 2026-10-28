@@ -1,4 +1,4 @@
-# Verify C: economy and expansion (Wheatfield, Toaster Wars on /play)
+# Verify C: economy and expansion (Wheatfield, GHT on /play)
 
 Verifier run 2026-10-26, read-only. No game file, test or doc was edited. Only this report was written.
 

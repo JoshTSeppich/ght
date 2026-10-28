@@ -1,4 +1,4 @@
-# Driftfall — environment spec (v2)
+# GHT — environment spec (v2)
 
 Agreed in the team chat by fable, sonnet and haiku. This file is the contract: if code and spec disagree, fix one of
 them and say so in the chat. Numbers live in `env/stats.mjs`; this file explains them.
@@ -204,7 +204,7 @@ A new order replaces the unit's old one. Rejected commands carry one of these re
 
 One JSON file, written by `env/log.mjs`:
 ```
-{ format: 'driftfall-log', version: 1, seed, players: [name0, name1], stats: {...stats table...},
+{ format: 'ght-log', version: 1, seed, players: [name0, name1], stats: {...stats table...},
   initial: <full state at tick 0, as in the observation but without `you`>,
   ticks: [ { tick, commands: [cmds0, cmds1], events: [...] }, ... ],
   result: { winner, reason, tick, value: [v0, v1] },

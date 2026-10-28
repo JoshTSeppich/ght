@@ -1,4 +1,4 @@
-// Toaster Wars buildings (owner: sonnet): the Power Strip, Mill, Well and Toaster as blocky toys, hooked into
+// GHT buildings (owner: sonnet): the Power Strip, Mill, Well and Toaster as blocky toys, hooked into
 // viewer3d/buildings.mjs through ctx.buildingLook. Real Three.js, headless.
 import test from 'node:test';
 import assert from 'node:assert/strict';

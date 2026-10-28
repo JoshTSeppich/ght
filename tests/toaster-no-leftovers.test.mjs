@@ -1,11 +1,11 @@
-// PLAYABLE.md item 10: the default Toaster Wars match has no Drift, market, research or tier gates. ?classic=1 keeps them.
+// PLAYABLE.md item 10: the default GHT match has no Drift, market, research or tier gates. ?classic=1 keeps them.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createToasterState, toasterPanel } from '../play/toaster-play.mjs';
 import { createTerritoryMatch } from '../env/sim-territory.mjs';
 import { tierReason } from '../env/tiers.mjs';
 
-test('toaster state has the Driftfall leftovers switched off', () => {
+test('toaster state has the GHT leftovers switched off', () => {
   const s = createToasterState(7);
   assert.equal(s.drift, undefined);
   assert.equal(s.market, undefined);

@@ -1,6 +1,6 @@
-// The Toaster Wars top bar (PLAYABLE.md items 8 and 23). Owner: sonnet (HUD). Pure helpers, no DOM, no Node globals.
+// The GHT top bar (PLAYABLE.md items 8 and 23). Owner: sonnet (HUD). Pure helpers, no DOM, no Node globals.
 // Wheat, Flour, Water, Toast (stack), Power used of made and Upkeep per minute, each with an income-rate hover. Upkeep turns
-// red when it is more than the wheat coming in. Toaster Wars also shows Toasters N/40 (the unit cap). A "Pilot light" chip
+// red when it is more than the wheat coming in. GHT also shows Toasters N/40 (the unit cap). A "Pilot light" chip
 // shows while the Power Strip is baking emergency slices. From 14:00 the clock counts down the last minute in amber.
 // Without a budget (classic) the cap shows as Supply.
 import { STATS } from '../env/stats.mjs';

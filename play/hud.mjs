@@ -11,7 +11,7 @@ import { BAKERY } from '../env/bakery.mjs';
 import { panelRate, CREEK_SECONDS, SPRING_SECONDS } from './placement-ghost.mjs';
 import { upgradeLevel, researchRow } from '../env/research.mjs';
 
-// Toaster Wars names (TERRITORY.md section 16): the sim keeps its stable kind ids, the roster in env/stats.mjs names them.
+// GHT names (TERRITORY.md section 16): the sim keeps its stable kind ids, the roster in env/stats.mjs names them.
 export const KIND_NAME = Object.freeze(Object.fromEntries(
   ['worker', 'grunt', 'lancer', 'brute', 'howler', 'spiker', 'dart', 'core', 'forge', 'turret', 'mill', 'well', 'toaster']
     .map((k) => [k, toasterName(k)]),
@@ -24,7 +24,7 @@ const isStructure = (kind, stats = STATS) => kind === 'core' || kind in stats.st
 
 /** Max hp for a kind (units, structures and the Core). */
 export function maxHp(kind, stats = STATS) {
-  if (kind === 'core' && stats.toaster?.coreHp) return stats.toaster.coreHp; // the Power Strip of a Toaster Wars match
+  if (kind === 'core' && stats.toaster?.coreHp) return stats.toaster.coreHp; // the Power Strip of a GHT match
   return stats.units[kind]?.hp ?? stats.structures[kind]?.hp ?? stats.core?.hp ?? 0;
 }
 

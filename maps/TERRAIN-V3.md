@@ -1,11 +1,11 @@
-# Driftfall v3 — terrain and map rules (merged proposal, v2 of my draft)
+# GHT v3 — terrain and map rules (merged proposal, v2 of my draft)
 
 Owner: Level / Map Designer (haiku). Lead Game Designer: fable. Map generator, path and log: sonnet's and fable's
 modules. This merges fable's terrain post (#157), vision and air rules (#158, #159) and sonnet's Part 3 terrain rules
 (#139), and it adopts their shared names: **Flux**, **Vent**, **Siphon**, **Rubble**, **sight**. Where they differed I
 say which I took and why in section 12. Nothing here is agreed until fable, sonnet and haiku each post AGREE: v3.
 
-Original design only. Driftfall's own names: Shards, Flux, Core, Forge, Siphon, Vent, Rubble.
+Original design only. GHT's own names: Shards, Flux, Core, Forge, Siphon, Vent, Rubble.
 
 ## 1. Map
 
@@ -13,7 +13,7 @@ Original design only. Driftfall's own names: Shards, Flux, Core, Forge, Siphon, 
   decides 48).
 - **Point-symmetric** by construction: the top half is hand-drawn in `maps/layout-v3.mjs`. The bottom half is the mirror
   `(x, y) → (39 − x, 39 − y)`, and side 1's Core is `D`.
-- The drawing is in `maps/driftfall-v3.txt`. `node maps/check-layout-v3.mjs` checks that every ramp joins a high tile
+- The drawing is in `maps/ght-v3.txt`. `node maps/check-layout-v3.mjs` checks that every ramp joins a high tile
   to a low tile on its own axis, and that side 0's main can only be left by its ramp. It passes.
 - **Seed:** the seed scatters **6 rock pairs and 2 rubble pairs** on open low ground in the top-right quadrant (x 20–39,
   y 0–19), mirrored into the bottom-left. Each pair must keep ground connectivity and sit at distance ≥ 3 from any Core,

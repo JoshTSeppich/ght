@@ -1,4 +1,4 @@
-// ONE table of every economy number in Toaster Wars (PLAYABLE.md item 1). Owner: sonnet.
+// ONE table of every economy number in GHT (PLAYABLE.md item 1). Owner: sonnet.
 //
 // buildEconomy(STATS) gathers the numbers the rules already use; it does not own or change them. Where a number lives
 // in a module that itself imports stats.mjs (bakery, ammo, power, map) it is written once here under LITERALS and
@@ -27,7 +27,7 @@ const LITERALS = {
     stationCost: { extension: 30, pylon: 60, generator: 60 },
     stationReach: { strip: 14, outlet: 10, extension: 12, pylon: 8 },
   },
-  // env/energy.mjs ENERGY: what makes and uses Energy (Toaster Wars, PLAYABLE.md item 20). energy.mjs imports power.mjs, which
+  // env/energy.mjs ENERGY: what makes and uses Energy (GHT, PLAYABLE.md item 20). energy.mjs imports power.mjs, which
   // imports stats.mjs, so this table cannot import it; tests/economy-curve.test.mjs pins these to ENERGY.
   energy: {
     make: { strip: 2, generator: 2, windmill: 3, dam: 6, milldam: 14 },

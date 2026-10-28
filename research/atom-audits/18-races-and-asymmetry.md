@@ -6,8 +6,8 @@ Code read: env/stats.mjs (factions block, upgrades, items), env/sim.mjs and env/
 (Tunnels, `wrong-faction` gate), env/tiers.mjs (faction check on research), play/app.mjs (which match the page starts),
 play/research-card.mjs, players/*/sim.mjs (balance tester sweeps). Grep only, nothing else.
 
-Verdict key: HAVE = Driftfall already does an equivalent. PARTIAL = some of it exists, or it exists but is off on the
-live page or as data only. MISSING = not there. NOT FOR US = deliberately not in Driftfall, with the reason.
+Verdict key: HAVE = GHT already does an equivalent. PARTIAL = some of it exists, or it exists but is off on the
+live page or as data only. MISSING = not there. NOT FOR US = deliberately not in GHT, with the reason.
 
 **The key fact for this section:** the live page starts the classic match (`createMatch`, env/sim.mjs) through
 play/app.mjs. It never calls `createTerritoryMatch`, so the faction plumbing (`state.factions`, claims, tiers, the
@@ -16,11 +16,11 @@ therefore PARTIAL: the data and tests exist, the page does not show them. (Same 
 
 ## Verdict table
 
-| # | Atom (section 18) | Verdict | Driftfall today (evidence) |
+| # | Atom (section 18) | Verdict | GHT today (evidence) |
 |---|---|---|---|
 | 18.1 | Three races with entirely different mechanics, units and buildings | PARTIAL | Two factions are designed and tabled: the Snakenators (`coil`) and the Burrow (`burrow`), each with its own claim structure (Totem / Mound), worker (Siphoner / Digger), Drill buffer (20 / 30), track type, upgrade list and unit role names (env/stats.mjs:220-234; TERRITORY.md sections 3, 6). Only the Snakenator mirror is playable (`sides: ["coil", "coil"]`), and the Burrow is `parked: true`. A third race is NOT FOR US for v0.1: Joshua said "start with only one race" (TERRITORY.md section 13). |
 | 18.2 | First race: flexible, defensive, mobile buildings, repair, siege | PARTIAL | This identity is the Burrow, and it is parked. Its pieces exist: Mounds hold ground, Thick Hide, Rumble (siege splash that stuns), Undermine, and Tunnels (env/effects.mjs:95-120, gated on `factions[player] === 'burrow'`). Repair is the Mender (3 hp a tick, UNITS.md). Mobile buildings: Shed Skin (a Snakenator claim moves) is a row in env/stats.mjs only; grep finds no code that reads its effect. |
-| 18.3 | Second race: psionic, expensive strong units, shields, warp-in, power fields | NOT FOR US | Driftfall has no shields, no warp-in and no power fields, and it should not get them in v0.1. Its closest caster is the Hexer (Snare, Surge) in the classic roster, which is not tied to a faction. Its identity is cheap and fast, so the expensive-elite lane is a different race, and the one-race-first scope rules it out. |
+| 18.3 | Second race: psionic, expensive strong units, shields, warp-in, power fields | NOT FOR US | GHT has no shields, no warp-in and no power fields, and it should not get them in v0.1. Its closest caster is the Hexer (Snare, Surge) in the classic roster, which is not tied to a faction. Its identity is cheap and fast, so the expensive-elite lane is a different race, and the one-race-first scope rules it out. |
 | 18.4a | Third race (swarm): cheap units | PARTIAL | Grunt-role Fang is cheap and the classic roster is cheap (UNITS.md), but "cheap" is not tied to a faction. |
 | 18.4b | Swarm: larvae | NOT FOR US | Units come from buildings (Forge, Foundry, Sanctum) and cost army upkeep (TERRITORY.md section 9). A larva economy would fight the upkeep model. |
 | 18.4c | Swarm: creep | PARTIAL | Claim and Hold do the job: a Totem built in a Reach spreads your ground, and a Hold needs a complete claim (territory.mjs, TERRITORY.md section 3). Off the live page. |
@@ -31,7 +31,7 @@ therefore PARTIAL: the data and tests exist, the page does not show them. (Same 
 | 18.7 | Balance across the asymmetric races is the defining achievement | PARTIAL | The goal is written: mirror win rate 45-55% across seeds (NORTHSTAR "Done means" 5; TERRITORY.md section 13). The tester exists: players/sonnet/sim.mjs sweeps report win rate with a 95% CI, and players/haiku/sim.mjs does the same. Nothing runs the Snakenator mirror as a fairness gate, and the three-race version is NOT FOR US. |
 | 18.8 | Mirror matchups are the "pure" skill tests | HAVE | The default is a Snakenator mirror (`sides: ["coil", "coil"]`, env/stats.mjs:222). The map is point-mirrored (TERRITORY.md section 2; tests/map-sizes.test.mjs checks the mirror). Both sides start with the same roster on the live page. |
 
-## TOP 5 changes (ranked by how much they improve how Driftfall plays)
+## TOP 5 changes (ranked by how much they improve how GHT plays)
 
 1. **Put the faction on the live page, so both sides are not identical.**
    - What: the start screen and HUD show "The Snakenators" (name, cyan, one line: "fast claims, Coils cross Flood water

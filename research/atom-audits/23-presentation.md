@@ -1,4 +1,4 @@
-# Atom audit 23: Presentation (Driftfall, haiku)
+# Atom audit 23: Presentation (GHT, haiku)
 
 Source: `research/STARCRAFT-ATOMS.md` section 23 (six lines). Read with NORTHSTAR.md "Done means" item 3 (drawn art on every unit, building and button), TERRITORY.md sections 1, 8 and 13, and the play/ and viewer3d/ files that draw the live page. Verdicts come from reading the code and asset files. I did not view live renders, so "readable" and "strong silhouette" are judged from geometry and settings, not by eye.
 
@@ -6,7 +6,7 @@ Verdicts: **HAVE** (an equivalent exists and is on the live page) · **PARTIAL**
 
 ## Verdict table
 
-| # | Atom line | Verdict | What Driftfall has (evidence) | Gap |
+| # | Atom line | Verdict | What GHT has (evidence) | Gap |
 |---|---|---|---|---|
 | 1 | Iconic art direction per race (industrial, golden-crystal, organic) | PARTIAL | The Snakenators are an organic serpent identity: drawn sprites in `assets/sprites/snakenators/` (siphoner, fang, spitter, constrictor, hisser, boomslang), slate green and cyan palette in ART-DIRECTION.md. The Burrow is parked (`STATS.factions.burrow.parked`, TERRITORY.md section 14). | Only one race has an art identity. No industrial or golden-crystal counterpart exists. The Faceted Ink look in ART-DIRECTION.md is a proposal awaiting Joshua's pick, not adopted. |
 | 2 | Readable from a top-down camera at small sizes | PARTIAL | Fixed tilted camera, pitch 52° (`play/camera.mjs:5`). Units are instanced billboards with a team foot ring and health bars (`play/render.mjs` header, `play/drawn-units.mjs`). Selection rings (`viewer3d/vfx.mjs:311`). Minimap units floor at 2 px (`play/minimap.mjs:40`). | Every minimap unit is the same square dot, so a Grunt and a Brute look alike. Buildings have no minimap kind mark. No test checks that the four live kinds stay distinct at max zoom (40 tiles). `tests/icons.test.mjs` checks that a fallback exists, not that it reads. |
@@ -17,7 +17,7 @@ Verdicts: **HAVE** (an equivalent exists and is on the live page) · **PARTIAL**
 
 ## TOP 5 changes, ranked by how much they improve play
 
-1. **Draw the buildings the way the units are drawn.** Replace the box-primitive buildings with Snakenator-drawn sprite or faceted models in the same ink family as the units, so a Core, a Totem and a Mound read as Driftfall at a glance.
+1. **Draw the buildings the way the units are drawn.** Replace the box-primitive buildings with Snakenator-drawn sprite or faceted models in the same ink family as the units, so a Core, a Totem and a Mound read as GHT at a glance.
    - Owner: fable sets the art contract in viewer3d (`buildings.mjs`); GPT draws the sprites; sonnet wires them into `play/render.mjs`.
    - Done when: a live match contains no building kind that is only a `BoxGeometry`, a test lists every building kind and its art source, and Joshua sees drawn buildings on his screen.
 

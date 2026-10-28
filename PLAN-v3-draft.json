@@ -13,7 +13,7 @@
   "modules": [
     {
       "id": "layout",
-      "files": ["maps/layout-v3.mjs", "maps/driftfall-v3.json", "maps/driftfall-v3.txt", "maps/check-layout-v3.mjs", "maps/TERRAIN-V3.md"],
+      "files": ["maps/layout-v3.mjs", "maps/ght-v3.json", "maps/ght-v3.txt", "maps/check-layout-v3.mjs", "maps/TERRAIN-V3.md"],
       "owner": "haiku",
       "task": "The hand-drawn 40x40 mirrored map from spec section 2: tiles, heights, two-wide ramps with an axis, Shard fields with a rich flag, Vents at 600 Flux, Rubble at 200 hp, Cores and six Worker starts per side. The JSON is the single source of the fixed layout; check-layout-v3 verifies symmetry, ramp joins and that the main can only be left by its ramp."
     },
@@ -21,7 +21,7 @@
       "id": "map",
       "files": ["env/rng.mjs", "env/map.mjs"],
       "owner": "sonnet",
-      "task": "generateMap(seed) loads maps/driftfall-v3.json, then uses the seeded stream to scatter 6 rock pairs and 2 Rubble pairs on open low tiles of the top-right quadrant, each mirrored, kept only at distance 3 or more from Cores, Worker starts, Shard tiles, Vents, ramps and Rubble and only if every passable tile still reaches every other by the ground stepping rule with Rubble as walls. Returns width, height, heights, ramps, rocks, crystals (with rich), vents, rubble, cores, workers. mirror and isConnected updated for heights and ramps."
+      "task": "generateMap(seed) loads maps/ght-v3.json, then uses the seeded stream to scatter 6 rock pairs and 2 Rubble pairs on open low tiles of the top-right quadrant, each mirrored, kept only at distance 3 or more from Cores, Worker starts, Shard tiles, Vents, ramps and Rubble and only if every passable tile still reaches every other by the ground stepping rule with Rubble as walls. Returns width, height, heights, ramps, rocks, crystals (with rich), vents, rubble, cores, workers. mirror and isConnected updated for heights and ramps."
     },
     {
       "id": "path",
@@ -109,7 +109,7 @@
     }
   ],
   "tests": [
-    { "id": "map-generation", "files": ["tests/map-generation.test.mjs"], "owner": "haiku", "task": "Updated for v3: same seed gives the identical map twice, different seeds differ, every scattered rock and Rubble has its mirror, scatter only on open low tiles of the right quadrants at distance 3 or more from everything fixed, all passable tiles connected by the stepping rule with Rubble as walls, and the fixed layout (Cores, Workers, fields, Vents, ramps, Rubble, heights) matches maps/driftfall-v3.json." },
+    { "id": "map-generation", "files": ["tests/map-generation.test.mjs"], "owner": "haiku", "task": "Updated for v3: same seed gives the identical map twice, different seeds differ, every scattered rock and Rubble has its mirror, scatter only on open low tiles of the right quadrants at distance 3 or more from everything fixed, all passable tiles connected by the stepping rule with Rubble as walls, and the fixed layout (Cores, Workers, fields, Vents, ramps, Rubble, heights) matches maps/ght-v3.json." },
     { "id": "map-layout", "files": ["tests/map-layout.test.mjs"], "owner": "sonnet", "task": "The hand-drawn layout file: point symmetry of tiles and heights, 10 Vents at 600, 12 ramp tiles each joining one high and one low tile along its axis and two wide, 24 standard and 12 rich Shard tiles with the rich flag, 12 Rubble at 200 hp, 6 Worker starts per side on high ground, the outer ring rock, and check-layout-v3 passing." },
     { "id": "stats-table", "files": ["tests/stats-table.test.mjs"], "owner": "sonnet", "task": "Updated for v3: every unit and structure kind has every required field with a sane value, costs and Flux match the spec tables, hits and layer values are from the allowed sets, every from and needs names a real structure, valueOf counts Shards plus Flux and gives 0 for Core, Rubble and sites, sideValue adds both resources." },
     { "id": "path-finding", "files": ["tests/path-finding.test.mjs"], "owner": "fable", "task": "v2 cases kept, plus canStep: a path climbs only through a ramp along its axis, a cliff is never crossed, a ramp entered sideways is refused, a goal across a cliff with no ramp returns null, and without canStep behaviour is identical to v2." },

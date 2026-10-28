@@ -1,9 +1,9 @@
-// Original synthesized sounds for TOASTER WARS (PLAYABLE item 26). Recipes follow research/SOUNDS.md: oscillators and
+// Original synthesized sounds for GHT (PLAYABLE item 26). Recipes follow research/SOUNDS.md: oscillators and
 // envelopes only, no samples. Browser-safe (no Node globals). Sits beside play/sound-player.mjs and shares its mute key.
 import { soundUrl } from '../viewer3d/audio.mjs';
-const MUTE_KEY = 'driftfall.muted';
+const MUTE_KEY = 'ght.muted';
 const AMBIENT_GAIN = 0.3; // the ambient loop sits under the effects (the viewer uses the same level)
-const VOL_KEY = 'driftfall.volume';
+const VOL_KEY = 'ght.volume';
 const MAX_VOICES = 24;
 
 // One oscillator voice: type, start/end pitch, start offset, attack, peak gain, decay end, stop (all seconds).
@@ -128,7 +128,7 @@ export function createToasterSounds({ ctx = defaultContext(), volume, muted } = 
   };
 }
 
-// Pure: which stinger a finished match plays, so each result gets one. A Toaster Wars win has the synth jingle;
+// Pure: which stinger a finished match plays, so each result gets one. A GHT win has the synth jingle;
 // every other win or loss has the sample stinger (MANIFEST victory/defeat); a draw plays nothing.
 export function resultStingers(result, side, toasterOn) {
   const winner = result?.winner;

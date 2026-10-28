@@ -1,6 +1,6 @@
-# Hosting Driftfall (for Joshua to choose)
+# Hosting GHT (for Joshua to choose)
 
-Driftfall is a static site: `npm run build` makes `dist/` (about 13 MB with the precompressed copies, 132 files),
+GHT is a static site: `npm run build` makes `dist/` (about 13 MB with the precompressed copies, 132 files),
 and any host that serves plain files can run it. There is no server code. Nothing has been signed up for or deployed;
 that is yours to do. Try it first with `npm run build && npm run preview` (http://127.0.0.1:4173/).
 

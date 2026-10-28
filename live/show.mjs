@@ -1,4 +1,4 @@
-// live/show.mjs — Driftfall LIVE VIEW scene scheduler (owner: fable, Show Director).
+// live/show.mjs — GHT LIVE VIEW scene scheduler (owner: fable, Show Director).
 //
 // Decides what is on the TV stage at every moment and switches scenes. Other panels plug in.
 // Runs in the browser (imported by live/index.html) and in node (dry run / self-test):
@@ -261,7 +261,7 @@ function pickRotation(s, avail, now, currentScene) {
 
 // What to show at a glance for each scene, so a panel or a caption can describe the stage in plain English.
 export function describe(cue, sig) {
-  if (!cue) return "Driftfall · waiting for the swarm";
+  if (!cue) return "GHT · waiting for the swarm";
   const a = sig?.agents?.count || 0;
   switch (cue.scene) {
     case "match": return `LIVE MATCH · ${sig?.match?.path || "no match yet"}${sig?.build?.number != null ? ` · build ${sig.build.number}` : ""}${sig?.build?.ok === false ? " · tests RED" : sig?.build?.ok ? " · tests GREEN" : ""}`;
@@ -270,7 +270,7 @@ export function describe(cue, sig) {
     case "moment": return `MOMENT · ${cue.reason}`;
     case "build": return `BUILD · ${sig?.build?.ok ? "GREEN" : "RED"}${sig?.build?.tests ? ` · ${JSON.stringify(sig.build.tests)}` : ""}`;
     case "changes": return `CHANGES · ${cue.reason}`;
-    default: return "DRIFTFALL · built live by the swarm";
+    default: return "GHT · built live by the swarm";
   }
 }
 
@@ -356,7 +356,7 @@ export function createShow(opts = {}) {
     current: () => state.current, signals: () => sig, history: () => state.history.slice(), queue: () => state.queue.slice(),
     describe: () => describe(state.current, sig),
   };
-  if (typeof window !== "undefined") window.DriftfallShow = show;
+  if (typeof window !== "undefined") window.GhtShow = show;
   return show;
 }
 

@@ -1,4 +1,4 @@
-# Build wave 2 — Toaster Wars to modern standards (2026-10-26)
+# Build wave 2 — GHT to modern standards (2026-10-26)
 
 Read first: reports/2026-10-26/DECISIONS.md (Joshua's five decisions), then RESOURCE-FLOW.md, then your card. Evidence for every gap is in "What's Missing (verified)" and reports/2026-10-26/verify-*.md and web-*.md.
 

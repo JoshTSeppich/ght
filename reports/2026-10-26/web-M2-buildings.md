@@ -2,7 +2,7 @@
 
 Checker: haiku, web checker. Slice M2 of the minutiae sweep: every structure's cost, hp, build time, placement, builder, cancel/refund, repair, rally, queue length, death, and visibility. Code read-only. Web sources: Liquipedia returned HTTP 403 to WebFetch, so SC2 claims rest on search snippets and one Blizzard guide page. Those are marked UNVERIFIED where the snippet did not state the number.
 
-## 1. Code facts (Toaster Wars, `state.ammo` overlay, 24 ticks = 1 s)
+## 1. Code facts (GHT, `state.ammo` overlay, 24 ticks = 1 s)
 
 | Building | Cost (wheat) | HP | Build time | Builder | Tier / gate | Source |
 |---|---|---|---|---|---|---|
@@ -25,7 +25,7 @@ Power stations are not structures. doPlaceCord (power.mjs:218-221) pushes them i
 ## 2. Queue, cancel, refund, repair, rally
 
 - **Queue length**: `STATS.match.queueMax = 5` (stats.mjs:99), one value for every building. A full queue rejects with `queue-full` (commands.mjs:110). No Reactor or Tech Lab add-on exists, so there is no 8-slot queue.
-- **Pay**: classic (no budget) charges the full unit cost when queued (commands.mjs:111-117). Under the Toaster Wars budget, cost is drawn gradually as the unit trains (budget.mjs via sim-territory.mjs:164-175).
+- **Pay**: classic (no budget) charges the full unit cost when queued (commands.mjs:111-117). Under the GHT budget, cost is drawn gradually as the unit trains (budget.mjs via sim-territory.mjs:164-175).
 - **Cancel train**: `cancel-train {building, index}` (commands.mjs:124-140). Classic: full refund, emitted as `refund`. Budget: no refund; the HUD says 0 (hud-queue.mjs:19). Cancelling the head also forfeits the cost already drawn (commands.mjs:130-132).
 - **Cancel construction**: NO command. There is no cancel-build and no demolish. A site's cost is spent at placement (commands.mjs:94). A destroyed site refunds nothing (test: economy-build-train.test.mjs:224-238; combat-damage.test.mjs:208).
 - **Repair**: NO command, no regen, no UI. The only "repair" hits in env/play are style-lab animation (play/style-lab/*), not gameplay.
@@ -63,8 +63,8 @@ Power stations are not structures. doPlaceCord (power.mjs:218-221) pushes them i
 
 ## 5. Associations
 
-- SC2's construction-site vulnerability (no mitigation until finished) and Toaster Wars' hp ramp (economy.mjs:128) both let an early kill of a site cost the whole investment, and the code refunds nothing. The research report's "bases never die" concern is about the Strip; the bigger M2 risk is that a 100-wheat Toaster can be lost to one raid with no undo. A construction cancel with a partial refund would match SC2 and close finding 3, but the refund rate still needs a source.
-- The report's repair-free design is consistent with the code, but if SC2's repair is a core part of its "bases don't die" argument, Toaster Wars has no equivalent for Heat Lamps or Toasters.
+- SC2's construction-site vulnerability (no mitigation until finished) and GHT' hp ramp (economy.mjs:128) both let an early kill of a site cost the whole investment, and the code refunds nothing. The research report's "bases never die" concern is about the Strip; the bigger M2 risk is that a 100-wheat Toaster can be lost to one raid with no undo. A construction cancel with a partial refund would match SC2 and close finding 3, but the refund rate still needs a source.
+- The report's repair-free design is consistent with the code, but if SC2's repair is a core part of its "bases don't die" argument, GHT has no equivalent for Heat Lamps or Toasters.
 - Rally lives client-side; SC2's rally rules (4.4) are sim rules. Moving rally into the sim is the faithful version and would make it testable.
 
 ## 6. Verdicts
@@ -76,8 +76,8 @@ Power stations are not structures. doPlaceCord (power.mjs:218-221) pushes them i
 | Repair cost (SC2) | UNVERIFIED, sources conflict | Liquipedia 403; TL blog 25%; BW page one third |
 | Construction has no damage mitigation (SC2) | CORRECT (for SC2 structures) | Blizzard guide |
 | Rally dies-means-stops (SC2) | CORRECT | Blizzard guide |
-| Toaster Wars: no repair, no cancel build | CORRECT (code) | grep of env and play; commands.mjs has cancel-train only |
-| Toaster Wars: queue 5 for every building | CORRECT (code) | stats.mjs:99 |
+| GHT: no repair, no cancel build | CORRECT (code) | grep of env and play; commands.mjs has cancel-train only |
+| GHT: queue 5 for every building | CORRECT (code) | stats.mjs:99 |
 
 ## 7. Not checked
 - Combat target list for station points (combat.mjs:26-30 read only by grep).

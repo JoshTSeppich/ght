@@ -1,4 +1,4 @@
-// Driftfall 3D viewer integration checks (owner: fable, 3D visual QA and performance).
+// GHT 3D viewer integration checks (owner: fable, 3D visual QA and performance).
 //
 // What this file holds everyone to, straight from VISUAL-3D.md:
 //   1. every viewer3d/*.mjs (and viewer3d/shaders/*.mjs) parses and imports in node;

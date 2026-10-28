@@ -1,4 +1,4 @@
-// Probe: does a play-page Toaster Wars match (createLiveMatch + createPlayableState + builtin easy AI, maxTicks 21600)
+// Probe: does a play-page GHT match (createLiveMatch + createPlayableState + builtin easy AI, maxTicks 21600)
 // end early, e.g. at tick 2000 (83 s)? Same fake-timer harness as tests/sandbox.test.mjs.
 import { createLiveMatch } from '../../env/live.mjs';
 import { createPlayableState } from '../../play/toaster-play.mjs';

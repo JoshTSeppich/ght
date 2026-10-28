@@ -61,7 +61,7 @@ test('hitsToKill is null when the attacker cannot hit the target\'s layer, other
   assert.equal(hitsToKill('worker', 'brute', 0, 0), 1440);
 });
 
-test('Weapons levels 0 to 3 take a Crumb against a Popper from 180 to 45 hits (Popper hp 180, Toaster Wars overlay)', () => {
+test('Weapons levels 0 to 3 take a Crumb against a Popper from 180 to 45 hits (Popper hp 180, GHT overlay)', () => {
   assert.deepEqual([0, 1, 2, 3].map((w) => hitsToKill('worker', 'grunt', w, 0)), [180, 90, 60, 45]);
 });
 

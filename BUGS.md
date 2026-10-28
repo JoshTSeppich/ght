@@ -1,4 +1,4 @@
-# Driftfall bug log
+# GHT bug log
 
 Owned by the QA Tester (team haiku). Each entry: seed, tick, what happened, expected, owner (from PLAN.json).
 Scope: found by playing matches through `env/run-match.mjs` and reading the logs. Code is not edited here.
@@ -15,7 +15,7 @@ Scope: found by playing matches through `env/run-match.mjs` and reading the logs
 
 ### BUG-002: Workers freeze forever when a crystal tile has no free neighbour
 - **Owner:** fable (env/movement.mjs, env/economy.mjs).
-- **Repro:** `node env/run-match.mjs --seed 1 --p0 <probe> --p1 <probe> --out x.json`, where the probe sends every idle Worker to the same nearest crystal, `(23,29)` on seed 1 for side 1. The probe is in /tmp/driftfall-qa (not in the repo).
+- **Repro:** `node env/run-match.mjs --seed 1 --p0 <probe> --p1 <probe> --out x.json`, where the probe sends every idle Worker to the same nearest crystal, `(23,29)` on seed 1 for side 1. The probe is in /tmp/ght-qa (not in the repo).
 - **What happened:** from about tick 700 on, side 1 has about 30 Workers on order `gather (23,29)`, phase `toField`, `ticks: 0`. At tick 700 they stand at (22..31, 26..31); at tick 1000 they are unchanged. Side 1's last `move` event is at tick 873 and it mines only 1,580 Shards against side 0's 4,800 in the same run. No `blocked` event, no retarget.
 - **Expected:** a Worker that cannot reach a free tile next to its crystal should wait and then retarget, or the order should clear with a `blocked` event. Spec §3 only covers empty tiles, so this is a gap in the spec too.
 - **Notes:** the probe caused the pile-up, so this is partly a player-side issue. The engine still gives a jammed Worker no way out, and that is the bug. The same freeze shape showed up in sample-vs-sample (fable's seed 7, tick 440, #104), which fable fixed in movement (#115). Only the crowded-tile case is still open.

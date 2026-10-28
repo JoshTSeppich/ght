@@ -1,4 +1,4 @@
-// Probe: why did a hungry Popper get resupplied in 0.1 s (sense.md row 8)? Real Toaster Wars state (createPlayableState),
+// Probe: why did a hungry Popper get resupplied in 0.1 s (sense.md row 8)? Real GHT state (createPlayableState),
 // one Popper (kind grunt) emptied next to our Power Strip, one idle Crumb at the Strip, stock above the reserve.
 // Prints every ammo event with its tick and the time since the Popper went hungry. Read-only: nothing in the repo is edited.
 import { createPlayableState } from '../../play/toaster-play.mjs';

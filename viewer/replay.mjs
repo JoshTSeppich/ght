@@ -1,4 +1,4 @@
-// Driftfall replay: rebuilds the game state tick by tick from a match log (ENV-SPEC.md §12).
+// GHT replay: rebuilds the game state tick by tick from a match log (ENV-SPEC.md §12).
 // Pure module: no DOM, no clock, no randomness. Safe to import from node tests.
 //
 // Replay promises: every entity's id, owner, kind, tile, hp, carrying; structure progress, complete and queue;

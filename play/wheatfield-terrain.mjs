@@ -277,7 +277,7 @@ export function createWheatfieldTerrain(ctx, { map }) {
   const disposables = [];
   const own = (o) => { disposables.push(o); return o; };
   const prevBackground = ctx.scene.background, prevFog = ctx.scene.fog;
-  ctx.scene.background = new THREE.Color(FOG);   // beyond the map edge: the quiet fog colour, not Driftfall's purple dusk
+  ctx.scene.background = new THREE.Color(FOG);   // beyond the map edge: the quiet fog colour, not GHT's purple dusk
   ctx.scene.fog = null;
   // Shared with the unit renderer (play/toaster-units.mjs draws the up-arrow on units standing high): highAt(x, y) in tiles.
   const highAt = (x, y) => highTile(map, Math.round(x), Math.round(y));

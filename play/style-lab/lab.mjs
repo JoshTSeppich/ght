@@ -63,7 +63,7 @@ function pentagon() {
   for(let i=0;i<5;i++){const a=Math.PI/2+i*Math.PI*2/5;const x=Math.cos(a),y=Math.sin(a);if(i===0)shape.moveTo(x,y);else shape.lineTo(x,y);}
   shape.closePath();const geo=new T.ShapeGeometry(shape);geo.userData.facets=5;return geo;
 }
-// The studio row of the four Toaster Wars buildings, built by the same function /play uses. Owner 0 is cyan, owner 1 orange.
+// The studio row of the four GHT buildings, built by the same function /play uses. Owner 0 is cyan, owner 1 orange.
 export const BUILDING_ROW = Object.freeze([
   Object.freeze({ kind: 'core', label: 'Power Strip', owner: 0, x: -4.5 }), Object.freeze({ kind: 'mill', label: 'Mill', owner: 0, x: -1.5 }),
   Object.freeze({ kind: 'well', label: 'Well', owner: 1, x: 1.5 }), Object.freeze({ kind: 'toaster', label: 'Toaster', owner: 1, x: 4.5 }),

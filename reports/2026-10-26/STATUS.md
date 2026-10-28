@@ -1,4 +1,4 @@
-# Toaster Wars fix waves: STATUS (QA Lead, 2026-10-26)
+# GHT fix waves: STATUS (QA Lead, 2026-10-26)
 
 Kept by QA Lead (card 15). Read-only for everything outside reports/.
 Verified = the card's named tests re-run by QA this wave and green, plus the claims in the DONE post checked against those tests.
@@ -14,7 +14,7 @@ Full suite: see the "Full suite" section at the bottom (output in qa-suite-wave.
 | 1 | Sonnet | 2 timeout tie-break (damage counter, then Wheat, then true draw) | DONE | PASS | tests/timeout-tiebreak.test.mjs 6/6; counter fed by Combat A |
 | 1 | Sonnet | 3 territory win from map (Wheatfield 21 of 31) | DONE | PASS | tests/territory-wincount.test.mjs 5/5 |
 | 1 | Sonnet | 4 default length 21600 ticks (15:00) | DONE | PASS (targeted) | Full-suite fallout: tests/cord-leash and tests/sim-determinism were red in the earlier runs; see Full suite |
-| 1 | Sonnet | 5 replays rebuild Toaster Wars | DONE | PASS | tests/rerun-toaster.test.mjs 5/5. Open: haiku review #1325 says rerun infers max(ticks, 21600), so an old pre-rules timeout log replays differently. Not covered by a test |
+| 1 | Sonnet | 5 replays rebuild GHT | DONE | PASS | tests/rerun-toaster.test.mjs 5/5. Open: haiku review #1325 says rerun infers max(ticks, 21600), so an old pre-rules timeout log replays differently. Not covered by a test |
 | 1 | Sonnet | Done-when: 40-match league, fewer than 4 timer ends; rerun matches matches/room/latest.json exactly | NOT DONE | not verified | League waits on AI (card 6); the latest.json byte check not run |
 | 2 Combat | Haiku A | 1 fog in chooseTarget and ordered attacks | DONE | PASS | tests/combat-fog.test.mjs 5/5 |
 | 2 | Haiku A | 2 target hold | DONE | PASS | tests/combat-target-hold.test.mjs 3/3 |

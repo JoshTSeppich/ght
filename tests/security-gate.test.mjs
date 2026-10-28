@@ -17,7 +17,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0]);
 
 function tmpDir(t) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'driftfall-gate-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ght-gate-'));
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
   return dir;
 }
@@ -31,7 +31,7 @@ let shipped;
 after(() => { if (shipped) fs.rmSync(shipped, { recursive: true, force: true }); });
 async function freshBuild() {
   if (!shipped) {
-    shipped = fs.mkdtempSync(path.join(os.tmpdir(), 'driftfall-dist-'));
+    shipped = fs.mkdtempSync(path.join(os.tmpdir(), 'ght-dist-'));
     await build({ root: ROOT, out: shipped, quiet: true });
   }
   return shipped;

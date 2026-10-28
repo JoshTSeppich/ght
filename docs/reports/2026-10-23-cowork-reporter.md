@@ -1,6 +1,6 @@
 # Cowork reporter read, 2026-10-23 (Claude in Joshua's Cowork chat)
 
-Reporter read from outside the swarm (Joshua's Cowork chat, Oct 23 ~11 PM), based on the 2-minute screen recording of TOASTER WARS + SWARM TV and the Match Room reads from Economy Designer and AI Opponent Designer on seeds 151 and 699. Five concerns, each with ONE change. Leads decide owners where I guessed.
+Reporter read from outside the swarm (Joshua's Cowork chat, Oct 23 ~11 PM), based on the 2-minute screen recording of GHT + SWARM TV and the Match Room reads from Economy Designer and AI Opponent Designer on seeds 151 and 699. Five concerns, each with ONE change. Leads decide owners where I guessed.
 
 1. Capacity is not the bottleneck. Governor read 2/8 running, 0 queued, 1 issue. Six idle slots and an empty queue means ticket supply and verification are the constraint, not agents. Joshua is wiring an API link to run more agents; that widens the gap and raises spend unless the Match Room is the thing feeding the queue. ONE change: before the API link goes live, the governor reports queue depth and queue SOURCE (which hub/room produced each ticket) on the Swarm TV header, so "0 queued" is diagnosable. Owner: governor.
 

@@ -9,7 +9,7 @@ import { ammoOf } from '../env/ammo.mjs';
 import { BUDGET } from '../env/budget.mjs';
 import { keyFor } from './key-text.mjs';
 
-// The Toaster Wars rows (rowOf reads the overlay when the state has ammo), so every number here is the one the sim plays by.
+// The GHT rows (rowOf reads the overlay when the state has ammo), so every number here is the one the sim plays by.
 const TW = { ammo: {} };
 const tps = () => STATS.clock.ticksPerSecond;
 const secs = (ticks) => Math.round((ticks / tps()) * 10) / 10;
@@ -25,7 +25,7 @@ export function numbersOf() {
     pantryPerToaster: BAKERY.pantryPerToaster,
     pilot: { everySeconds: secs(BAKERY.pilotTicks), floor: BAKERY.pilotFloor },
     station: { extension: STATION.extension.link, pylon: STATION.pylon.link },
-    // The rate the Toaster Wars sim charges (toaster.upkeepPercent, 5); the classic budget default (10) only without it.
+    // The rate the GHT sim charges (toaster.upkeepPercent, 5); the classic budget default (10) only without it.
     upkeepPercent: STATS.toaster?.upkeepPercent ?? BUDGET.upkeepPercentPerMinute,
   };
 }

@@ -1,4 +1,4 @@
-// Driftfall 3D units (owner: fable). createUnits(ctx, opts) -> { update(frame, dt), dispose() } per VISUAL-3D.md.
+// GHT 3D units (owner: fable). createUnits(ctx, opts) -> { update(frame, dt), dispose() } per VISUAL-3D.md.
 //
 // Every unit is an original low-poly model built in code from Three.js primitives, following the shape words in
 // ART-GUIDE.md §4 (Worker round, Grunt wedge, Lancer needle, Brute hex) and the Art Director's shape words for the

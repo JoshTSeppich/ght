@@ -1,4 +1,4 @@
-# Driftfall v3 unit roster (draft by sonnet, Unit Designer)
+# GHT v3 unit roster (draft by sonnet, Unit Designer)
 
 All designs and names are original. Numbers are proposals; the balance owner tunes them in env/stats.mjs.
 Rules for every unit: flat integers, no randomness, ties go to the lowest id.

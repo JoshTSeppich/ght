@@ -18,7 +18,7 @@ const duel = () => base({
   ],
 });
 
-test('A1: Hold uses the Toaster Wars range, so a Popper (range 4) holds an enemy three tiles away', () => {
+test('A1: Hold uses the GHT range, so a Popper (range 4) holds an enemy three tiles away', () => {
   const state = duel();
   const input = createInput({ side: 0, stats: STATS, rowOf, ...toasterInputOptions('grid') });
   input.ui.selection = [1];
@@ -27,7 +27,7 @@ test('A1: Hold uses the Toaster Wars range, so a Popper (range 4) holds an enemy
   assert.ok(out.some((c) => c.type === 'attack' && c.target === 9), 'the Popper attacks the enemy inside its real range');
 });
 
-test('A1: without the Toaster Wars rows Hold reads the old range (1), so the same Popper does not reach', () => {
+test('A1: without the GHT rows Hold reads the old range (1), so the same Popper does not reach', () => {
   const state = duel();
   const input = createInput({ side: 0, stats: STATS, ...toasterInputOptions('grid') });
   input.ui.selection = [1];

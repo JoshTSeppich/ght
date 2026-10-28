@@ -30,7 +30,7 @@ test("classifyLine tells narration, tools, results, tests and denials apart", ()
   assert.equal(classifyLine("    ↳ ✖ world frames # tests 5 # pass 4 # fail 1").kind, "test-fail");
   assert.equal(classifyLine("    ↳ Error: Cannot find module 'x'").kind, "error");
   assert.equal(classifyLine("    ✗ This command requires approval").kind, "denied");
-  assert.equal(classifyLine("    ↳ 1 # Driftfall swarm roles").kind, "result");
+  assert.equal(classifyLine("    ↳ 1 # GHT swarm roles").kind, "result");
   assert.equal(classifyLine("[started] session abc · claude-haiku-5-5").started, true);
 });
 
@@ -49,8 +49,8 @@ test("say.mjs posts are recovered from Bash commands and toned", () => {
 
 test("parseLabel splits team, role, model and machine", () => {
   assert.deepEqual(parseLabel("Live View · Agent Spotlight Operator (fable)"), { team: "Live View", role: "Agent Spotlight Operator", model: "fable", machine: "mini", core: "Live View · Agent Spotlight Operator (fable)" });
-  const a = parseLabel("Driftfall 3D · 3D buildings (haiku) · MacBook Air");
-  assert.equal(a.machine, "MacBook Air"); assert.equal(a.role, "3D buildings"); assert.equal(a.core, "Driftfall 3D · 3D buildings (haiku)");
+  const a = parseLabel("GHT 3D · 3D buildings (haiku) · MacBook Air");
+  assert.equal(a.machine, "MacBook Air"); assert.equal(a.role, "3D buildings"); assert.equal(a.core, "GHT 3D · 3D buildings (haiku)");
 });
 
 test("describeWork prefers the agent's own narration, then the caption, then the last file", () => {
@@ -63,8 +63,8 @@ test("describeWork prefers the agent's own narration, then the caption, then the
 
 test("scoreAgent ranks a fresh test pass or a disagreement above quiet reading", () => {
   const now = Date.now();
-  const quiet = { id: "q", label: "Driftfall 3D · 3D terrain (sonnet)", last: now - 50000 };
-  const tester = { id: "t", label: "Driftfall 3D · 3D VFX (sonnet)", last: now - 1000 };
+  const quiet = { id: "q", label: "GHT 3D · 3D terrain (sonnet)", last: now - 50000 };
+  const tester = { id: "t", label: "GHT 3D · 3D VFX (sonnet)", last: now - 1000 };
   const fighter = { id: "f", label: "Roster + terrain accord · Unit Designer (sonnet)", last: now - 30000 };
   const q = scoreAgent(quiet, [{ text: '  → Read {"file_path":"/x/ENV-SPEC.md"}', age: 40 }, { text: "    ↳ 1 # spec", age: 40 }], { now });
   const t = scoreAgent(tester, [{ text: "    ↳ ✔ vfx plan (1ms) # pass 7 # fail 0", age: 2 }], { now });
@@ -109,7 +109,7 @@ test("pickSpotlight holds cards, swaps only on a clear win, and keeps slots stab
 });
 
 test("renderCard escapes and colors lines", () => {
-  const html = renderCard({ id: "x", role: "3D units", team: "Driftfall 3D", model: "fable", machine: "mini", tag: "TESTS PASS", tone: "ok", doing: "Modelling <Brute>", caption: "", file: "viewer3d/units.mjs",
+  const html = renderCard({ id: "x", role: "3D units", team: "GHT 3D", model: "fable", machine: "mini", tag: "TESTS PASS", tone: "ok", doing: "Modelling <Brute>", caption: "", file: "viewer3d/units.mjs",
     lines: [{ text: "claude: hi", age: 1 }, { text: "    ↳ ✔ units # pass 3", age: 1 }, { text: '  → Bash {"command":"node say.mjs fable \\"AGREE\\""}', age: 1 }], last: Date.now() - 1500, hot: true, reasons: [] });
   assert.match(html, /Modelling &lt;Brute&gt;/);
   assert.match(html, /sp-ok/); assert.match(html, /sp-chat/); assert.match(html, /says in chat: AGREE/);

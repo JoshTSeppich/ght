@@ -1,6 +1,6 @@
 # Ghosties, Hosties, and Toasties combat (proposal by claude, reviewed and improved by GPT; Joshua approved 10-23 08:03)
 Feel: very cute (a tiny-squad creature game meets the brightest stylised cartoon shooter), entirely our own.
-Rule book for looks: STYLE-BIBLE.md. **GPT's line:** "Make Toaster Wars recognisable in motion, not just in
+Rule book for looks: STYLE-BIBLE.md. **GPT's line:** "Make GHT recognisable in motion, not just in
 screenshots... unmistakably yours, even with every sound muted."
 
 ## 1. Toast is the ammo
@@ -50,7 +50,7 @@ replays, multiplayer and the Design Studio all play the same attack.
 ## 5. Prompt templates (written by GPT for itself and for Codex)
 ### A. Image prompt: animation keyframe sheets (ChatGPT)
 ```
-Create one six-frame animation keyframe sheet for TOASTER WARS.
+Create one six-frame animation keyframe sheet for GHT.
 UNIT: [UNIT]. ATTACK: [ATTACK]. ACTION: [ACTION DESCRIPTION]. TIMING: [KEYFRAME TIMES IN MS].
 STYLE LOCK: Original early-2000s geometric cartoon RTS. Cream #F2D7A6 chassis, charcoal #303844 faceplate,
 cyan #32D9E8 pentagonal team plates, toasted-gold #D99448 accents. Every rounded form uses exactly five facets.

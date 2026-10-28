@@ -1,4 +1,4 @@
-// Driftfall live TV page. Polls the Control Room (same origin) and repaints; no reloads.
+// GHT live TV page. Polls the Control Room (same origin) and repaints; no reloads.
 // Optional inputs, all tolerated when missing or shaped differently than expected:
 //   live/status.json   build status   (ok|green|status, summary, tests{pass,fail}, failures[], t)
 //   live/threads.json  chat threads   (array, or {threads:[{title|topic, count|messages, decision}]})

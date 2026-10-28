@@ -6,12 +6,12 @@ spawn), env/budget.mjs (training draw), env/tiers.mjs (tier pause, research queu
 core/structures/units rows, tiers), env/items.mjs (Recall, by grep), play/input.mjs (queueTrain, rally, train card),
 play/hud.mjs (selection panel), play/app.mjs (rally overlay), tests/commands-validation.test.mjs (queue-full, by grep).
 
-Verdict key: HAVE = Driftfall already does an equivalent. PARTIAL = some of it exists, or it exists but is off on the
-live page. MISSING = not there. NOT FOR US = deliberately not in Driftfall, with the reason.
+Verdict key: HAVE = GHT already does an equivalent. PARTIAL = some of it exists, or it exists but is off on the
+live page. MISSING = not there. NOT FOR US = deliberately not in GHT, with the reason.
 
 ## Verdict table
 
-| # | Atom (section 5) | Verdict | Driftfall today (evidence) |
+| # | Atom (section 5) | Verdict | GHT today (evidence) |
 |---|---|---|---|
 | 5.1 | Units come from specific buildings, each with a queue (5 per building) | HAVE | Core trains `worker`; Forge trains `grunt`, `lancer`, `brute` (env/stats.mjs:132, 137). Queue cap `STATS.match.queueMax = 5` (stats.mjs:99), enforced in env/commands.mjs:99 and env/sim-territory.mjs:132. Pinned by tests/commands-validation.test.mjs:183-197. |
 | 5.2 | One unit at a time per building; more buildings = more output | HAVE | Only the queue head trains (env/economy.mjs:82-115). The live page's train card sends the order to the selected building with the shortest queue (play/input.mjs:292-304), so several Forges double output. |
@@ -19,7 +19,7 @@ live page. MISSING = not there. NOT FOR US = deliberately not in Driftfall, with
 | 5.4 | Rally points send new units to a spot, or to mine for workers | PARTIAL | Works on the live page only. The rally lives in the UI (`ui.rally`, play/input.mjs:253-256, 405-430), not in the sim, so it is not in replays, not in watch mode, and not used by AI sides. A unit gets the rally only if it spawns within 2 tiles of the building. Workers from the Core go to the nearest crystal by default. |
 | 5.5 | Production structures can be built in numbers ("4 gate", "3 rax") | HAVE | `build` has no cap on the count of one kind (env/commands.mjs:74-91). Forge is the only military production building right now, so there is no variety yet (see 5.7). |
 | 5.6 | Zerg larvae: a shared pool at hatcheries | NOT FOR US | A shared pool would break the per-building queue and the per-building Hold pause that TERRITORY.md section 5 relies on. Burrow already has its own identity through Mounds and claims. Revisit only if Burrow needs a production identity of its own. |
-| 5.7 | Protoss warp-in at any powered location | NOT FOR US | Power-field placement is a Protoss signature. Driftfall has a Recall instead: a ranked unit returns from its Shed Skin at the Nest with its rank and items (TERRITORY.md section 14, env/items.mjs). That covers the "reinforce from anywhere" need without a new rule. |
+| 5.7 | Protoss warp-in at any powered location | NOT FOR US | Power-field placement is a Protoss signature. GHT has a Recall instead: a ranked unit returns from its Shed Skin at the Nest with its rank and items (TERRITORY.md section 14, env/items.mjs). That covers the "reinforce from anywhere" need without a new rule. |
 | 5.8 | Terran add-ons: reactor (double queue), tech lab (advanced units) | PARTIAL | The tech-lab job is done by tier gates: tier 2 needs a Foundry or Sanctum plus Hold 3, tier 3 needs a Hangar plus Hold 6 (env/stats.mjs:198-212, env/tiers.mjs). But Foundry, Sanctum and Hangar are not in STATS.structures, so the building part is skipped and tier 2 and 3 are gated by Hold alone (tiers.mjs header). The reactor (a second queue slot per building) is MISSING: the queue is a flat 5 for every building. |
 | 5.9 | Cancelling refunds most of the cost (and is exploited in tricks) | MISSING | There is no cancel or dequeue command. The command list is move, attack, gather, build, train, stop (env/commands.mjs:17-31), and the queue only shrinks when the head finishes. A misclick can't be undone. The cancel itself is missing, not just the refund. |
 
@@ -28,7 +28,7 @@ Also noted (not in section 5, but production-adjacent): the selection panel says
 ## TOP 5 changes (ranked by how much they improve play)
 
 **1. Cancel a queued unit, with a fair refund (MISSING, 5.9).**
-- What to add, in Driftfall's terms: a `cancel` train command `{ type: 'cancel', building, index }`. Clicking a queue chip in the selection panel removes that unit. Refund rule: a unit still waiting in the queue is refunded in full. The head unit that has already started is refunded for the part not yet drawn. In the budget mode (TERRITORY.md section 9) nothing is charged up front, so cancelling just stops the draw and there is nothing to exploit. Shift-click on a chip removes the whole queue.
+- What to add, in GHT's terms: a `cancel` train command `{ type: 'cancel', building, index }`. Clicking a queue chip in the selection panel removes that unit. Refund rule: a unit still waiting in the queue is refunded in full. The head unit that has already started is refunded for the part not yet drawn. In the budget mode (TERRITORY.md section 9) nothing is charged up front, so cancelling just stops the draw and there is nothing to exploit. Shift-click on a chip removes the whole queue.
 - Owner: fable for the command and the refund in env/commands.mjs and env/sim-territory.mjs (the budget draw is fable's, env/budget.mjs). Sonnet for the chip click in play/hud.mjs and play/input.mjs.
 - Done when: (a) a test in a new tests/train-cancel.test.mjs covers a waiting unit refunded in full, a started head refunded for the undrawn part, and a finished unit not cancellable; (b) on the live page, clicking a queued chip removes it and the Shards shown go back up at once; (c) the anticheat suite still passes.
 
@@ -56,4 +56,4 @@ Also noted (not in section 5, but production-adjacent): the selection panel says
 
 - Changes 1, 2 and 5 are wiring of existing state (queue, training ticks, selection), so they fit "wire, don't add" in NORTHSTAR.md.
 - Change 3 changes the live tier rules once the buildings exist, so it must stay behind territory mode until the Foundry is built by the AI as well.
-- Nothing in section 5 was copied: the Recall, the budget draw and the tier pauses are Driftfall's own rules.
+- Nothing in section 5 was copied: the Recall, the budget draw and the tier pauses are GHT's own rules.

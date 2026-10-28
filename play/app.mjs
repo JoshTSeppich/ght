@@ -1,4 +1,4 @@
-// Toaster Wars (default) / Driftfall Classic (?classic=1): the playable client (owner: sonnet, Playable Client).
+// GHT (default) / GHT Classic (?classic=1): the playable client (owner: sonnet, Playable Client).
 // A human plays side 0 against a built-in bot (side 1) live in the browser. env/live.mjs runs the sim at a fixed
 // 24 ticks per second and the bot; input becomes commands on the next tick (play/input.mjs); the viewer3d systems
 // draw it through a "live world" that has the same frame() shape as viewer3d/world.mjs.
@@ -209,7 +209,7 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
     return { setup: true };
   }
   const side = q.get('side') === '1' ? 1 : 0;
-  // The TV (watch mode on Toaster Wars) plays a recorded toaster-sonnet v toaster-sonnet match that ends in a siege.
+  // The TV (watch mode on GHT) plays a recorded toaster-sonnet v toaster-sonnet match that ends in a siege.
   const wantReplay = watch && side === 0 && toasterOptions(q).on ? replaySeed(q) : null;
   const storedReplay = q.get('replay');
   const lastRec = watch && toasterOptions(q).on && (storedReplay === 'last' || /^\d$/.test(storedReplay ?? '')) ? (loadStoredReplay(storedReplay) ?? (storedReplay === 'last' ? loadLastMatch() : null)) : null; // Watch replay on the results card
@@ -224,14 +224,14 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
   // gives us the new state; we hand the driver the commands for the next tick.
   // Default opponent: the built-in AI on its easy setting, so a first game survives the opening. The team
   // tournament bots are opt-in with ?ai=sonnet|haiku|fable|sample.
-  const aiName = watch ? (q.get('ai') ?? 'builtin') : opponentAiName(q, toasterOptions(q).on); // Toaster Wars: ?difficulty=easy (default) | normal | none (play/opponent.mjs)
+  const aiName = watch ? (q.get('ai') ?? 'builtin') : opponentAiName(q, toasterOptions(q).on); // GHT: ?difficulty=easy (default) | normal | none (play/opponent.mjs)
   const sandbox = !watch && !replay && sandboxMode(q); // ?mode=sandbox or 'Opponent: None': an idle enemy and cheat keys (play/sandbox.mjs)
   let aiModule = null;
   if (replay) aiModule = replayPlayer(replay);
   else if (sandbox) aiModule = idleOpponent;
   else try { aiModule = await imp(aiName === 'sample' ? '../players/sample-player.mjs' : aiName === 'builtin' ? '../players/builtin/ai.mjs' : `../players/${aiName}/bot.mjs`); }
   catch (err) { console.warn('[play] bot not loaded', err); toast(els, `Bot "${aiName}" failed to load`); }
-  const toaster = toasterOptions(q); // Toaster Wars by default; ?classic=1 keeps the old Driftfall Classic page
+  const toaster = toasterOptions(q); // GHT by default; ?classic=1 keeps the old GHT Classic page
   if (toaster.on && typeof document !== 'undefined') document.title = PAGE_TITLE;
   const terr = toaster.on ? toaster : territoryOptions(q); // ?territory=1: Reaches, tiers, the Drift and the flow panel (needs createState in env/live.mjs)
   const driver = createLiveMatch({
@@ -250,7 +250,7 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
   const caster = watch ? createCaster() : null, topbar = watch ? createTopbar({ tps }) : null;
   const state = driver.state;
   const matchStats = createMatchStats(side); // wheat, slices, toasters lost for the results card
-  // Toaster Wars teaching (play/tutorial.mjs): the five-step guide is on unless ?tutorial=0, and the objective line sits under the top bar.
+  // GHT teaching (play/tutorial.mjs): the five-step guide is on unless ?tutorial=0, and the objective line sits under the top bar.
   const tutorial = toaster.on && !watch && tutorialOn(q) ? mountTutorial(document) : null;
   const objective = toaster.on && !watch ? root.appendChild(Object.assign(document.createElement('div'), { id: 'objective', textContent: OBJECTIVE })) : null;
   const kitchen = toaster.on && !watch ? mountKitchenPanel(document) : null; // K: the Kitchen panel (play/kitchen-panel.mjs)
@@ -352,7 +352,7 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
   ctx.world.map = world.map;
 
   const made = {};
-  // Toaster Wars on Wheatfield Valley: the grid terrain and a land-coloured minimap (play/wheatfield-terrain.mjs).
+  // GHT on Wheatfield Valley: the grid terrain and a land-coloured minimap (play/wheatfield-terrain.mjs).
   const wheat = toaster.on ? wheatfieldMap(seed, q) : null;
   if (wheat && state.width === wheat.width) mmBase = minimapCanvas(buildMinimapImage(wheat));
   if (wheat && state.width === wheat.width) mmSites = kitchenSites(wheat);
@@ -726,7 +726,7 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
     drawCampsOverlay(ov, campMarks(neutralSnap.neutrals), project, tp);
     drawPickups(ov, neutralSnap.groundItems, project, tp, performance.now());
     drawReachBorders(ov, state.territory, side, state.tick, project);
-    // Toaster Wars: the thick 3D cords are the cords; the thin lines only show as a faint 'inspect power' overlay (Tab).
+    // GHT: the thick 3D cords are the cords; the thin lines only show as a faint 'inspect power' overlay (Tab).
     drawPowerOverlay(ov, state, side, input.ui.selection, project, state.tick, toaster.on ? { cords: inspectPower, faint: true } : {});
     if (toaster.on) drawBadges(ov, badgesFor(state, side), project, tp, performance.now()); // what each Mill, Well and Toaster is missing
     if (mode) {
@@ -797,7 +797,7 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
     }
   }
 
-  window.driftfallPlay = { engine, ctx, game, input, rig, project, groundTile };
+  window.ghtPlay = { engine, ctx, game, input, rig, project, groundTile };
   engine.start();
   if (toaster.on && !watch) mountFlowMenu(root, {
     query: q, isPaused: () => paused,
@@ -837,7 +837,7 @@ function buildDom(root, toasterOn = false) {
     <div id="toast"></div>
     <div id="result" hidden></div>
     <div id="hud"></div>
-    <div id="boot"><b>${toasterOn ? 'GHOSTIES, HOSTIES, AND TOASTIES' : 'DRIFTFALL'}</b><br>loading…</div>`;
+    <div id="boot"><b>${toasterOn ? 'GHOSTIES, HOSTIES, AND TOASTIES' : 'GHT'}</b><br>loading…</div>`;
   const $ = (id) => root.querySelector('#' + id);
   return { canvas: $('view'), overlay: $('overlay'), minimap: $('minimap'), shards: $('shards'), supply: $('supply'), clock: $('clock'),
     top: $('top'), alert: $('alert'), selection: $('selection'), card: $('card'), toast: $('toast'), territory: $('territory'), result: $('result'), hud: $('hud'), boot: $('boot') };
@@ -849,7 +849,7 @@ function toast(els, text) {
   clearTimeout(toastTimer); toastTimer = setTimeout(() => { els.toast.style.opacity = '0'; }, 3200);
 }
 
-// Toaster Wars end card (play/results-card.mjs): the numbers, Restart and Watch replay.
+// GHT end card (play/results-card.mjs): the numbers, Restart and Watch replay.
 function showResultsCard(els, result, side, totals, tps, driver, q) {
   saveLastMatch(driver.log);
   saveReplay(driver.log, q);

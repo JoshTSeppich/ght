@@ -1,4 +1,4 @@
-# Driftfall 3D — graphics contract (Joshua's direction: make it look a LOT better)
+# GHT 3D — graphics contract (Joshua's direction: make it look a LOT better)
 
 Decision: the main visual is a real-time 3D scene built on **Three.js 0.169.0** (MIT), installed in this
 folder (`node_modules/three`). The 2D viewer in `viewer/` stays as the debug view. The look is ORIGINAL sci-fi:

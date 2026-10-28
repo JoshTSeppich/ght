@@ -1,4 +1,4 @@
-# Driftfall: territory on a drifting world
+# GHT: territory on a drifting world
 
 > Joshua, 18:03: "Watch a game of StarCraft, write down all the upgrades and tiers of tech and timings and
 > incorporate this, but instead this game is about how to handle territory among an ever-changing environment."
@@ -32,7 +32,7 @@ ground fast; the Burrow (wombats) are best at holding ground and moving under it
   first.
 - **Hand-drawn at the Reach level, filled by seed.** `maps/layout-v4.mjs` draws each Reach's outline, height, ramps,
   fields and vents for the top half and mirrors it; the seed scatters rocks and Rubble inside the Reaches.
-  Output: `maps/driftfall-v4.json` (`version: 4`).
+  Output: `maps/ght-v4.json` (`version: 4`).
 - Distances grow ~3×: Main to Main is about 75 s for a normal ground unit (the classic is ~60–90 s). Sight and
   weapon ranges stay the same.
 - **Performance:** paths use the tile grid plus a coarse Reach graph (between Reaches first, then tiles inside), so
@@ -137,7 +137,7 @@ red.
 
 ## 7. Target timings (what a good game should look like)
 
-A Driftfall match is ~12–16 minutes; the classic's phases are compressed by about a quarter.
+A GHT match is ~12–16 minutes; the classic's phases are compressed by about a quarter.
 
 | Time | Event (a standard, safe game) |
 |---|---|
@@ -206,7 +206,7 @@ minute), shown on the HUD.
 
 ## 11. What changes in the code (owners settle in the accord)
 
-- `maps/layout-v4.mjs`, `maps/driftfall-v4.json`, `env/map.mjs`, `env/path.mjs`: the 128 × 128 map and Reach graph.
+- `maps/layout-v4.mjs`, `maps/ght-v4.json`, `env/map.mjs`, `env/path.mjs`: the 128 × 128 map and Reach graph.
 - `env/territory.mjs`: Reaches, claims, hold, Hold count, territory win.
 - `env/drift.mjs`: the seeded Drift schedule and its five events.
 - `env/economy.mjs`: Drills, Depots, Track, Presses, Alloy, flow.
@@ -329,7 +329,7 @@ and every map has a fast lane through the middle so armies meet before minute 6.
 (Centre) = 31, Huge is 5 × 4 + the Rift = 41. The middle column runs straight to the Rift, three doors feed the Rift
 from each side, and one long link along each edge lets a flank force cross without touching it. Doors are left out on
 purpose so there are lanes and chokes. Gate ids start at 48 (Large) and 64 (Huge) and the file stores 2 digits per id.
-Win count is two-thirds rounded up: 14 / 21 / 28 (`winCountFor`). `?map=standard|large|huge` (or `DRIFTFALL_MAP=`)
+Win count is two-thirds rounded up: 14 / 21 / 28 (`winCountFor`). `?map=standard|large|huge` (or `GHT_MAP=`)
 picks the map; `v4` still means Standard; the default stays `legacy` until the sim runs these maps at full speed.
 Tests: `tests/map-sizes.test.mjs` (counts, mirror, one connected piece, fair starts, fast lane, routing budget).
 
@@ -447,7 +447,7 @@ This refines section 17: you don't gather toast or bread; you gather four ingred
 - **Wiring the bigger map into the live page is now the integrator's FIRST item**: Joshua is still seeing 40 × 40.
 
 ## 20. The cord is the leash (Joshua, 20:42: "the toasters can't go farther than their electrical cord")
-The defining rule of **Toaster Wars**.
+The defining rule of **GHT**.
 - **Every toaster is plugged in.** Each unit trails a visible cord back to the nearest power point it's plugged into:
   the **Power Strip** (your base), an **Outlet** (your claims), or an **Extension Box** (cheap, places power further
   out). **Cord length** depends on the unit: Crumbs 12 tiles, Poppers 8, Zappers 10, Four-Slice 6, Bagel 16;
@@ -466,7 +466,7 @@ The defining rule of **Toaster Wars**.
   power there). Hold the river and generators and you hold the war.
 
 ## 20. The cord is the leash (Joshua, 22 Oct 20:42: "the toasters can't go farther than their electrical cord")
-The defining rule of **Toaster Wars**.
+The defining rule of **GHT**.
 - **Every toaster is plugged in** to a power point: the **Power Strip** (base), an **Outlet** (claims) or an
   **Extension Box** (cheap, pushes power outward). Cord length by unit: Crumb 12 tiles, Popper 8, Zapper 10,
   Four-Slice 6, Bagel 16; cord upgrades lengthen them.

@@ -1,4 +1,4 @@
-// Driftfall cord power (TERRITORY.md section 20: "the cord is the leash"). Owner: sonnet.
+// GHT cord power (TERRITORY.md section 20: "the cord is the leash"). Owner: sonnet.
 //
 // Opt-in: nothing here runs unless state.power exists (enablePower; createTerritoryMatch turns it on).
 // Pure and deterministic: no clock, no randomness.

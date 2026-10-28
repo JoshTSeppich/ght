@@ -132,7 +132,7 @@ else {
     : `Red: ${failing.length} of ${totals.files} test file${totals.files === 1 ? '' : 's'} not passing (${totals.failed} failing check${totals.failed === 1 ? '' : 's'}).`;
 
   // Plain-English summary, one block per area.
-  console.log(`Driftfall test run: ${headline} (${seconds}s)\n`);
+  console.log(`GHT test run: ${headline} (${seconds}s)\n`);
   for (const a of areas) {
     console.log(`${a.verdict === 'pass' ? 'PASS' : 'FAIL'}  ${a.label} · owner: ${a.owner}`);
     console.log(`      ${a.headline}`);
@@ -148,7 +148,7 @@ else {
 
   if (!filter) {
     const run = {
-      format: 'driftfall-test-run', version: 1, at: new Date().toISOString(), seconds, node: process.version,
+      format: 'ght-test-run', version: 1, at: new Date().toISOString(), seconds, node: process.version,
       verdict: green ? 'green' : 'red', headline, totals,
       areas: areas.map(({ id, label: l, owner, verdict, headline: h, files }) => ({ id, label: l, owner, verdict, headline: h, files })),
       failing,

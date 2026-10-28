@@ -1,5 +1,5 @@
-// Toaster Wars tiers (SYSTEMS-DESIGN.md section 2): Strip (nothing), Kitchen (one complete Toaster), Powered (a complete
-// Windmill or Dam of yours). No Hold, no foundry, sanctum or hangar. The Driftfall tiers stay on STATS.tiers for ?classic=1.
+// GHT tiers (SYSTEMS-DESIGN.md section 2): Strip (nothing), Kitchen (one complete Toaster), Powered (a complete
+// Windmill or Dam of yours). No Hold, no foundry, sanctum or hangar. The GHT tiers stay on STATS.tiers for ?classic=1.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { STATS } from '../env/stats.mjs';
@@ -23,7 +23,7 @@ test('the table: Strip is nothing, Kitchen is one complete Toaster, Powered is a
   assert.deepEqual([...t[3].unlocks].sort(), ['brute', 'dart', 'howler'].sort());
 });
 
-test('the Driftfall tiers stay on STATS.tiers for ?classic=1 (their tests read them)', () => {
+test('the GHT tiers stay on STATS.tiers for ?classic=1 (their tests read them)', () => {
   assert.deepEqual(STATS.tiers[2].needs, ['foundry', 'sanctum']);
   assert.equal(STATS.tiers[2].hold, 3);
 });

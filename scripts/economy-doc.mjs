@@ -24,7 +24,7 @@ Wheat is still called "Shards" inside the code. The game runs ${e.match.ticksPer
 - Crumbs gather on their own. On the play page (play/idle-crumbs.mjs, hooked in play/app.mjs) an idle Crumb goes to the nearest wheat in its cord reach at the first tick, and again 3 s after it stands idle. Right-clicking wheat still overrides it.
 
 ## Wheat
-- A field tile holds ${e.wheat.tileAmount} Wheat (${e.wheat.classicTileAmount} on the old Driftfall maps); a rich tile holds ${e.wheat.richMultiplier}x.
+- A field tile holds ${e.wheat.tileAmount} Wheat (${e.wheat.classicTileAmount} on the old GHT maps); a rich tile holds ${e.wheat.richMultiplier}x.
 - A Crumb takes ${e.wheat.mineSeconds} s to mine a load and carries ${e.wheat.crumbCarryPerTrip} Wheat a trip (${e.wheat.classicCarryPerTrip} in a classic match). Walking time is on top.
 - With six auto-gathering Crumbs on the home field, a Crumb brings about 28 Wheat a minute (about 167 for six), inside the 25-30 target, so the bank holds 400-700 after 120 s (tests/passive-income.test.mjs). The walk is short, so the mining time sets the pace.
 

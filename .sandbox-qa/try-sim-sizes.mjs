@@ -1,7 +1,7 @@
 // Smoke: the sim steps on each map size (workers told to gather, a worker told to cross the map).
 import { createMatch, step } from '../env/sim.mjs';
 for (const map of ['legacy', 'standard', 'large', 'huge']) {
-  process.env.DRIFTFALL_MAP = map;
+  process.env.GHT_MAP = map;
   const s = createMatch(7);
   const t = Date.now();
   const mine = s.units.filter((u) => u.owner === 0);

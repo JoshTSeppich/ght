@@ -26,7 +26,7 @@ test('the live world frame keeps the power fields on its units', () => {
   assert.ok(f.next.power.view.points.length > 0);
 });
 
-test('thin power lines: drawn in classic, hidden in Toaster Wars until "inspect power", then faint', async () => {
+test('thin power lines: drawn in classic, hidden in GHT until "inspect power", then faint', async () => {
   const { drawPowerOverlay } = await import('../play/territory-wire.mjs');
   const s = createToasterState(7); stepPower(s);
   const run = (opts) => {
@@ -38,7 +38,7 @@ test('thin power lines: drawn in classic, hidden in Toaster Wars until "inspect 
   const classic = run({});
   assert.ok(classic > 0, 'classic draws the thin cords');
   assert.equal(run({ cords: true, faint: true }), classic, 'inspect power shows them');
-  assert.ok(run({ cords: false }) < classic, 'default Toaster Wars hides them');
+  assert.ok(run({ cords: false }) < classic, 'default GHT hides them');
 });
 
 test('end to end: the live world frame from observeToaster makes the toaster cord batch draw', async () => {

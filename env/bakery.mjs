@@ -1,4 +1,4 @@
-// Driftfall — the Toaster-Wars kitchen (TERRITORY.md sections 17 and 18). Owner: sonnet. Pure and deterministic.
+// GHT — the kitchen (TERRITORY.md sections 17 and 18). Owner: sonnet. Pure and deterministic.
 //
 // Wheat (Shards, hauled by Crumbs) -> Mill -> flour; Well -> water; Toaster building: flour + water + power -> toast.
 // Toast is the ammo (env/ammo.mjs): the toast stack IS the Power Strip's slice store. Three buildings, one chain, and

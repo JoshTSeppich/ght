@@ -1,4 +1,4 @@
-// Driftfall — the army budget (TERRITORY.md section 9): no supply cap of its own (the 40-unit cap, STATS.match.unitCap,
+// GHT — the army budget (TERRITORY.md section 9): no supply cap of its own (the 40-unit cap, STATS.match.unitCap,
 // is enforced in env/commands.mjs in every match, /play included), training always runs and draws its cost
 // gradually (into debt if needed), every combat unit pays upkeep per second, and debt pauses building and research
 // but never training. Deep debt makes units weary.
@@ -84,7 +84,7 @@ function unitWeight(unit, red, opts, pct = cfg().upkeepPercentPerMinute) {
 
 function upkeepSums(state, player, opts) {
   const red = reductionPercent(opts);
-  const pct = state.budget?.upkeepPercent ?? cfg().upkeepPercentPerMinute; // a match may set its own (Toaster Wars: 5)
+  const pct = state.budget?.upkeepPercent ?? cfg().upkeepPercentPerMinute; // a match may set its own (GHT: 5)
   let shards = 0;
   let flux = 0;
   for (const u of state.units) {

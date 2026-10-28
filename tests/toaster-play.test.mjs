@@ -1,4 +1,4 @@
-// Toaster Wars on the play page (owner: sonnet): the default page is the territory match with power, ammo, bakery,
+// GHT on the play page (owner: sonnet): the default page is the territory match with power, ammo, bakery,
 // fences and wrap on; the top bar is Wheat/Flour/Water/Toast/Power; no goods panel; toaster names in the teach text.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -8,7 +8,7 @@ import { territoryPanel } from '../play/territory-wire.mjs';
 
 const q = (s = '') => new URLSearchParams(s);
 
-test('Toaster Wars is the default; ?classic=1 keeps the old page', () => {
+test('GHT is the default; ?classic=1 keeps the old page', () => {
   assert.equal(toasterMode(q('')), true);
   assert.equal(toasterMode(q('classic=1')), false);
   assert.equal(toasterOptions(q('classic=1')).createState, undefined);
@@ -46,7 +46,7 @@ test('side panel has no Trading House goods and no Flux/Alloy rows', () => {
   const s = toasterOptions(q('')).createState(7);
   const html = toasterPanel(s, 0);
   assert.doesNotMatch(html, /Trading House|glowmoss|stormglass|quakestone|ironroot|amberlight|Flux|Alloy|Shards/);
-  assert.equal(html, ''); // no tier readout or Drift in Toaster Wars (PLAYABLE.md item 10)
+  assert.equal(html, ''); // no tier readout or Drift in GHT (PLAYABLE.md item 10)
   assert.match(territoryPanel(s, 0), /Flux/); // the classic panel is untouched
 });
 

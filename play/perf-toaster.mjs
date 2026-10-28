@@ -1,4 +1,4 @@
-// The Toaster Wars frame-rate page's runner (owner: sonnet, PERF). Mounts the real Wheatfield scene with the same modules
+// The GHT frame-rate page's runner (owner: sonnet, PERF). Mounts the real Wheatfield scene with the same modules
 // play/app.mjs uses, on the synthetic state from play/perf-scenario.mjs.
 // Open play/perf-toaster.html (repo-root server). Query: ?units=200 (even), ?quality=high|balanced|low, ?frames=120 (measured),
 // ?mode=render (default: sim frozen, only engine render + instanced update timed) | ?mode=sim (one sim tick per frame, never catch-up).

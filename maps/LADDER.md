@@ -69,7 +69,7 @@ const state = createTerritoryMatch(42, { map: 'ladder' });
 enableEnergy(state);
 ```
 
-For existing scripts that use the default map picker, set `DRIFTFALL_MAP=ladder`.
+For existing scripts that use the default map picker, set `GHT_MAP=ladder`.
 The default map has not changed. `loadMapV4('ladder')`, `generateMap(seed,
 {map:'ladder'})` and `reachLayoutV4('ladder')` are all supported. Nine Reaches have
 roles main, natural, third and flank for each side, plus the neutral centre.

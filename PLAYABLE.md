@@ -2,7 +2,7 @@
 
 Joshua: "I just want to mess around in the game. Are the farming mechanics and costs of things all squared up?"
 
-Short answer: **No, not yet.** The bread chain exists in the code, but it's a mix of old Driftfall numbers and new
+Short answer: **No, not yet.** The bread chain exists in the code, but it's a mix of old GHT numbers and new
 toaster rules that were never balanced together. Several things on screen are leftovers, power is free, and nothing
 teaches you what to do. Facts checked in code tonight:
 
@@ -26,7 +26,7 @@ teaches you what to do. Facts checked in code tonight:
   | Flak Popper | 100 |
   | Bagel | 100 |
 
-- **Upkeep:** 5% of a unit's cost per minute in Toaster Wars (the classic rate is 10%), in wheat, with no supply cap (yet the top bar shows "Supply 6/40").
+- **Upkeep:** 5% of a unit's cost per minute in GHT (the classic rate is 10%), in wheat, with no supply cap (yet the top bar shows "Supply 6/40").
 - **Ammo (as of 26 Oct):** a Popper has 6 slots and fires one slice every 4.5 s (three 20-damage shots, 1.5 s apart), so about
   13 slices a minute while fighting (`ECONOMY.units.grunt.slicesPerMinuteFighting`; env/ammo.mjs ARMED). The 23 Oct figures (3 slices, 0.75 s, 80 a minute) are superseded.
 - **Leftovers still switched on in the default match:**

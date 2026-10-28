@@ -7,7 +7,7 @@
 // tracks through the Assembly Line, air tracks through the Cooling Rack) and the air layer (Cooling Rack + the three
 // flyers, env/air.mjs) all run; no clock or randomness.
 // Original header of the planner follows.
-// Toaster-sonnet v2: a bot that plays the Toaster Wars rules, cord-bending included. Crumbs mine wheat, it builds the kitchen
+// Toaster-sonnet v2: a bot that plays the GHT rules, cord-bending included. Crumbs mine wheat, it builds the kitchen
 // (Mill, Well, Toaster) so its fighters have toast, an Assembly Line for Poppers and Zappers, and walks a chain of Extension
 // Boxes toward the enemy Power Strip (a cord reaches only so far, TERRITORY.md section 20). The army follows the chain and
 // sieges once the last box is in range. Player API only (plus the pure cord-wrap helpers); no clock or randomness, so

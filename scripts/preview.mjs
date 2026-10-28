@@ -33,5 +33,5 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const dir = path.resolve(arg('--dir', path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'dist')));
   if (!fs.existsSync(path.join(dir, 'index.html'))) { console.error(`nothing to serve in ${dir}; run: npm run build`); process.exit(1); }
   const port = Number(arg('--port', 4173));
-  createPreviewServer(dir).listen(port, '127.0.0.1', () => console.log(`Driftfall preview: http://127.0.0.1:${port}/  (serving ${dir})`));
+  createPreviewServer(dir).listen(port, '127.0.0.1', () => console.log(`GHT preview: http://127.0.0.1:${port}/  (serving ${dir})`));
 }

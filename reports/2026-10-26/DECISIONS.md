@@ -42,7 +42,7 @@ Asked whether to make the Mill faster, have the Toaster keep a reserve, or make 
 
 Joshua: "Officially rename it to Ghosties, Hosties, and Toasties. Put things in order."
 
-The official game name is **Ghosties, Hosties, and Toasties**. The three factions are the Ghosties, the Hosties and the Toasties, in that order. The game was formerly Toaster Wars, then "Ghosters, Hosters and Toasters", and originally Driftfall. The GitHub repo stays named `driftfall`.
+The official game name is **Ghosties, Hosties, and Toasties**. The three factions are the Ghosties, the Hosties and the Toasties, in that order. The game was formerly GHT, then "Ghosters, Hosters and Toasters", and originally GHT. The GitHub repo stays named `ght`.
 
 **Scope (player-facing text only).**
 - Renamed: the game title wherever a player or viewer sees it (setup screen heading, page `<title>`s under play/, boot and error text, the perf page label), the faction display names Toasters, Ghosters and Hosters (now Toasties, Ghosties, Hosties) in UI copy (objective line, tutorial and card tips, HUD counter "Toasties 6/40", results card), and the title lines of NORTHSTAR.md, PLAYABLE.md, COMBAT.md, playtest/PLAYTEST.md and maps/WHEATFIELD.md.

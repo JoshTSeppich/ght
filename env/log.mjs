@@ -21,13 +21,18 @@ const EVENT_FIELDS = {
   refund: ['player', 'amount', 'shards'],   // card 11 (Construction): env/commands.mjs cancel
 };
 
+// New logs are written as 'ght-log'. Logs recorded before the GHT rename say 'driftfall-log' and still load.
+export const LOG_FORMAT = 'ght-log';
+export const LEGACY_LOG_FORMATS = ['driftfall-log'];
+export const isLogFormat = (format) => format === LOG_FORMAT || LEGACY_LOG_FORMATS.includes(format);
+
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const isInt = (v) => Number.isInteger(v);
 const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
 
 export function createLog({ seed, players, stats, initial }) {
   return {
-    format: 'driftfall-log',
+    format: LOG_FORMAT,
     version: 1,
     seed,
     players: [players?.[0], players?.[1]],
@@ -89,7 +94,7 @@ export function validateLog(log) {
   const problems = [];
   if (!isObj(log)) return ['The log is not an object.'];
 
-  if (log.format !== 'driftfall-log') problems.push('The format must be "driftfall-log".');
+  if (!isLogFormat(log.format)) problems.push(`The format must be "${LOG_FORMAT}".`);
   if (log.version !== 1) problems.push('The version must be 1.');
   if (!('seed' in log) || log.seed === undefined || log.seed === null) problems.push('The seed is missing.');
   if (!Array.isArray(log.players) || log.players.length !== 2 || !log.players.every((p) => typeof p === 'string')) {

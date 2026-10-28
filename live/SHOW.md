@@ -1,4 +1,4 @@
-# Driftfall LIVE VIEW — run of show
+# GHT LIVE VIEW — run of show
 
 Owner: fable (Show Director). What Joshua sees on the TV at every moment, and why it switches.
 The scheduler that enforces this is `live/show.mjs`. Everything shown is read from the harness's records
@@ -37,7 +37,7 @@ the agent count. The scene decides which panel is **big** (the `focus`), never w
 | MOMENT | a chat moment, quoted in full: Joshua's post, an AGREE, a decision, a question to an owner | chat | 12 s | at once |
 | BUILD | the build just flipped: green or red, which test files, whose | status | 15 s | at once |
 | CHANGES | what just changed in the repo (files, who, why from the changelog) | status | 15 s | 60 s |
-| TITLE | "Driftfall, built live by the swarm" card, only when there is nothing to show | stage | 8 s | — |
+| TITLE | "GHT, built live by the swarm" card, only when there is nothing to show | stage | 8 s | — |
 
 ## When it switches
 

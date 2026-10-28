@@ -1,6 +1,6 @@
 // Paths are relative to this module, so live play and edition copies use the same assets.
 // A null manifest entry deliberately uses text until matching hand-drawn art exists.
-// Toaster Wars installs an art provider (play/toaster-art.mjs) with setArtProvider(); while one is set, every icon and
+// GHT installs an art provider (play/toaster-art.mjs) with setArtProvider(); while one is set, every icon and
 // portrait comes from it and the old snake pictures are never used. ?classic=1 never installs one.
 import manifest from '../assets/icons/snakenators/manifest.json' with { type: 'json' };
 const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

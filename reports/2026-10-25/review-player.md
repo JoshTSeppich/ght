@@ -1,4 +1,4 @@
-# Fresh-eyes player review: Toaster Wars, 2026-10-25
+# Fresh-eyes player review: GHT, 2026-10-25
 
 Reviewer: a new RTS player, no earlier reports read until the end. Evidence marks: VERIFIED (ran it, or file:line) / UNVERIFIED.
 

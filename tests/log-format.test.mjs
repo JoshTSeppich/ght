@@ -273,7 +273,7 @@ function checkTiming(log) {
 }
 
 function checkTopLevel(log, STATS) {
-  assert.equal(log.format, 'driftfall-log');
+  assert.equal(log.format, 'ght-log');
   assert.equal(log.version, 1);
   assert.ok(Number.isFinite(log.seed), 'seed must be a number');
   assert.ok(Array.isArray(log.players) && log.players.length === 2, 'players must be two names');
@@ -426,7 +426,7 @@ describe('validateLog names the problem when a required field is broken', () => 
 
   test('never throws on garbage and reports a problem for it', async () => {
     const validateLog = await fn('../env/log.mjs', 'validateLog');
-    for (const junk of [null, undefined, 0, 'log', [], {}, { format: 'driftfall-log' }]) {
+    for (const junk of [null, undefined, 0, 'log', [], {}, { format: 'ght-log' }]) {
       let problems;
       assert.doesNotThrow(() => { problems = validateLog(junk); }, `validateLog threw on ${JSON.stringify(junk)}`);
       assert.ok(Array.isArray(problems) && problems.length > 0, `validateLog must reject ${JSON.stringify(junk)}`);

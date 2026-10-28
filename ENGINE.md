@@ -1,4 +1,4 @@
-# The Coil Engine: real movement, built for Driftfall (Joshua, 19:51)
+# The Coil Engine: real movement, built for GHT (Joshua, 19:51)
 
 > **DIRECTION CHANGE (Joshua, 20:05): the units are now little TOASTER ROBOTS (the Toastinators, TERRITORY.md
 > section 16), because snakes were too hard. This section SUPERSEDES the snake parts below and any snake details in

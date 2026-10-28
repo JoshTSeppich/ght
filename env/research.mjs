@@ -1,4 +1,4 @@
-// Research and upgrades for Toaster Wars (build wave 2, card M3). Owner: sonnet (Research lead).
+// Research and upgrades for GHT (build wave 2, card M3). Owner: sonnet (Research lead).
 // Weapons and armor tracks 1 to 3 per layer are bought at the Assembly Line ('forge', ground and structure tracks) and the
 // Cooling Rack (air tracks). Level 2 needs the Kitchen's tier 2 (a Toaster), level 3 tier 3 (a Windmill or Dam), and each
 // level needs the one below it. Everything costs Wheat + Flour (decision 2); Flour is the Toasters' pantry flour.
@@ -45,7 +45,7 @@ export const flourCostOf = (kind) => FLOUR_COST[kind] ?? 0;
 // Flour
 // ---------------------------------------------------------------------------------------------
 
-/** Flour costs apply on the Toaster Wars rules (noTiers) when the pantry exists. */
+/** Flour costs apply on the GHT rules (noTiers) when the pantry exists. */
 export const flourOn = (state) => !!state.noTiers && !!state.toast?.pantry;
 const pantry = (state, side) => state.toast.pantry[side];
 

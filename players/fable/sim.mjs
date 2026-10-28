@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Team fable's match simulator and tuning harness.
 //
-// Runs many REAL Driftfall matches (the same env/sim.mjs `step`, `observe` and `checkEnd` the referee uses) between
+// Runs many REAL GHT matches (the same env/sim.mjs `step`, `observe` and `checkEnd` the referee uses) between
 // our bot and an opponent, over many seeds and with the sides swapped, in a pool of worker threads. Prints win
 // rates with confidence intervals, value margins, end reasons, think-time stats and the seeds we lost, and appends
 // one honest record per experiment to players/fable/results.json.

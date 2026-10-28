@@ -1,4 +1,4 @@
-// Watch mode plays a recorded Toaster Wars match (play/replay/record.mjs) instead of two live AIs. Owner: sonnet.
+// Watch mode plays a recorded GHT match (play/replay/record.mjs) instead of two live AIs. Owner: sonnet.
 //   replaySeed(query)         -> 3 | 5 | null    which recording the page plays (null: ?replay=off, run the live AIs)
 //   replayUrl(seed, base)     -> URL of the recording (gzipped JSON)
 //   replayPlayer(rec)         -> createPlayer(opts) giving { name, act(obs) } that answers with the recorded commands for obs.tick

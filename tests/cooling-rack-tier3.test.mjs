@@ -21,7 +21,7 @@ function structure(id, owner, kind, x, y, complete = true) {
 test('Cooling Rack is tier 3', () => {
   const row = STATS.structures.coolingRack;
   assert.ok(row, 'coolingRack should exist in STATS');
-  // For Toaster Wars (the current game), check toasterTiers
+  // For GHT (the current game), check toasterTiers
   const tier3Unlocks = STATS.toasterTiers?.[3]?.unlocks ?? [];
   assert.ok(tier3Unlocks.includes('coolingRack'), 'Cooling Rack should be in tier 3 unlocks');
 });

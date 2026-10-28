@@ -1,4 +1,4 @@
-// Toaster Wars — the toast moods (TERRITORY.md sections 17 and 18). Pure module. Every territory match calls enableToast
+// GHT — the toast moods (TERRITORY.md sections 17 and 18). Pure module. Every territory match calls enableToast
 // (env/sim-territory.mjs enableHunger). stepToast has no caller yet, so no mood changes (SWITCHED-OFF.md, reports/2026-10-26).
 //
 // Toast is baked at the Power Strip (your Core) from Flour + Water + Energy. Every fighting unit eats one Toast a minute.

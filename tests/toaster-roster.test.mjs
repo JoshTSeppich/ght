@@ -1,4 +1,4 @@
-// Toaster Wars sim (Joshua, 09:27: "remember they're toasters?"). Owner: sonnet (env/stats.mjs ROSTER, env/bakery.mjs).
+// GHT sim (Joshua, 09:27: "remember they're toasters?"). Owner: sonnet (env/stats.mjs ROSTER, env/bakery.mjs).
 // The roster is data, old kinds are aliases, the territory match runs hunger + cords by default, and the cord and the
 // hunger rules end the old 15-second melee rush on their own.
 import { test } from 'node:test';
@@ -40,7 +40,7 @@ test('the roster names all seven toasters and the Power Strip, and old kinds are
 
 test('every roster unit has a full data row, and the base is a Power Strip that costs the match', () => {
   for (const r of ROSTER.units) {
-    const row = rowOf({ ammo: {} }, r.kind); // the Toaster-Wars numbers
+    const row = rowOf({ ammo: {} }, r.kind); // the GHT numbers
     // The Crouton Kite is a true scout (DECISIONS.md 3): no damage field, no shot, never attacks.
     const fields = r.kind === 'croutonKite' ? ['cost', 'hp', 'range', 'speed', 'trainTicks'] : ['cost', 'hp', 'damage', 'range', 'speed', 'trainTicks'];
     for (const f of fields) assert.ok(Number.isFinite(row[f]), r.kind + '.' + f);

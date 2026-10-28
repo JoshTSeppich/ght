@@ -44,7 +44,7 @@ let run; // { status, signal, stdout, stderr, elapsedMs }
 let log; // parsed JSON log, or undefined if the file is missing / unparsable
 
 before(() => {
-  tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "driftfall-smoke-"));
+  tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "ght-smoke-"));
   outFile = path.join(tmpDir, "match.json");
 
   const args = [
@@ -164,7 +164,7 @@ test("the written log file validates with env/log.mjs", async () => {
   assert.deepEqual(problems, [], `validateLog reported problems:\n - ${problems.join("\n - ")}`);
 
   // A few headline fields from §12, checked directly so a weak validateLog can't hide them.
-  assert.equal(theLog.format, "driftfall-log");
+  assert.equal(theLog.format, "ght-log");
   assert.equal(theLog.version, 1);
   assert.equal(theLog.seed, SEED, "log.seed should be the --seed given on the command line");
   assert.ok(Array.isArray(theLog.players) && theLog.players.length === 2, "log.players should list two names");

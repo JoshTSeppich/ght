@@ -1,4 +1,4 @@
-// Hits to kill for every attacker and target at Weapons and Armor levels 0 to 3, from rowOf (Toaster Wars overlay)
+// Hits to kill for every attacker and target at Weapons and Armor levels 0 to 3, from rowOf (GHT overlay)
 // and the real hit formula in env/combat.mjs (DECISIONS.md 1): max(0.5, base + tag bonus + attackLevel - (armor + armorLevel)).
 // node scripts/breakpoints.mjs
 // A level's attackLevel/armorLevel comes from one of env/research.mjs's five TRACKS, chosen by attacker/target layer,
@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { STATS, ECONOMY, UNIT_KINDS, STRUCTURE_KINDS, rowOf } from '../env/stats.mjs';
 import { damagePerHit } from '../env/combat.mjs';
 
-const TOASTER_STATE = { ammo: true }; // the Toaster Wars overlay: the hp, shot and range Joshua plays on /play
+const TOASTER_STATE = { ammo: true }; // the GHT overlay: the hp, shot and range Joshua plays on /play
 
 // Every shooter on /play with a shot: the seven ground fighters, the two flyers that attack, and the Heat Lamp turret.
 // The Crouton Kite carries no `damage` field (DECISIONS.md 3: a true scout) and never attacks, so it is not an attacker.
@@ -23,7 +23,7 @@ export const COMMON_TARGETS = Object.freeze(['worker', 'grunt', 'lancer']);
 export const LEVELS = Object.freeze([0, 1, 2, 3]);
 
 const isStructureKind = (kind) => kind === 'core' || STRUCTURE_KINDS.includes(kind);
-// A row's shot damage with the Toaster Wars overlay on, same selection as env/combat.mjs hitDamage's `base`.
+// A row's shot damage with the GHT overlay on, same selection as env/combat.mjs hitDamage's `base`.
 const shotDamage = (row) => (row.shot ? row.shot.damage : row.damage);
 
 // Can this attacker's weapon reach that target's layer at all (env/combat.mjs canHit, minus the minRange dead zone,

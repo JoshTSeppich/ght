@@ -1,4 +1,4 @@
-// Driftfall — the Drift: a seeded, deterministic schedule of land events (TERRITORY.md section 4).
+// GHT — the Drift: a seeded, deterministic schedule of land events (TERRITORY.md section 4).
 // Same seed, same Drift. The whole schedule is built once from the seed; step(tick) only looks it up, so
 // asking for the same tick twice, in any order, gives the same answer. Every event is announced 30 s
 // (ANNOUNCE_TICKS) before it applies. Targets are (side, role, index) in TERRITORY.md section 2 terms; the map

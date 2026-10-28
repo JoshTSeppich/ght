@@ -18,7 +18,7 @@ let dir;
 before(async () => {
   ({ runMatch } = await import('../env/referee.mjs'));
   ({ comparable } = await import('../env/log.mjs'));
-  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'driftfall-referee-'));
+  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ght-referee-'));
 });
 
 after(() => {

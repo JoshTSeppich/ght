@@ -1,4 +1,4 @@
-# Driftfall tests
+# GHT tests
 
 Owner: SDET / Test Automation (team haiku). Scope: `tests/run-all.mjs` and this file.
 
@@ -29,7 +29,7 @@ half run as green.
 ## tests/last-run.json
 
     {
-      "format": "driftfall-test-run", "version": 1,
+      "format": "ght-test-run", "version": 1,
       "at": "ISO time", "seconds": 0.0, "node": "v20...",
       "verdict": "green" | "red",
       "headline": "plain English",

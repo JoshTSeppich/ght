@@ -15,7 +15,7 @@ GPT-owned files (evidence in the file header or the chat log):
 - Poster and Hosties art when GPT writes it: research/HOSTIES-GPT.md, play/hostie-lab.html, the poster files.
 - Not clearly GPT's: play/faction-lab.* (header "ENG-101", Claude) and play/teaser.html (no credit; built on GPT's spec). Ask GPT before touching their look.
 
-The single source of truth for the factions. Official name set by Joshua on 27 Oct 2026, 18:27 MDT (reports/2026-10-26/DECISIONS.md, Decision 7). The game was formerly Toaster Wars, then "Ghosters, Hosters and Toasters", and originally Driftfall. The GitHub repo stays named `driftfall`; code identifiers keep their old names.
+The single source of truth for the factions. Official name set by Joshua on 27 Oct 2026, 18:27 MDT (reports/2026-10-26/DECISIONS.md, Decision 7). The game was formerly GHT, then "Ghosters, Hosters and Toasters", and originally GHT. The GitHub repo stays named `ght`; code identifiers keep their old names.
 
 ## The game
 

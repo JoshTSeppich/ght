@@ -1,4 +1,4 @@
-# M7 MINUTIAE: HUD, feedback and sound (Toaster Wars /play)
+# M7 MINUTIAE: HUD, feedback and sound (GHT /play)
 
 Checker: haiku (web). Read-only. Code read by hand (no node run). Liquipedia checked via the raw form the HIVE tip gives.
 
@@ -13,7 +13,7 @@ Checker: haiku (web). Read-only. Code read by hand (no node run). Liquipedia che
 - The mute key is the backtick. Confirmed: play/input.mjs:29 `MUTE_KEY = '`'`; app.mjs:504-505 toggles on it and toasts "Sound off (`)". play/index.html:7 header says "` mute". Correct.
 - The on-screen label still says "(U)": play/toaster-sounds.mjs:152 `'Muted (U)' : 'Sound (U)'`. WRONG. And in classic keys U is Unplug (play/toaster-play.mjs HOTKEY_PROFILES.classic `unplug: 'u'`), so the label points at the wrong key in both profiles. See B1.
 
-## MISSING (StarCraft II has it, Toaster Wars does not)
+## MISSING (StarCraft II has it, GHT does not)
 
 MUST
 - M1. Silent refusals on train and build. A queued train refused for "queue-full" or "unit-cap" (env/commands.mjs:110, :113) or for lack of wheat gives no text. The only reject texts are for place-power and set-fence (play/station-controls.mjs:56-63), and noteEvents only toasts those (play/input.mjs:543-545). The card shows red price only (play/command-card.mjs:52 class "poor"). SC2 prints a message for "Not enough resources" and "Supply blocked". Evidence: not found: grep "queue-full" in play/ (no toast mapping). Fix: add reject text for train (queue-full, unit-cap, wheat) to REJECT_TEXT.
@@ -34,14 +34,14 @@ NICE
 ## BROKEN (exists, but wrong, inconsistent or contradicted by text the player sees)
 
 - B1. Mute label says "(U)" (play/toaster-sounds.mjs:152). Key is backtick (input.mjs:29). Fix the label string.
-- B2. Toaster upkeep tip is 2x too high. play/hud-tips.mjs:25 reads `{...BUDGET, ...(STATS.budget||{})}.upkeepPercentPerMinute`. STATS.budget is not set, so it falls back to BUDGET's 10 (env/budget.mjs:23). The Toaster Wars rate is 5 (env/stats.mjs:166 `toaster.upkeepPercent: 5`, applied at play/toaster-play.mjs:25 as state.budget.upkeepPercent, used at env/budget.mjs:85; economy-table.mjs:56 uses 5%). Example: Popper 75 wheat: tip line hud-tips.mjs:44 says "Eats 7.5 wheat a minute"; sim eats 3.75 (hud-bar.mjs:105 upkeep chip shows the sim figure). Player sees two different upkeeps. Fix: read STATS.toaster.upkeepPercent.
+- B2. Toaster upkeep tip is 2x too high. play/hud-tips.mjs:25 reads `{...BUDGET, ...(STATS.budget||{})}.upkeepPercentPerMinute`. STATS.budget is not set, so it falls back to BUDGET's 10 (env/budget.mjs:23). The GHT rate is 5 (env/stats.mjs:166 `toaster.upkeepPercent: 5`, applied at play/toaster-play.mjs:25 as state.budget.upkeepPercent, used at env/budget.mjs:85; economy-table.mjs:56 uses 5%). Example: Popper 75 wheat: tip line hud-tips.mjs:44 says "Eats 7.5 wheat a minute"; sim eats 3.75 (hud-bar.mjs:105 upkeep chip shows the sim figure). Player sees two different upkeeps. Fix: read STATS.toaster.upkeepPercent.
 - B3. "press F to fence the line" is wrong for the default grid keys. play/hud-tips.mjs:58 (extension) and play/teach.mjs KIND_LINE. In HOTKEY_PROFILES.grid, fence = 'a' and forge = 'f' (play/toaster-play.mjs:79-97). F builds the Assembly Line. The text is copied from the classic profile (fence 'f' there).
 - B4. Power tooltip names classic keys. play/hud-bar.mjs:69 "Windmills (N) and Dams (D)". Grid keys: windmill C, dam V (toaster-play.mjs grid). N and D are classic.
 - B5. Flak Popper tip: "crouton flak for swarms and anything that flies" (play/hud-tips.mjs:51). Nothing flies (HIVE correction 2).
 - B6. Lancer text contradicts itself. hud-tips.mjs:48 (Zapper) says "bites close and fast". teach.mjs KIND_LINE lancer says "Hits from a distance". The teach text only shows in classic (command-card.mjs:42 uses teach describe when tips are off, app.mjs:759 passes tips: toaster.on), but the classic text lists classic kinds (depot, drill, siphon, press, tradinghouse at teach.mjs KIND_LINE). Keep one source.
 - B7. Idle-Crumb hotkey '.' is not bound. play/teach.mjs:53 IDLE_KEY = '.'; the coach line teach.mjs:96 says "Press . to select it". Not found: grep "'\.'" in play/input.mjs (no binding). The real key is F1 (app.mjs:525). teach.idleButtonHtml (teach.mjs:65-72) is not used by app.mjs (app uses idle-crumbs.mjs).
 - B8. Coach text uses wrong keys if it ever runs. teach.mjs:RULES: train-worker fallback 'W' (grid worker is 'a', toaster-play.mjs:86); attack text "press A" (no attack key in grid; attack-move is T). The coach is dead: createCoach is only in teach.test.mjs (not found: grep createCoach in play/app.mjs). Either wire it or delete it.
-- B9. Two stingers on a win in /play. app.mjs:309 plays synth 'jingle' on a win. app.mjs:313 `else showResult(...); sounds.play(...)` is unbraced, so the sample stinger also plays on every result, including Toaster Wars wins and losses.
+- B9. Two stingers on a win in /play. app.mjs:309 plays synth 'jingle' on a win. app.mjs:313 `else showResult(...); sounds.play(...)` is unbraced, so the sample stinger also plays on every result, including GHT wins and losses.
 - B10. Most sample events are never played. app.mjs:305-313 is the only sounds.play call (the result stinger). unit_select, unit_move_ack, ranged_shot, melee_hit, building_finished, alert_under_attack, resource_collected in assets/audio/MANIFEST.json are dead in /play; the synth in play/toaster-sounds.mjs does the work. The manifest note ("Nobody has listened to these yet") is still true.
 - B11. Ding on cancel (UNVERIFIED sim detail). toaster-sounds.mjs cuesFor 'queue': a shrinking queue plays "ding" ("toast ready"). If a cancel also emits a 'queue' event, cancelling plays the unit-ready sound. Did not confirm the event in the sim.
 - B12. Kitchen toast arrow shows twice in one row. play/kitchen-panel.mjs row 4 prints "toast/min" before and after the Toast box with the same number. Cosmetic.
@@ -65,7 +65,7 @@ NICE
 - F13. Minimap hit pings and click pings (minimap-kitchen.mjs:36-50; app.mjs:462-470, :676-682). Red attack, green move.
 - F14. Chirp on order, pop on each shot (toaster-sounds.mjs cuesFor). Unit acknowledgement exists (chirp). Attack sounds exist (pop, ouch, alarm for core).
 - F15. Alarm for the Power Strip hit (toaster-sounds.mjs cuesFor: core/strip -> alarm).
-- F16. Mute persists across pages (driftfall.muted in localStorage, toaster-sounds.mjs:3, sound-player.mjs:7). ?mute=1 works (app.mjs:282, :304).
+- F16. Mute persists across pages (ght.muted in localStorage, toaster-sounds.mjs:3, sound-player.mjs:7). ?mute=1 works (app.mjs:282, :304).
 - F17. Volume slider, saved (toaster-sounds.mjs:145-156 and VOL_KEY).
 - F18. Clicking "Sound" label toggles mute (toaster-sounds.mjs:154). The label text is the only problem (B1).
 - F19. Teach/tutorial card is wired (app.mjs:247 mountTutorial). Not checked line by line here; the M7 HUD and the first-minutes text in tutorial.mjs were not read in full.

@@ -1,5 +1,5 @@
 // Stalemate (Match Rules, card 1.1): 120 s with no structure damage, no unit kill and no new structure (income does not
-// count) warns, then 60 s later the match ends with reason `stalemate`, scored like a timeout. Toaster Wars matches only.
+// count) warns, then 60 s later the match ends with reason `stalemate`, scored like a timeout. GHT matches only.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createMatch, step, checkEnd, updateStalemate, STALEMATE } from '../env/sim.mjs';
@@ -25,7 +25,7 @@ test('the constants are 120 s quiet and a 60 s countdown at 24 ticks a second', 
   assert.equal(STALEMATE.countdownTicks, COUNTDOWN);
 });
 
-test('an idle Toaster Wars match warns at 2:00 and ends by stalemate 60 s later, scored like a timeout', () => {
+test('an idle GHT match warns at 2:00 and ends by stalemate 60 s later, scored like a timeout', () => {
   const state = createTerritoryMatchForTests(3);
   state.maxTicks = 24 * 60 * 15;
   const marks = run(state, QUIET + COUNTDOWN + 5);

@@ -9,8 +9,8 @@ exempt list in stats), env/sim.mjs (gathering step), env/map.mjs (crystal placem
 and target choice), FANATICS.md (rush counter, item 2).
 No tests were run; verdicts come from reading the source.
 
-Verdict key: HAVE = Driftfall already does an equivalent. PARTIAL = some of it exists, or it exists but is off on the
-live page. MISSING = not there. NOT FOR US = deliberately not in Driftfall, with the reason.
+Verdict key: HAVE = GHT already does an equivalent. PARTIAL = some of it exists, or it exists but is off on the
+live page. MISSING = not there. NOT FOR US = deliberately not in GHT, with the reason.
 
 Important context for the live page: the chain (Drills, Tracks, Depots) is OFF in a plain `createMatch`
 (env/economy.mjs line 9, enabled only by env/sim-territory.mjs). So the default page runs the hand-mining rules:
@@ -18,7 +18,7 @@ load 10 (`STATS.crystal.carry`), drop-off only at the own Core, and no Depot.
 
 ## Verdict table
 
-| # | Atom (section 3, as written) | Verdict | Evidence in Driftfall | Gap |
+| # | Atom (section 3, as written) | Verdict | Evidence in GHT | Gap |
 |---|---|---|---|---|
 | 3a | Workers are the economy: each gathers and returns small loads (5 minerals, 8 gas) | PARTIAL | `env/economy.mjs` `stepGathering` / `tickGather`: Workers mine and haul. Load is `STATS.crystal.carry` = 10 on the default page; `stats.hand.carry` = 5 only when the chain is on | Default load is 10, twice the spec in TERRITORY §8 (5). Joshua's "mining too fast" playtest bug points the same way. Mine time is 8 ticks (a third of a second) per load |
 | 3b | Workers walk to a patch, mine for a fixed time, carry the load back to the main building | HAVE | `tickGather` phases `toField` → `mining` (fixed `mineTicks` = 8) → `toCore`; `dropOff` returns the load to the own Core | none (the walk and timing are as described) |
@@ -27,13 +27,13 @@ load 10 (`STATS.crystal.carry`), drop-off only at the own Core, and no Depot.
 | 3e | Constant worker production is the first macro skill | PARTIAL | Core trains from a queue: `trainTicks` 20, cost 50 (`stats.mjs` worker row). Queueing works on the page | Workers pay no upkeep (exempt list in `env/budget.mjs` / stats), and there is no pressure to keep the Core busy, so the skill is only the 50-Shard cost. No auto-repeat or "keep training" control |
 | 3f | Distance from patch to drop-off matters; base layouts are tuned for it | PARTIAL | Distance matters: `distance(unit, sink)` gates every drop. With the chain on, the nearest Core or Depot is used (`dropOff`) | On the default page the only drop-off is the Core (`dropOff` with no chain), and there is no Depot. Base layout tuning for distance was not found in `env/map.mjs` (crystals are placed by map, not per base). Not verified in the maps |
 | 3g | Workers can attack weakly and are used to fight off early rushes ("pull workers") | PARTIAL | Workers have 40 hp, damage 2, range 1 (`stats.mjs` worker row). `env/combat.mjs` line 7: "Workers only fight when ordered". Attack-move works on them | No one-key pull. A player must box-select the Workers and attack-move by hand, which is slow in a rush. FANATICS #2 asks for "workers pulling" as the rush counter, and it is not a single action yet |
-| 3h | Workers can be lost to harassment; killing workers is the cheapest way to hurt an economy | PARTIAL | Workers are normal units with hp, so they can be killed (`env/combat.mjs`). The Track can be cut (TERRITORY §8), which is the Driftfall version of the same idea | Workers are nonCombat for territory (`env/territory.mjs` line 11), and enemy armies do not target them first. The cheap-harassment payoff does not exist on the default page, where the only economy is Workers |
-| 3i | BW worker mining bounce: workers drift between patches (an AI quirk players exploited with "mineral walking") | NOT FOR US | Driftfall's retarget is deterministic and nearest-first (`nearestCrystalWithShards`), so no drifting | Mineral walking is an AI quirk and an exploit. The useful idea (spreading Workers across patches) is covered by 3d |
+| 3h | Workers can be lost to harassment; killing workers is the cheapest way to hurt an economy | PARTIAL | Workers are normal units with hp, so they can be killed (`env/combat.mjs`). The Track can be cut (TERRITORY §8), which is the GHT version of the same idea | Workers are nonCombat for territory (`env/territory.mjs` line 11), and enemy armies do not target them first. The cheap-harassment payoff does not exist on the default page, where the only economy is Workers |
+| 3i | BW worker mining bounce: workers drift between patches (an AI quirk players exploited with "mineral walking") | NOT FOR US | GHT's retarget is deterministic and nearest-first (`nearestCrystalWithShards`), so no drifting | Mineral walking is an AI quirk and an exploit. The useful idea (spreading Workers across patches) is covered by 3d |
 | 3j | Each race builds differently: one stays to build (Terran), one summons and leaves (Protoss), one becomes the building (Zerg) | PARTIAL | Both factions use the same Worker kind and build rule. Snakenators: Siphoner (`stats.mjs` faction row, buffer 20). Burrow: Digger (buffer 30, Diggers compact ore). Both build the claim (Totem, Mound, 20 s) | The three build styles are not in the game. Both factions' Workers stay to build and then go back to work, so the factions look the same in the build step |
 
 Counts across the 10 rows: HAVE 2 (3b, 3c), PARTIAL 6 (3a, 3e, 3f, 3g, 3h, 3j), MISSING 1 (3d), NOT FOR US 1 (3i).
 
-## TOP 5 changes (ranked by how much they improve how Driftfall plays)
+## TOP 5 changes (ranked by how much they improve how GHT plays)
 
 **1. Put the load back to the spec: 5 per trip on the default page.**
 - What: set the default hand-mining load to 5. Either change `STATS.crystal.carry` to 5, or make the chain-off path read

@@ -1,7 +1,7 @@
-// Toaster Wars on the play page (Joshua 10-23: "I want to SEE Toaster Wars"). Owner: sonnet (Playable Client).
+// GHT on the play page (Joshua 10-23: "I want to SEE GHT"). Owner: sonnet (Playable Client).
 // Pure helpers, no DOM. The default page is the territory match on Wheatfield Valley with power, ammo, bakery, fences
-// and wrap on; ?classic=1 keeps the old Driftfall Classic page. The top bar names the kitchen: Wheat, Flour, Water, Toast,
-// Power. An ingredient that is missing (and would stop the Toaster) blinks. No Trading House goods panel: Toaster Wars has
+// and wrap on; ?classic=1 keeps the old GHT Classic page. The top bar names the kitchen: Wheat, Flour, Water, Toast,
+// Power. An ingredient that is missing (and would stop the Toaster) blinks. No Trading House goods panel: GHT has
 // no toaster market. The side panel is empty on /play; the Kitchen panel (play/kitchen-panel.mjs) shows the tiers.
 import { createTerritoryMatch } from '../env/sim-territory.mjs';
 import { enableFences } from '../env/fence.mjs';
@@ -16,7 +16,7 @@ import { renderBar } from './hud-bar.mjs';
 
 export const PAGE_TITLE = 'GHOSTIES, HOSTIES, AND TOASTIES';
 
-/** Toaster Wars unless the page asks for ?classic=1. */
+/** GHT unless the page asks for ?classic=1. */
 export const toasterMode = (q) => q.get('classic') !== '1';
 
 /** The ready territory match: power cords, ammo, bakery on (createTerritoryMatch), plus fences and wrap. */
@@ -25,7 +25,7 @@ export function createToasterState(seed) {
   state.budget.upkeepPercent = STATS.toaster.upkeepPercent;
   enableFences(state);
   state.power.wrap = true;
-  switchOffDriftfall(state);
+  switchOffGht(state);
   return state;
 }
 
@@ -40,13 +40,13 @@ export function createPlayableState(seed) {
 }
 
 /**
- * Toaster Wars leaves the Driftfall rules behind (PLAYABLE.md item 10): no Drift (floods, quakes, blooms), no market, no
+ * GHT leaves the classic rules behind (PLAYABLE.md item 10): no Drift (floods, quakes, blooms), no market, no
  * research (its upgrades cost Flux and Alloy), no tier gates. ?classic=1 and the bots' own matches keep them.
  */
-export function switchOffDriftfall(state) {
+export function switchOffGht(state) {
   delete state.drift;
   delete state.market;
-  state.noTiers = true; // state.research stays: on Toaster Wars it holds the Wheat + Flour upgrades (env/research.mjs)
+  state.noTiers = true; // state.research stays: on GHT it holds the Wheat + Flour upgrades (env/research.mjs)
   return state;
 }
 
@@ -95,7 +95,7 @@ export const HOTKEY_PROFILES = Object.freeze({
 export const keyProfile = (q, stored = null) => ((q.get('keys') ?? stored) === 'classic' ? 'classic' : 'grid');
 /** Hotkeys by toaster name for the grid profile (the default). Kept under its old name for the kitchen panel. */
 export const TOASTER_HOTKEYS = HOTKEY_PROFILES.grid;
-/** Extra createInput options for Toaster Wars: the key table, the grid cells, and the Power Station buttons. */
+/** Extra createInput options for GHT: the key table, the grid cells, and the Power Station buttons. */
 export const toasterInputOptions = (profile = 'grid') => ({ hotkeys: HOTKEY_PROFILES[profile] ?? HOTKEY_PROFILES.grid, grid: HOTKEY_PROFILES.grid, stations: true });
 
 /** The Wheatfield Valley map data for the terrain and the minimap, or null when the page runs another map (?map=). */
@@ -122,11 +122,11 @@ export function toasterTopBar(state, opts = {}) {
   return renderBar(state, opts);
 }
 
-/** The side panel for ?classic=1: Drift warnings and the research tier readout. Empty on Toaster Wars (no Drift, no research). */
+/** The side panel for ?classic=1: Drift warnings and the research tier readout. Empty on GHT (no Drift, no research). */
 export function toasterPanel(state, side) {
   if (!state?.territory) return '';
   reachViews(state.territory);
-  if (state.noTiers || (!state.drift && !state.research)) return ''; // Toaster Wars: no Drift, no tiers
+  if (state.noTiers || (!state.drift && !state.research)) return ''; // GHT: no Drift, no tiers
   const parts = [];
   const banner = driftBanner(state.drift?.events ?? [], state.tick, side);
   if (banner) parts.push(`<div class="drift ${banner.phase}"><b>${banner.title}</b></div>`);

@@ -1,4 +1,4 @@
-// Driftfall viewer: loads a match log, draws the grid on a canvas, play / pause / step / scrub, side panel.
+// GHT viewer: loads a match log, draws the grid on a canvas, play / pause / step / scrub, side panel.
 import { createReplayer, valueOf, countsOf } from './replay.mjs';
 
 const $ = (id) => document.getElementById(id);
@@ -16,8 +16,9 @@ let lastFrame = 0;
 let acc = 0;
 
 function loadLog(data, name = '') {
-  if (!data || data.format !== 'driftfall-log' || !data.initial || !Array.isArray(data.ticks)) {
-    $('title').textContent = 'That file is not a Driftfall match log.';
+  // 'driftfall-log': logs recorded before the GHT rename (env/log.mjs LEGACY_LOG_FORMATS).
+  if (!data || !['ght-log', 'driftfall-log'].includes(data.format) || !data.initial || !Array.isArray(data.ticks)) {
+    $('title').textContent = 'That file is not a GHT match log.';
     return;
   }
   log = data;

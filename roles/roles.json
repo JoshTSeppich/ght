@@ -14,7 +14,7 @@
    "department": "Live View",
    "title": "Live Build Compiler",
    "status": "core",
-   "scope": "Continuously rebuilds Driftfall from whatever the swarm has saved: runs the full test suite, checks every module loads, records a fresh match from the latest code, and publishes build status (green/red, what broke, who owns it) every few minutes.",
+   "scope": "Continuously rebuilds GHT from whatever the swarm has saved: runs the full test suite, checks every module loads, records a fresh match from the latest code, and publishes build status (green/red, what broke, who owns it) every few minutes.",
    "owns": "live/compile.mjs, live/status.json, matches/latest-*.json"
   },
   {
@@ -62,7 +62,7 @@
    "department": "Leadership",
    "title": "Game Director",
    "status": "core",
-   "scope": "Owns the vision for Driftfall: what makes it fun, the final call when teams can't agree, and protecting scope so it ships.",
+   "scope": "Owns the vision for GHT: what makes it fun, the final call when teams can't agree, and protecting scope so it ships.",
    "owns": "VISION.md"
   },
   {
@@ -230,7 +230,7 @@
    "department": "Design",
    "title": "Monetization / Live Ops Designer",
    "status": "n/a",
-   "scope": "No store or live economy in Driftfall.",
+   "scope": "No store or live economy in GHT.",
    "owns": ""
   },
   {
@@ -990,7 +990,7 @@
    "department": "Business",
    "title": "Product Manager",
    "status": "on-call",
-   "scope": "Owns what Driftfall is for (demo, product, research) and its roadmap.",
+   "scope": "Owns what GHT is for (demo, product, research) and its roadmap.",
    "owns": "ROADMAP.md"
   },
   {
@@ -998,7 +998,7 @@
    "department": "Business",
    "title": "Marketing Director / Brand Manager",
    "status": "on-call",
-   "scope": "Owns how Driftfall is presented (name, tagline, trailer).",
+   "scope": "Owns how GHT is presented (name, tagline, trailer).",
    "owns": ""
   },
   {

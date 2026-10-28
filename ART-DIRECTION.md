@@ -27,7 +27,7 @@ bending detail. No fine greebles, no tiny parts that need their own animation. I
 camera, cut it. Silhouette and colour carry the joke.
 
 ## The Five-Facet rule (Joshua, 20:14: "make them 5 faceted")
-**Every rounded form is built from exactly five facets.** This is Driftfall's signature silhouette.
+**Every rounded form is built from exactly five facets.** This is GHT's signature silhouette.
 - Cylinders, wheels, knobs, dials, coils and pipes = **pentagonal prisms** (5 sides); domes and cones = 5-sided.
 - Toaster bodies keep their boxy shape, but every rounded edge is a single bevel facet and the corners read as
   five-sided where they turn (a pentagon profile on the ends).

@@ -1,4 +1,4 @@
-// Driftfall production build (owner: sonnet, shipping). `npm run build` -> dist/.
+// GHT production build (owner: sonnet, shipping). `npm run build` -> dist/.
 //
 // Starts at play/index.html, follows every import (static, dynamic with a literal path, JSON), and copies only what
 // the page can reach, plus the opponent bots that app.mjs picks by name at runtime (?ai=), plus the assets named in

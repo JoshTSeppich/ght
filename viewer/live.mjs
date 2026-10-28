@@ -1,4 +1,4 @@
-// Driftfall TV match screen (owner: haiku). A full-screen page for a big screen: plays one match log, or a list of
+// GHT TV match screen (owner: haiku). A full-screen page for a big screen: plays one match log, or a list of
 // logs, on a loop, showing both players' names and colors, the board, effects and a HUD.
 //
 // Everything above the browser wiring is plain logic with no DOM, so tests/live-viewer.test.mjs can import it in node.
@@ -37,7 +37,8 @@ const clamp01 = (a) => (a < 0 ? 0 : a > 1 ? 1 : a);
 // Returns a plain-English problem with a log, or null when it can be played.
 export function problemWith(data) {
   if (!data || typeof data !== 'object') return 'the file is not a JSON object';
-  if (data.format !== 'driftfall-log') return 'this is not a Driftfall match log';
+  // 'driftfall-log': logs recorded before the GHT rename (env/log.mjs LEGACY_LOG_FORMATS).
+  if (!['ght-log', 'driftfall-log'].includes(data.format)) return 'this is not a GHT match log';
   if (!data.initial || typeof data.initial !== 'object') return 'the log has no starting state';
   if (!Array.isArray(data.ticks)) return 'the log has no list of ticks';
   return null;

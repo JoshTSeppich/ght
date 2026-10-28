@@ -1,4 +1,4 @@
-// Driftfall 3D effects: lasers, melee sparks, impacts, explosions with debris, Shard delivery sparkles, Brute dust,
+// GHT 3D effects: lasers, melee sparks, impacts, explosions with debris, Shard delivery sparkles, Brute dust,
 // build-complete pulses, selection rings. Everything is driven by frame.events (+ prev/next states for positions).
 //
 // Shape (see VISUAL-3D.md): createVfx(ctx, opts?) -> { update(frame, dt), dispose(), setSelection(ids), stats() }

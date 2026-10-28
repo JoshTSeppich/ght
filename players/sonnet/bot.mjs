@@ -1,4 +1,4 @@
-// Team sonnet's Driftfall player. Strategy notes live in NOTES.md.
+// Team sonnet's GHT player. Strategy notes live in NOTES.md.
 //
 // Shape: economy (spread Workers over crystal tiles, keep training), tech (Forge early, a second one when rich,
 // a Turret when the enemy shows up near home), army (counter-composition, staged waves, focus on the nearest

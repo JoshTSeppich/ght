@@ -1,4 +1,4 @@
-// Energy: the power that Toaster Wars buildings and fences spend (PLAYABLE.md items 20 and 21). Owner: sonnet.
+// Energy: the power that GHT buildings and fences spend (PLAYABLE.md items 20 and 21). Owner: sonnet.
 //
 // Windmills (on high-ground pads) and Dams (on river dam sites) MAKE energy; the Power Strip makes a little, so a base can
 // never be left with nothing (no softlock). Each finished Toaster USES energy and so does each live fence (1 per 8 tiles,

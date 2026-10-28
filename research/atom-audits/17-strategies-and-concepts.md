@@ -2,13 +2,13 @@
 
 Read: STARCRAFT-ATOMS.md section 17, NORTHSTAR.md, TERRITORY.md sections 1 to 7, 14 and the Snakenators and Burrow upgrade tables. Code grepped (not read in full): env/sim-territory.mjs, env/live.mjs, env/vision.mjs, env/drift.mjs, env/territory.mjs, env/effects.mjs, env/tiers.mjs, env/budget.mjs, env/neutrals.mjs, env/combat.mjs, env/stats.mjs, players/builtin/ai.mjs, play/app.mjs, play/input.mjs, play/render.mjs. No code or other files were edited.
 
-**How to read the verdicts.** They judge the rules Driftfall has, and whether Joshua can see and use them on the live page. HAVE means the rule works on the live page and has a test. PARTIAL means the rule exists in part, or only in the sim (env/), or only as data with no reader. MISSING means no rule and no page support. NOT FOR US means we chose against it, with the reason.
+**How to read the verdicts.** They judge the rules GHT has, and whether Joshua can see and use them on the live page. HAVE means the rule works on the live page and has a test. PARTIAL means the rule exists in part, or only in the sim (env/), or only as data with no reader. MISSING means no rule and no page support. NOT FOR US means we chose against it, with the reason.
 
-**The big finding.** The live page runs the classic match (`env/live.mjs` imports `createMatch` from `env/sim.mjs`). The territory rules, the Drift, claims, camps, research, the budget and the mining chain are switched on only by `createTerritoryMatch` in `env/sim-territory.mjs`, and only tests call it. So most Driftfall-specific strategy (timing windows, Floods, Hold, claims, walls, upgrades) is real in the sim and invisible to Joshua. Several top changes below come from that one gap. Owner note: the rules themselves are not in doubt; the wiring is.
+**The big finding.** The live page runs the classic match (`env/live.mjs` imports `createMatch` from `env/sim.mjs`). The territory rules, the Drift, claims, camps, research, the budget and the mining chain are switched on only by `createTerritoryMatch` in `env/sim-territory.mjs`, and only tests call it. So most GHT-specific strategy (timing windows, Floods, Hold, claims, walls, upgrades) is real in the sim and invisible to Joshua. Several top changes below come from that one gap. Owner note: the rules themselves are not in doubt; the wiring is.
 
 ## Verdict table
 
-| Atom line | Verdict | Driftfall now (evidence) |
+| Atom line | Verdict | GHT now (evidence) |
 |---|---|---|
 | Build order: the scripted opening | PARTIAL | The built-in AI has a scripted opening: 12 Workers, a Forge at 4 Workers, a second Forge, an expansion Turret (players/builtin/ai.mjs:18, 238-256). The player has no opening on screen. play/teach.mjs has a first-3-minutes coach, but the target timings in TERRITORY.md section 7 are not shown in the game. |
 | Rush: very early attack | PARTIAL | The AI is not asked to act before 3:00 (`aiStartTick: 24 * 180`, env/live.mjs:49-51, 315). That protects a new player (Council item 1), but it also means an early rush by the player meets an AI that issues no orders. The code reads that way; whether its Workers sit idle was not run. Nothing else is rush-specific. |

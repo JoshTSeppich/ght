@@ -72,7 +72,7 @@ test('live world frames match viewer3d/world.mjs on the same match', () => {
   const state = createMatch(7);
   const bots = [createPlayer({ side: 0, seed: 7, stats: STATS }), createPlayer({ side: 1, seed: 7, stats: STATS })];
   const live = createLiveWorld(observe(state, 0), STATS);
-  const log = { format: 'driftfall-log', seed: 7, stats: STATS, players: ['a', 'b'], initial: observe(state, 0), ticks: [] };
+  const log = { format: 'ght-log', seed: 7, stats: STATS, players: ['a', 'b'], initial: observe(state, 0), ticks: [] };
   for (let i = 0; i < 400; i++) {
     const cmds = bots.map((b, s) => b.act(observe(state, s)));
     step(state, cmds);

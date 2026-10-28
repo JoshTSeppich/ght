@@ -40,7 +40,7 @@ export function renderResearchCard(upgrades, ctx = {}) {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Toaster Wars (build wave 2, card M3): the research buttons on the Assembly Line card, paid in Wheat + Flour.
+// GHT (build wave 2, card M3): the research buttons on the Assembly Line card, paid in Wheat + Flour.
 // play/input.mjs puts these entries on the command card; a click or key runs act(state, 'research:<id>').
 // ---------------------------------------------------------------------------------------------
 import { RESEARCH_ROWS, researchRow, researchLockReason, RESEARCH_TRACKS } from '../env/research.mjs';
@@ -69,7 +69,7 @@ const TRACK_KEY = { 'ground-weapons': 'c', 'ground-armor': 'v', 'structure-armor
 /**
  * Command-card entries for a selected building of this kind: [{ slot, key, pos, label, action, cost, locked, reason, tip }].
  * `cost` is the Wheat price (the card greys it when short); the Flour price and the lock sit in `tip` and `reason`.
- * An empty list when the match has no Toaster Wars research (Classic).
+ * An empty list when the match has no GHT research (Classic).
  */
 export function toasterResearchEntries(state, side, buildingKind) {
   if (!state?.research || !state.noTiers) return [];

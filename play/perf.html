@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Driftfall perf gate (owner: haiku). Boots the real play renderer on the 128 x 128 v4 map with 200 units (half marching),
+<!-- GHT perf gate (owner: haiku). Boots the real play renderer on the 128 x 128 v4 map with 200 units (half marching),
      steps the sim at 24 tps, and reports frame time, draw calls, triangles and sim tick cost. Open from the repo-root server:
      http://localhost:8123/play/perf.html?n=200&frames=600&quality=high
      Result: the page text, and window.__perf (JSON) when the run is done. -->
@@ -7,7 +7,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Driftfall perf gate</title>
+<title>GHT perf gate</title>
 <script type="importmap">{ "imports": {
   "three": "../node_modules/three/build/three.module.js",
   "three/addons/": "../node_modules/three/examples/jsm/" } }</script>
@@ -110,7 +110,7 @@ function finish() {
   window.__perf = result;
   const line = (k, v) => `${k.padEnd(14)}${v}`;
   say([
-    `DRIFTFALL perf gate  ${result.spawned} units, ${result.map}, quality ${quality}`,
+    `GHT perf gate  ${result.spawned} units, ${result.map}, quality ${quality}`,
     line('units live', result.units),
     line('fps (p50)', result.fps),
     line('frame ms', `mean ${f.mean}  p50 ${f.p50}  p95 ${f.p95}  max ${f.max}`),
