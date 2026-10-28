@@ -3,14 +3,16 @@
      Open play/index.html from the repo-root server. Query: ?ai=sonnet|haiku|fable|sample  ?seed=7  ?ticks=21600  ?quality=low  ?mute=1
      Mouse: drag = box select (12 max), click, double-click = all of that kind, right-click = smart command (move / attack / mine / rally),
             wheel = zoom, screen edges or arrows = scroll, minimap click = move camera, minimap right-click = command.
-     Keys:  A attack-move then click, S stop, H hold, M move then click, Shift = queue, building hotkeys (F, T) then click to place
-            (green = ok, red = blocked), training hotkeys on a selected building (shown on the buttons), R rally then click,
+     Keys:  the card is 5 x 3 with each key printed on its button: Q move, W stop, E hold, R patrol, T attack-move (then click for
+            the last three), A/S/D/F/G/Z/X/C/V/B the rest, ` mute. ?keys=classic (or localStorage keys=classic) prints the old letters
+            (M, S, H, P, A, then I W T F L X V N D). Shift = queue, building keys then click to place
+            (green = ok, red = blocked), training keys on a selected building (shown on the buttons), rally then click,
             Ctrl+1..9 make a group, 1..9 recall (twice = centre), Space = last alert, P pause, Esc cancel, + / - zoom. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TOASTER WARS</title>
+<title>GHOSTIES, HOSTIES, AND TOASTIES</title>
 <script type="importmap">{ "imports": {
   "three": "../node_modules/three/build/three.module.js",
   "three/addons/": "../node_modules/three/examples/jsm/" } }</script>
@@ -32,12 +34,12 @@
   #selection .dim, .dim { color: #7e78a0; } .foe { color: #ff7a5a; }
   .bar { height: 6px; width: 180px; background: #2a2640; margin: 4px 0; } .bar i { display: block; height: 100%; background: #5dff7a; }
   .chips span { display: inline-block; margin: 2px 6px 2px 0; padding: 1px 7px; background: #26223c; border-radius: 3px; }
-  #card { display: grid; grid-template-columns: repeat(4, 76px); gap: 4px; align-content: end; padding-bottom: 4px; }
+  #card { display: grid; grid-template-columns: repeat(4, 76px); gap: 4px; align-content: end; padding-bottom: 4px; background: #303844; background-image: linear-gradient(#39424e, #303844 35%, #2b323d); box-shadow: inset 0 1px 0 #68717a, inset 0 -2px 5px #171d26; }
   #card button { font: inherit; color: #e8e4f4; background: #26223c; border: 1px solid #4a4568; padding: 6px 4px; cursor: pointer; text-align: left; }
   #card button:hover { background: #342f52; } #card button.poor { color: #ff8f8f; } #card button.on { border-color: #ffe14a; }
   #card kbd { background: #0b0918; padding: 0 5px; border-radius: 3px; color: #ffe14a; } #card small { color: #7e78a0; }
   #card .cc { height: 66px; padding: 2px; text-align: center; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; font-size: 11px; line-height: 1.1; }
-  #card .cc.empty { background: #14112299; border: 1px dashed #2a2640; display: block; pointer-events: none; }
+  #card .cc.empty { background: #222933; border: 1px solid #39424e; box-shadow: inset 0 2px 4px #151a22, inset 0 -1px 0 #303844; display: block; pointer-events: none; }
   #card .cc .command-icon { width: 30px; height: 30px; } #card .cc .lbl { display: block; } #card .cc kbd { font-size: 10px; padding: 0 3px; }
   .portrait { display: block; } .sel-single { display: flex; gap: 10px; align-items: flex-start; } .sel-info { display: flex; flex-direction: column; }
   .item-slots { display: flex; gap: 4px; margin-top: 4px; } .slot { width: 26px; height: 26px; border: 2px solid #1d1a14; border-radius: 4px; background: #e9d9b0; color: #1d1a14; font: 700 13px system-ui; padding: 0; cursor: help; }
@@ -48,6 +50,12 @@
   .bar.sm { width: 40px; height: 4px; margin: 2px 0 0; }
   #territory { position: fixed; right: 10px; top: 34px; width: 230px; padding: 6px 10px; background: #0b0918cc; border: 1px solid #4a4568; border-radius: 4px; font-size: 12px; pointer-events: none; }
   #territory[hidden] { display: none; } #territory .tier { margin-bottom: 4px; } #territory .flow-row { display: flex; gap: 8px; justify-content: space-between; }
+  /* Leave the Menu button at y=44 clear of the resource explanation. */
+  #territory { top: 76px; z-index: 6; }
+  .tutorial-steps .mark { display: inline-block; min-width: 1.4em; margin-right: 6px; }
+  /* Sound controls are mounted with inline positioning and no id. Keep them
+     above the four command rows (including gaps, borders and bottom padding). */
+  body > div:has(> input[type="range"][title="Volume"]) { bottom: 316px !important; }
   #territory .drift { padding: 3px 6px; margin-bottom: 4px; background: #3a2a10; color: #ffb13b; font-weight: 700; border-radius: 3px; } #territory .drift.incoming { background: #4a1a1a; color: #ff8f6a; }
   #territory .bank.debt { font-weight: 700; }
   #toast { position: fixed; left: 50%; top: 84px; transform: translateX(-50%); padding: 6px 14px; background: #000a; border-radius: 4px; opacity: 0; transition: opacity .3s; pointer-events: none; }
@@ -55,6 +63,69 @@
   #result[hidden] { display: none; } #result h1 { font-size: 64px; letter-spacing: .12em; margin: 0; } .win { color: #5dff7a; } .lose { color: #ff5d5d; }
   #boot { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; color: #b9b3d6; } #boot b { color: #33e0ff; letter-spacing: .08em; }
   #boot.error { color: #ffb13b; }
+  /* The Kitchen panel (play/kitchen-panel.mjs): K opens it, Esc or K closes it. */
+  #kitchen { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 640px; max-width: 94vw; padding: 12px 16px; box-sizing: border-box; z-index: 30; background: #0b0918f2; border: 1px solid #4a4568; border-radius: 6px; font-size: 13px; }
+  #kitchen[hidden] { display: none; }
+  #kitchen .kitchen-head { display: flex; gap: 12px; align-items: baseline; margin-bottom: 8px; }
+  #kitchen .kitchen-head button { margin-left: auto; font: inherit; color: #e8e4f4; background: #26223c; border: 1px solid #4a4568; padding: 0 8px; cursor: pointer; }
+  #kitchen .kr { display: flex; align-items: center; gap: 6px; margin: 6px 0; flex-wrap: wrap; }
+  #kitchen .kb { min-width: 96px; padding: 6px 8px; background: #26223c; border: 1px solid #4a4568; border-radius: 4px; color: #e8e4f4; }
+  #kitchen .kb.off { opacity: .4; filter: grayscale(1); }
+  #kitchen .kb b { display: block; } #kitchen .kb small { display: block; color: #7e78a0; font-size: 11px; }
+  #kitchen .kb kbd { background: #0b0918; padding: 0 5px; border-radius: 3px; color: #ffe14a; }
+  #kitchen .ka { color: #33e0ff; font-size: 12px; white-space: nowrap; } #kitchen .kp { color: #7e78a0; font-weight: 700; }
+  #kitchen .kitchen-foot { margin: 8px 0 0; color: #7e78a0; font-size: 11px; }
+</style>
+<style>
+  /* Setup only: override the panel's inline paint without changing match UI. */
+  #start-screen {
+    box-sizing: border-box; padding: 78px 24px 32px; overflow-y: auto;
+    background: radial-gradient(ellipse at 18% 12%, #F7F4EB 0%, #b9c2bc 30%, #52696B 62%, #26353f 100%) !important;
+    color: #303844 !important; gap: 14px !important;
+  }
+  #start-screen h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); letter-spacing: .06em; line-height: 1.1; text-shadow: 0 2px #F7F4EB80; }
+  #start-screen > p { margin: 0 0 8px; font-size: 18px; font-weight: 650; }
+  #start-screen form {
+    box-sizing: border-box; width: min(420px, 100%); padding: 28px;
+    background: linear-gradient(135deg, #F7F4EB, #F2D7A6);
+    border: 1px solid #F7F4EB; border-bottom: 5px solid #bfa779; border-radius: 18px;
+    box-shadow: 0 18px 36px #18232f45, 0 3px 6px #18232f26;
+  }
+  #start-screen label { display: grid; gap: 7px; font-size: 14px; font-weight: 700; text-align: left; }
+  #start-screen select {
+    appearance: none; box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 36px 10px 12px;
+    border: 1px solid #202832; border-top-color: #F7F4EB; border-radius: 2px;
+    background: linear-gradient(45deg, transparent 50%, #F2D7A6 50%) calc(100% - 19px) 19px / 6px 6px no-repeat,
+      linear-gradient(135deg, #F2D7A6 50%, transparent 50%) calc(100% - 13px) 19px / 6px 6px no-repeat,
+      linear-gradient(#414b58, #303844 55%);
+    color: #F7F4EB; font: 500 15px/1.4 system-ui, sans-serif; color-scheme: dark;
+    box-shadow: 0 2px 3px #30384420; cursor: pointer;
+  }
+  #start-screen option { background: #303844; color: #F7F4EB; }
+  #start-screen button {
+    position: relative; min-height: 58px; padding: 22px 18px 10px; margin-top: 4px;
+    background: #D99448; color: #303844; border: 1px solid #805432; border-top-color: #F7F4EB;
+    border-bottom: 5px solid #805432; border-radius: 2px; font: 800 16px/1.2 system-ui, sans-serif;
+    box-shadow: 0 3px 0 #30384430; cursor: pointer; transition: transform 100ms, background 100ms;
+  }
+  #start-screen button::before {
+    content: ''; position: absolute; top: 8px; left: 20%; right: 20%; height: 5px;
+    background: #303844; border-top: 2px solid #805432; box-shadow: 0 1px #F2D7A6;
+  }
+  #start-screen button:hover { background: #e7a55b; transform: translateY(-2px); }
+  #start-screen button:active { transform: translateY(2px); box-shadow: none; }
+  #start-screen select:focus-visible, #start-screen button:focus-visible { outline: 3px solid #32D9E8; outline-offset: 3px; }
+  /* Edition watcher appends this inline-styled sibling to body. Keep match banners unchanged. */
+  body:has(#start-screen) > div[style*="z-index: 50"] {
+    z-index: 61 !important; top: 18px !important; box-sizing: border-box; max-width: calc(100% - 32px); width: max-content;
+    background: #D99448 !important; color: #303844 !important; border: 2px solid #805432 !important;
+    border-radius: 2px !important; font: 750 16px/1.4 system-ui, sans-serif !important;
+    font-variant-numeric: tabular-nums; text-align: center; box-shadow: 0 4px 12px #18232f30;
+  }
+  @media (max-height: 680px) {
+    #start-screen { justify-content: flex-start !important; }
+    #start-screen form { padding: 18px 24px; gap: 10px !important; }
+  }
 </style>
 </head>
 <body>
@@ -72,7 +143,7 @@ try {
   console.error(err);
   const boot = root.querySelector('#boot') ?? root;
   boot.hidden = false; boot.classList.add('error');
-  boot.innerHTML = `<b>TOASTER WARS</b><br>could not start<br><small>${String(err?.message ?? err)}</small>`;
+  boot.innerHTML = `<b>GHOSTIES, HOSTIES, AND TOASTIES</b><br>could not start<br><small>${String(err?.message ?? err)}</small>`;
 }
 </script>
 </body>

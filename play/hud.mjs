@@ -5,13 +5,19 @@ import { TEAM, NEUTRAL, HEALTH } from '../viewer3d/palette.mjs';
 import { portraitFor } from './icons.mjs';
 import { slotsHtml, rankStars } from './items-ui.mjs';
 import { STATS, toasterName } from '../env/stats.mjs';
+import { renderQueue } from './hud-queue.mjs';
+import { unitState } from '../env/ammo.mjs';
+import { BAKERY } from '../env/bakery.mjs';
+import { panelRate, CREEK_SECONDS, SPRING_SECONDS } from './placement-ghost.mjs';
+import { upgradeLevel, researchRow } from '../env/research.mjs';
 
 // Toaster Wars names (TERRITORY.md section 16): the sim keeps its stable kind ids, the roster in env/stats.mjs names them.
 export const KIND_NAME = Object.freeze(Object.fromEntries(
   ['worker', 'grunt', 'lancer', 'brute', 'howler', 'spiker', 'dart', 'core', 'forge', 'turret', 'mill', 'well', 'toaster']
     .map((k) => [k, toasterName(k)]),
 ));
-export const kindName = (kind) => KIND_NAME[kind] ?? toasterName(kind);
+const STATION_NAME = Object.freeze({ extension: 'Extension Box', pylon: 'Relay Pylon', outlet: 'Outlet', strip: 'Power Strip', windmill: 'Windmill', dam: 'Dam' });
+export const kindName = (kind) => KIND_NAME[kind] ?? STATION_NAME[kind] ?? toasterName(kind);
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const isStructure = (kind, stats = STATS) => kind === 'core' || kind in stats.structures;
@@ -73,7 +79,7 @@ export function renderTopBar(snap, { side, stats = STATS, tps = 24, alert = null
 }
 
 /** The selection panel: nothing, one entity (portrait, hp, status, queue) or a grid of several units. */
-export function renderSelectionPanel(snap, picked, { side, stats = STATS } = {}) {
+export function renderSelectionPanel(snap, picked, { side, stats = STATS, live = null } = {}) {
   if (!picked.length) return '<span class="dim">Nothing selected. Drag a box, or click a unit.</span>';
   if (picked.length > 1) return renderMulti(picked, { side, stats });
   const e = picked[0];
@@ -86,17 +92,51 @@ export function renderSelectionPanel(snap, picked, { side, stats = STATS } = {})
     const total = stats.structures[e.kind]?.buildTicks || 1;
     status = `Building ${Math.min(100, Math.floor((e.progress / total) * 100))}%`;
   } else if (structure) {
-    status = e.queue.length ? `Training ${esc(kindName(e.queue[0]))}${e.queue.length > 1 ? ` (+${e.queue.length - 1} queued)` : ''}` : 'Idle';
-    queue = e.queue.length ? `<div class="chips">${e.queue.map((k, i) => `<span${i === 0 ? ' class="on"' : ''}>${esc(kindName(k))}</span>`).join('')}</div>` : '';
+    status = e.kind === 'well' ? wellStatus(e, snap, stats) : e.queue.length ? `Training ${esc(kindName(e.queue[0]))}${e.queue.length > 1 ? ` (+${e.queue.length - 1} queued)` : ''}` : 'Idle';
+    if ((e.research?.length ?? 0) > 0 && live?.research) {
+      const r = e.research[0];
+      const row = researchRow(r.upgrade);
+      if (row) status = `Researching ${esc(row.name)}`;
+    }
+    queue = renderQueue({ ...e, training: live?.structures.find((s) => s.id === e.id)?.training }, { stats, budget: !!live?.budget });
   } else {
     status = e.carrying ? `Carrying ${e.carrying} wheat` : 'Idle';
+    // Same truth the renderer droops its toast eyes on (observeAmmo().units[].droopy): out of slices, cannot fire.
+    const lu = live?.units?.find((u) => u.id === e.id);
+    if (lu && unitState(live, lu) === 'hungry') status += ' <span class="chip hungry" style="color:#ff9d5d" title="Out of toast: it cannot fire until a Crumb brings slices.">Hungry</span>';
   }
   // Units show their rank stars and two item slots; structures carry neither.
   const gear = structure ? '' : slotsHtml(e);
+  const upgradeBadges = !structure && live?.research ? upgradesBadgeHtml(e.kind, e.owner, live, stats) : '';
   return `<div class="sel-single">${portraitSvg(e.kind, e.owner, { size: 72 })}`
     + `<div class="sel-info"><b>${esc(kindName(e.kind))}</b>${foe}${structure ? '' : rankStars(e.rank)}`
     + `${hpBar(e.hp, max)}<span>${e.hp}/${max} HP</span>`
-    + `<div class="status dim">${status}</div>${queue}${gear}</div></div>`;
+    + `<div class="status dim">${status}</div>${upgradeBadges}${queue}${gear}</div></div>`;
+}
+
+// A built Well: its draw rate and the Wells it shares the draw with. The sim's crowd and rateTicks win when it supplies them.
+function upgradesBadgeHtml(kind, owner, snap, stats) {
+  if (!snap.research) return '';
+  const groundWeapons = upgradeLevel(snap, owner, 'ground-weapons');
+  const groundArmor = upgradeLevel(snap, owner, 'ground-armor');
+  if (groundWeapons === 0 && groundArmor === 0) return '';
+  const badges = [];
+  if (groundWeapons > 0) badges.push(`<span class="chip" style="color:#ff9d5d" title="Ground Weapons level ${groundWeapons}">Wpn ${groundWeapons}</span>`);
+  if (groundArmor > 0) badges.push(`<span class="chip" style="color:#5d9dff" title="Ground Armor level ${groundArmor}">Arm ${groundArmor}</span>`);
+  return badges.length ? `<div>${badges.join(' ')}</div>` : '';
+}
+
+function wellStatus(e, snap, stats) {
+  // Fallback when the sim does not supply them (SYSTEMS-DESIGN.md section 1): every other standing Well closer than R adds (1 - d / R).
+  let crowd = 0, sum = 0;
+  for (const o of snap?.structures ?? []) {
+    if (o.kind !== 'well' || o.id === e.id || o.complete === false || (o.hp ?? 1) <= 0) continue;
+    const d = Math.max(Math.abs(o.x - e.x), Math.abs(o.y - e.y));
+    if (d < BAKERY.wellCrowdRadius) { crowd++; sum += 1 - d / BAKERY.wellCrowdRadius; }
+  }
+  const sharers = e.crowd ?? crowd;
+  const every = e.rateTicks ? e.rateTicks / stats.clock.ticksPerSecond : Math.round((e.spring ? SPRING_SECONDS : CREEK_SECONDS) * (1 + sum) * 10) / 10;
+  return panelRate({ every, sharers, dry: !!e.dry });
 }
 
 function renderMulti(picked, { side, stats }) {

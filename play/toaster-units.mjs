@@ -20,12 +20,14 @@ import { TOASTERS, COLORS, EXPRESSIONS, CORD, toasterKindOf } from './toaster-mo
 import { TOY_MATERIALS, applyToyEdges, createContactShadows } from './toy-render.mjs';
 import { createCoilUnits } from './coil-motion.mjs';
 import { shardAt } from '../engine/coil/motions.mjs';
+import { createShotPool, shotStyleOf } from './shots.mjs';
 
 export const UNIT_SCALE = 0.9;            // tiles per model unit (the spec's crumb is 1 wide); same footprint as the old shapes
 const START_CAPACITY = 32;
 const SHARD_SECONDS = 0.8;
 const SHARD_SCALE = 3.2;                  // shard radii are ~0.06-0.12 m; blow them up so they read from the RTS camera
 const HUNGRY_DROOP = 0.35;                // radians the toast leans forward when the unit is hungry
+const ICON_SIZE = 0.42;                   // the overhead icon's width, in tiles (before the unit scale)
 const FLASH_ON = 0.4;                     // v.hitFlash above this draws the white block (the first ~85 ms of a hit)
 const WHEELED_HOP = 0.1;                  // wheeled toasters keep this share of the Coil hop: a small bounce, not a walk
 const MAX_BEADS = 24;
@@ -57,6 +59,7 @@ export function createToasterUnits(ctx, { scale = UNIT_SCALE, capacity = 512 } =
   mats.bead = unlit('bead');
   mats.flash = new THREE.MeshBasicMaterial({ color: COLORS.flash, transparent: true, opacity: 0.8, toneMapped: false, depthWrite: false });
   mats.shard = new THREE.MeshStandardMaterial({ color: COLORS.chassis, roughness: 0.5, flatShading: true });
+  mats.icon = unlit('icon');   // overhead hungry and unpowered icons: saturated, never tone mapped
   const edges = ['chassis', 'team', 'feet', 'toast'].map((n) => applyToyEdges(mats[n]));
 
   // ----- geometry: unit boxes (aHalf attached per batch), planes facing +Z, five-sided prisms (wheel axis x, bagel axis z) -----
@@ -112,6 +115,8 @@ export function createToasterUnits(ctx, { scale = UNIT_SCALE, capacity = 512 } =
   makeBatch('bead', geos.box(), mats.bead, { order: 2 });
   makeBatch('flash', geos.box(), mats.flash, { order: 3 });
   makeBatch('shard', geos.shard(), mats.shard, { cast: true });
+  makeBatch('icon:box', geos.box(), mats.icon, { order: 4 });
+  const shots = createShotPool(ctx, { unitScale });
   const decals = createContactShadows(ctx, { capacity });
   const decalList = [];
 
@@ -194,6 +199,8 @@ export function createToasterUnits(ctx, { scale = UNIT_SCALE, capacity = 512 } =
   const heat = new THREE.Color(COLORS.heat), tyreCol = new THREE.Color(TYRE), hubCol = new THREE.Color(HUB);
   const beadOf = [teamColor[0].clone().lerp(new THREE.Color('#ffffff'), 0.6), teamColor[1].clone().lerp(new THREE.Color('#ffffff'), 0.6)];
   const plugCol = new THREE.Color('#ffffff');
+  const iconHungry = new THREE.Color('#ff9d5d'), iconSlash = new THREE.Color('#ff3b2f'), iconOff = new THREE.Color('#9fb3c8');
+  const iconUp = new THREE.Color('#ffd34d');   // the high-ground arrow: warm yellow, reads over cream toasters and cyan teams
 
   // scratch
   const q = new THREE.Quaternion(), yawQ = new THREE.Quaternion(), e = new THREE.Euler(), p = new THREE.Vector3(), s = new THREE.Vector3();
@@ -257,6 +264,10 @@ export function createToasterUnits(ctx, { scale = UNIT_SCALE, capacity = 512 } =
     a.mv += ((moved > 1e-4 ? 1 : 0) - a.mv) * Math.min(1, dt * 12);
     const bounce = model.wheels ? Math.abs(Math.sin(a.roll * 2.5)) * 0.035 * a.mv : 0;
     const hop = model.wheels ? pose.lift * WHEELED_HOP : pose.lift;
+    // an attack starts a shot once (the pose holds for many frames); no shot when the model has none (Crumb, Bagel, Flak)
+    const attacking = poseName === 'attack' && !v.dying;
+    if (attacking && !a.attacking) spawnShot(v, model, info, sc, yaw, owner(v));
+    a.attacking = attacking;
 
     const wx = v.pos.x + (pose.offX + pose.shakeX) * unitScale;
     const wz = v.pos.z + (pose.offZ + pose.shakeZ) * unitScale;
@@ -350,8 +361,14 @@ export function createToasterUnits(ctx, { scale = UNIT_SCALE, capacity = 512 } =
       put(batches.flash, M.multiplyMatrices(P, L));
     }
 
+    // overhead icons: unpowered (a grey plug, the power is out) wins over hungry (an orange toast outline with a slash)
+    const unpowered = hunger === 'unpowered' || u?.power?.state === 'battery' || u?.power?.state === 'down';
+    if (!v.dying && (unpowered || hunger === 'hungry')) overhead(v, model, sc, unpowered ? 'unpowered' : 'hungry');
+    // a small up-arrow over a unit standing on high ground (SYSTEMS-DESIGN.md section 3); ctx.highAt is set by the terrain system
+    if (!v.dying && u && ctx.highAt?.(u.x, u.y)) upArrow(v, model, sc);
+
     if (!v.dying) {
-      if (info.cord) cord(v, model, info.cord, B, yaw, sc, owner(v), a);
+      if (info.cord) cord(v, model, info.cord, B, yaw, sc, owner(v), a, info.selected);
       // contact decal on the ground
       decalList.push(decalFor(decalList.length, v.pos.x, v.pos.y, v.pos.z, model.radius * 2 * sc * 1.02));
     }
@@ -359,12 +376,55 @@ export function createToasterUnits(ctx, { scale = UNIT_SCALE, capacity = 512 } =
   }
   const owner = (v) => (v.owner === 1 ? 1 : 0);
 
+  // The shot leaves the toast and flies at the aim the frame hands in (info.aim, the hit's target); with none it goes 4 tiles ahead.
+  function spawnShot(v, model, info, sc, yaw, side) {
+    const style = shotStyleOf(model.id);
+    if (!style) return;
+    const reach = 4 * (ctx.tileSize ?? 1);
+    const from = { x: v.pos.x, y: v.pos.y + model.top * sc, z: v.pos.z };
+    const aim = info.aim ?? { x: v.pos.x + Math.sin(yaw) * reach, y: v.pos.y, z: v.pos.z + Math.cos(yaw) * reach };
+    shots.spawn(style, from, aim, side, now * 1000);
+  }
+
+  // Two small boxes-of-light above the unit: an outline of toast with a slash when hungry, a grey plug when unpowered.
+  function overhead(v, model, sc, kind) {
+    const S = ICON_SIZE * unitScale, T = S * 0.14;
+    const cx = v.pos.x, cz = v.pos.z, cy = v.pos.y + model.height * sc + S * 0.9;
+    const box = (x, y, z, sx, sy, sz, rz, color) => {
+      L.compose(p.set(x, y, z), rz ? q.setFromAxisAngle(AXIS_Z, rz) : quatIdentity, s.set(sx, sy, sz));
+      put(batches['icon:box'], L, color);
+    };
+    if (kind === 'unpowered') {
+      box(cx, cy - S * 0.1, cz, S * 0.6, S * 0.5, T, 0, iconOff);
+      for (const sd of [-1, 1]) box(cx + sd * S * 0.14, cy + S * 0.3, cz, T, S * 0.3, T, 0, iconOff);
+      return;
+    }
+    box(cx, cy + S / 2, cz, S, T, T, 0, iconHungry);
+    box(cx, cy - S / 2, cz, S, T, T, 0, iconHungry);
+    box(cx - S / 2, cy, cz, T, S, T, 0, iconHungry);
+    box(cx + S / 2, cy, cz, T, S, T, 0, iconHungry);
+    box(cx, cy, cz, S * 1.3, T * 0.9, T * 0.9, Math.PI / 4, iconSlash);
+  }
+
+  // A small up-arrow above the unit: a stem and two arms meeting at the top, three boxes, above any hungry or unpowered icon.
+  function upArrow(v, model, sc) {
+    const S = ICON_SIZE * unitScale, T = S * 0.14;
+    const cx = v.pos.x, cz = v.pos.z, cy = v.pos.y + model.height * sc + S * 1.7;
+    const box = (x, y, sy, rz) => {
+      L.compose(p.set(x, y, cz), rz ? q.setFromAxisAngle(AXIS_Z, rz) : quatIdentity, s.set(T, sy, T));
+      put(batches['icon:box'], L, iconUp);
+    };
+    box(cx, cy - S * 0.1, S * 0.6, 0);
+    box(cx - S * 0.2, cy + S * 0.2, S * 0.5, -Math.PI / 4);
+    box(cx + S * 0.2, cy + S * 0.2, S * 0.5, Math.PI / 4);
+  }
+
   // The cord: coil at the back of the body -> a short drop to the ground -> the route (bend points) -> the plug at the outlet.
-  function cord(v, model, c, Bm, yaw, sc, side, a) {
+  function cord(v, model, c, Bm, yaw, sc, side, a, selected = false) {
     const route = c.route;
     if (!route || !route.length) return;
     const anchor = route[0];
-    const r = CORD.radius * unitScale;
+    const r = CORD.radius * unitScale * (selected ? 1.4 : 1);   // a selected unit's cord is thicker and brighter
     // how far the leash is stretched: the walked length from the unit through the bends to the anchor
     let len = 0, px = v.pos.x, pz = v.pos.z;
     for (let i = route.length - 1; i >= 0; i--) { len += Math.hypot(route[i].x - px, route[i].z - pz); px = route[i].x; pz = route[i].z; }
@@ -377,7 +437,8 @@ export function createToasterUnits(ctx, { scale = UNIT_SCALE, capacity = 512 } =
     const coilLen = CORD.coilLength * sc * (1 + 0.6 * stretch);
     const rc = CORD.coilRadius * sc * (1 - 0.8 * stretch);
     const flashOn = taut && Math.sin(now * 16) > 0;
-    const col = flashOn ? [1, 1, 1] : (side ? [1, 0.48, 0.18] : [0.07, 0.85, 0.94]);
+    const teamRgb = side ? [1, 0.48, 0.18] : [0.07, 0.85, 0.94];
+    const col = flashOn ? [1, 1, 1] : (selected ? teamRgb.map((x) => x + (1 - x) * 0.55) : teamRgb);
     const dark = [col[0] * 0.8, col[1] * 0.8, col[2] * 0.8];
     // coil: a helix along the back direction (a straight pair of points once stretched taut)
     let n = 0;
@@ -459,6 +520,7 @@ export function createToasterUnits(ctx, { scale = UNIT_SCALE, capacity = 512 } =
     }
     // forget graphs of units that are gone (their shards live on in the pool)
     for (const [id, a] of anim) if (!a.seen) { anim.delete(id); coil.forget(id); }
+    shots.update(now * 1000);
     for (const b of Object.values(batches)) {
       b.mesh.count = b.used;
       b.mesh.instanceMatrix.needsUpdate = true;
@@ -478,12 +540,13 @@ export function createToasterUnits(ctx, { scale = UNIT_SCALE, capacity = 512 } =
     root.remove(cordMesh); cordGeo.dispose();
     for (const m of Object.values(mats)) m.dispose();
     decals.dispose();
+    shots.dispose();
     ctx.scene.remove(root);
     anim.clear(); shards.length = 0;
   }
 
   return {
-    name: 'toaster-units', begin, emit, end, dispose, root, batches, decals, edges, unitScale,
+    name: 'toaster-units', begin, emit, end, dispose, root, batches, decals, edges, unitScale, shots,
     cords: { mesh: cordMesh, get count() { return cordCount; }, get triangles() { return cordI / 3; } },
     height: (kind) => TOASTERS[toasterKindOf(kind)].height,
     get draws() { return Object.values(batches).filter((b) => b.used).length + (decals.mesh.count ? 1 : 0) + (cordI > 0 ? 1 : 0); },

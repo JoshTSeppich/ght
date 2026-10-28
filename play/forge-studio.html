@@ -1,0 +1,42 @@
+<!doctype html>
+<!-- Character Forge studio (owner: Claude). Every unit of every faction built from its recipe (play/forge/recipes.mjs), live.
+     Pick a unit, edit its recipe on the right, Apply: the model, pivots, team colour and glow rebuild instantly.
+     Open from the repo-root server: http://localhost:8123/play/forge-studio.html   ?view=rts|close  ?detail=game|hero -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Character Forge</title>
+<script type="importmap">{ "imports": {
+  "three": "../node_modules/three/build/three.module.js",
+  "three/addons/": "../node_modules/three/examples/jsm/" } }</script>
+<style>
+  :root { --bg: #15121d; --panel: #1f1a2b; --line: #352d48; --ink: #ece6f6; --muted: #a49cb6; --gold: #ffc93c; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 13px/1.4 system-ui, -apple-system, sans-serif; overflow: hidden; }
+  #stage { position: fixed; inset: 0 340px 0 0; width: calc(100% - 340px); height: 100%; display: block; }
+  aside { position: fixed; top: 0; right: 0; bottom: 0; width: 340px; box-sizing: border-box; background: var(--panel); border-left: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; padding: 14px; }
+  h1 { margin: 0; font-size: 15px; letter-spacing: .04em; }
+  .row { display: flex; gap: 6px; flex-wrap: wrap; }
+  button, select { font: 600 12px system-ui; color: var(--ink); background: #2a2338; border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; cursor: pointer; }
+  button[aria-pressed="true"] { background: var(--gold); color: #1a1408; border-color: var(--gold); }
+  #list { overflow: auto; max-height: 34%; border: 1px solid var(--line); border-radius: 6px; }
+  #list div { display: flex; justify-content: space-between; padding: 5px 8px; cursor: pointer; border-bottom: 1px solid #2a2338; font-variant-numeric: tabular-nums; }
+  #list div.on { background: #33294a; } #list span.f { color: var(--muted); }
+  textarea { flex: 1; min-height: 160px; resize: none; background: #120f19; color: #dfe; border: 1px solid var(--line); border-radius: 6px; font: 12px/1.45 ui-monospace, Menlo, monospace; padding: 8px; }
+  #msg { min-height: 2.6em; color: var(--muted); font-size: 12px; white-space: pre-wrap; }
+  #msg.err { color: #ff7a6b; }
+</style>
+</head>
+<body>
+<canvas id="stage"></canvas>
+<aside>
+  <h1>CHARACTER FORGE</h1>
+  <div class="row"><button id="v-rts" aria-pressed="true">Gameplay view</button><button id="v-close" aria-pressed="false">Close-up</button><button id="d-hero" aria-pressed="false">Hero detail</button></div>
+  <div id="list"></div>
+  <textarea id="recipe" spellcheck="false" aria-label="Recipe JSON"></textarea>
+  <div class="row"><button id="apply">Apply recipe</button><button id="dup">Duplicate as new</button><button id="anim" aria-pressed="true">Animate</button></div>
+  <div id="msg"></div>
+</aside>
+<script type="module" src="./forge-studio.mjs"></script>
+</body>
+</html>

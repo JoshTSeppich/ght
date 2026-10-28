@@ -1,6 +1,6 @@
-// The ?motion=coil adapter: the live game asks this for each unit's pose. It keeps one motion graph per unit id and
-// maps each sim kind to its Toastinator (TERRITORY.md section 16). Presentation only: the sim is never touched and
-// with the flag off nothing here runs. Owner: sonnet.
+// The Coil motion adapter: play/toaster-units.mjs asks this for each unit's pose, always on (there is no flag). It keeps
+// one motion graph per unit id and maps each sim kind to its Toastinator (TERRITORY.md section 16). Presentation only:
+// the sim is never touched. Owner: sonnet.
 import { createMotionGraph } from '../engine/coil/motions.mjs';
 import { MOTION_UNITS } from '../engine/coil/motion-specs.mjs';
 
@@ -10,10 +10,6 @@ const KIND_TO_TOASTINATOR = Object.freeze({
   crumb: 'crumb', popper: 'popper', zapper: 'zapper', 'four-slice': 'four-slice', fourslice: 'four-slice', broiler: 'broiler',
   'flak-popper': 'popper', flakpopper: 'popper', bagel: 'bagel',
 });
-
-export function coilEnabled(search = '') {
-  return new URLSearchParams(search).get('motion') === 'coil';
-}
 
 export function toastinatorFor(kind) {
   return KIND_TO_TOASTINATOR[kind] ?? 'popper';

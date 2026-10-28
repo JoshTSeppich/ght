@@ -42,7 +42,7 @@ test('idle workers: only own workers with no order', () => {
   assert.deepEqual(idleWorkers(s, 0).map((u) => u.id), [1]);
   assert.equal(idleButtonHtml(0), '');
   assert.match(idleButtonHtml(2), /data-action="idle"[^>]*>.*2/s);
-  assert.match(idleButtonHtml(2), /\(\.\)/);
+  assert.match(idleButtonHtml(2), /\(F1\)/); // was (.): the game binds F1 (app.mjs), not the dot
 });
 
 test('the idle key cycles through idle workers and wraps', () => {
@@ -117,6 +117,7 @@ test('the audit grid is the command card grid', () => assert.deepEqual([...GRID_
 
 test('hotkey grid audit flags buttons that are off the fixed grid, or share a key', () => {
   assert.deepEqual(gridAudit([{ key: 'a' }, { key: 'f' }]), { ok: true, off: [], dupes: [] });
-  assert.deepEqual(gridAudit([{ key: 'a' }, { key: 't' }]), { ok: false, off: ['t'], dupes: [] });
+  // SYSTEMS-DESIGN.md section 4: the grid is 5 x 3 (Q-T, A-G, Z-B), so T is on it; H is off it.
+  assert.deepEqual(gridAudit([{ key: 'a' }, { key: 'h' }]), { ok: false, off: ['h'], dupes: [] });
   assert.deepEqual(gridAudit([{ key: 'a' }, { key: 'a' }]), { ok: false, off: [], dupes: ['a'] });
 });

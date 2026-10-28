@@ -33,11 +33,14 @@ test('driver + input + live world: mine, build a Forge, train, with no rejected 
     }
     if (ticks === 30) {
       driver.state.shards[0] += 300;
-      input.ui.selection = [snap.units.find((u) => u.owner === 0).id];
-      input.key(snap, 'f');
-      const core = snap.structures.find((s) => s.owner === 0 && s.kind === 'core');
-      const t = [[2, 2], [-2, 2], [2, -2], [-2, -2], [3, 0], [0, 3]].map(([dx, dy]) => ({ x: core.x + dx, y: core.y + dy })).find((p) => input.placeCheck(snap, 'forge', p.x, p.y).ok);
-      input.modeClick(snap, t);
+      // The wheat was just added to the sim, so the forge check must read a fresh snapshot, not this tick's stale one.
+      const fresh = observe(driver.state, 0);
+      input.ui.selection = [fresh.units.find((u) => u.owner === 0).id];
+      input.key(fresh, 'f');
+      const core = fresh.structures.find((s) => s.owner === 0 && s.kind === 'core');
+      const t = [[2, 2], [-2, 2], [2, -2], [-2, -2], [3, 0], [0, 3]].map(([dx, dy]) => ({ x: core.x + dx, y: core.y + dy })).find((p) => input.placeCheck(fresh, 'forge', p.x, p.y).ok);
+      assert.ok(t, 'a free tile by the core for the Forge');
+      input.modeClick(fresh, t);
     }
     if (ticks > 100 && ticks % 10 === 0) {
       const forge = snap.structures.find((s) => s.owner === 0 && s.kind === 'forge' && s.complete);
@@ -125,4 +128,19 @@ test('a human-style session against the bot runs 1500 ticks without a rejected c
   }
   assert.equal(rejects, 0, 'the client never sends an illegal command in this scenario');
   assert.ok(trained > 0, 'the human side trained grunts');
+});
+
+// H1: the page's key setting (?keys=classic, else the stored setting, else grid) reaches the input's key table, and the
+// card prints the letters of that profile on the same cells.
+test('the key setting flips the printed keys: classic prints M S H P A on row 1, grid prints Q W E R T', async () => {
+  const { keyProfile, toasterInputOptions } = await import('./toaster-play.mjs');
+  const { layoutCard } = await import('./command-card.mjs');
+  const row1 = (profile) => {
+    const input = createInput({ side: 0, stats: STATS, ...toasterInputOptions(keyProfile(new URLSearchParams(''), profile)) });
+    const state = { tick: 0, width: 40, height: 40, rocks: [], crystals: [], shards: { 0: 999, 1: 999 }, units: [], structures: [] };
+    return layoutCard(input.commandCard(state)).slice(0, 5).map((c) => c.entry.key).join(' ');
+  };
+  assert.equal(row1(null), 'q w e r t');
+  assert.equal(row1('classic'), 'm s h p a');
+  assert.equal(row1('grid'), 'q w e r t');
 });

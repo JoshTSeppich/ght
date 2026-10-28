@@ -26,7 +26,7 @@ function storeMuted(muted) {
 
 // opts: { ctx (a WebAudio context, or null), fetchFn, manifestUrl, volume, muted }.
 // Returns { load(manifestJson) -> problems[], unlock(), play(list) -> count started, setMuted, toggleMute, isMuted }.
-export function createSoundPlayer({ ctx = defaultContext(), fetchFn = globalThis.fetch, manifestUrl = '../assets/audio/MANIFEST.json', volume = 0.6, muted = readMuted() } = {}) {
+export function createSoundPlayer({ ctx = defaultContext(), fetchFn = globalThis.fetch, manifestUrl = new URL('../assets/audio/MANIFEST.json', import.meta.url).href, volume = 0.6, muted = readMuted() } = {}) {
   const buffers = new Map(); // event name -> AudioBuffer (or a stand-in)
   const kinds = new Map();   // event name -> sound kind, for the stand-in
   let isMuted = muted;
@@ -65,6 +65,28 @@ export function createSoundPlayer({ ctx = defaultContext(), fetchFn = globalThis
     if (ctx && ctx.state !== 'running') ctx.resume?.();
   }
 
+  // Ambient loop support: one looping music track
+  let musicSrc = null;
+  function playMusic(name = 'ambient_loop') {
+    if (!ctx || isMuted || ctx.state !== 'running') return;
+    const buffer = buffers.get(name);
+    if (!buffer || musicSrc) return;
+    const gain = ctx.createGain();
+    gain.gain.value = volume * 0.3;
+    musicSrc = ctx.createBufferSource();
+    musicSrc.buffer = buffer;
+    musicSrc.loop = true;
+    musicSrc.connect(gain);
+    gain.connect(ctx.destination);
+    musicSrc.start();
+  }
+  function stopMusic() {
+    if (musicSrc) {
+      try { musicSrc.stop(); } catch { /* already stopped */ }
+      musicSrc = null;
+    }
+  }
+
   // list: [{ name, dist? }]. Returns how many sounds were started. Unknown names and muted calls do nothing.
   function play(list) {
     if (!ctx || isMuted || ctx.state !== 'running') return 0;
@@ -84,10 +106,19 @@ export function createSoundPlayer({ ctx = defaultContext(), fetchFn = globalThis
     return started;
   }
 
-  function setMuted(next) { isMuted = !!next; storeMuted(isMuted); }
+  function setMuted(next) {
+    isMuted = !!next;
+    storeMuted(isMuted);
+    // Muting affects music too
+    if (musicSrc) {
+      musicSrc.disconnect();
+      if (isMuted) stopMusic();
+      else playMusic();
+    }
+  }
   function toggleMute() { setMuted(!isMuted); return isMuted; }
 
-  return { load, unlock, play, setMuted, toggleMute, isMuted: () => isMuted };
+  return { load, unlock, play, playMusic, stopMusic, setMuted, toggleMute, isMuted: () => isMuted };
 }
 
 function defaultContext() {

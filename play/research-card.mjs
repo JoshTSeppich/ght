@@ -38,3 +38,58 @@ export function renderResearchCard(upgrades, ctx = {}) {
       + `<small>Tier ${u.tier} · ${costText(u.cost)} · ${u.seconds} s</small></button>`;
   }).join('');
 }
+
+// ---------------------------------------------------------------------------------------------
+// Toaster Wars (build wave 2, card M3): the research buttons on the Assembly Line card, paid in Wheat + Flour.
+// play/input.mjs puts these entries on the command card; a click or key runs act(state, 'research:<id>').
+// ---------------------------------------------------------------------------------------------
+import { RESEARCH_ROWS, researchRow, researchLockReason, RESEARCH_TRACKS } from '../env/research.mjs';
+
+export const RESEARCH_ACTION = 'research:';
+/** The upgrade id inside a card action ('research:ground-weapons-1'), or null when the action is not a research. */
+export const researchIdOf = (action) => (typeof action === 'string' && action.startsWith(RESEARCH_ACTION) ? action.slice(RESEARCH_ACTION.length) : null);
+
+/** "100 Wheat + 2 Flour". */
+export const priceText = (cost) => `${cost.wheat} Wheat + ${cost.flour} Flour`;
+
+/**
+ * The researches to offer on a building of this kind: the next unfinished level of each track, then each unit research not yet
+ * done. A level already queued still shows (it reads "Researching"). Order: tracks first, as RESEARCH_TRACKS lists them.
+ */
+export function toasterResearchFor(state, side, buildingKind) {
+  const done = state?.research?.done?.[side] ?? [];
+  const rows = RESEARCH_ROWS.filter((r) => r.building === buildingKind && !done.includes(r.id));
+  const tracks = RESEARCH_TRACKS.map((t) => rows.find((r) => r.track === t)).filter(Boolean);
+  return [...tracks, ...rows.filter((r) => !r.track)];
+}
+
+// Keys for the three track buttons (the free cells c v b of the Assembly Line card); unit researches are click-only.
+const TRACK_KEY = { 'ground-weapons': 'c', 'ground-armor': 'v', 'structure-armor': 'b' };
+
+/**
+ * Command-card entries for a selected building of this kind: [{ slot, key, pos, label, action, cost, locked, reason, tip }].
+ * `cost` is the Wheat price (the card greys it when short); the Flour price and the lock sit in `tip` and `reason`.
+ * An empty list when the match has no Toaster Wars research (Classic).
+ */
+export function toasterResearchEntries(state, side, buildingKind) {
+  if (!state?.research || !state.noTiers) return [];
+  const flour = state.toast?.pantry?.[side]?.flour ?? 0;
+  return toasterResearchFor(state, side, buildingKind).map((r) => {
+    const lock = researchLockReason(state, side, r.id);
+    const poorWheat = (state.shards?.[side] ?? 0) < r.cost.wheat;
+    const poorFlour = flour < r.cost.flour;
+    const reason = lock ?? (poorFlour ? `Not enough Flour (${r.cost.flour})` : poorWheat ? `Not enough Wheat (${r.cost.wheat})` : null);
+    const key = TRACK_KEY[r.track] ?? '';
+    return {
+      slot: `research-${r.id}`, key, pos: key || undefined, label: r.name, action: RESEARCH_ACTION + r.id, cost: r.cost.wheat,
+      tip: `${r.name}: ${r.effect}. ${priceText(r.cost)}, ${r.seconds} s.`,
+      locked: !!reason, ...(reason ? { reason } : {}),
+    };
+  });
+}
+
+/** The one line a toast shows when a research is queued from the card. */
+export function researchQueuedText(id) {
+  const r = researchRow(id);
+  return r ? `Researching ${r.name} (${r.seconds} s)` : 'Researching';
+}

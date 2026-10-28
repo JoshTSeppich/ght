@@ -2,13 +2,11 @@
 // Pure node. Owner: sonnet.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { coilEnabled, toastinatorFor, createCoilUnits } from './coil-motion.mjs';
+import { toastinatorFor, createCoilUnits } from './coil-motion.mjs';
+import * as coilModule from './coil-motion.mjs';
 
-test('?motion=coil turns the mode on and nothing else does', () => {
-  assert.equal(coilEnabled('?motion=coil'), true);
-  assert.equal(coilEnabled('?x=1&motion=coil'), true);
-  assert.equal(coilEnabled(''), false);
-  assert.equal(coilEnabled('?motion=off'), false);
+test('no ?motion flag: the Coil adapter exports no flag reader', () => {
+  assert.equal('coilEnabled' in coilModule, false);
 });
 
 test('every sim kind maps to a Toastinator, and unknown kinds fall back to the Popper', () => {

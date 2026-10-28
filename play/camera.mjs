@@ -47,6 +47,8 @@ export function createCameraRig(width, height, start = { x: width / 2, y: height
     if (rig.keys.has('ArrowRight')) vx += 1;
     if (rig.keys.has('ArrowUp')) vy -= 1;
     if (rig.keys.has('ArrowDown')) vy += 1;
+    if (rig.keys.has('PageUp')) vy -= 1;
+    if (rig.keys.has('PageDown')) vy += 1;
     const e = edgeVector(rig.mouse, rig.size);
     const d = limit(vx + e.x, vy + e.y);
     const k = CAMERA.speed * (rig.zoom / 24);
@@ -73,4 +75,32 @@ export function createCameraRig(width, height, start = { x: width / 2, y: height
     clampXY();
   };
   return rig;
+}
+
+// Saved cameras (SYSTEMS-DESIGN.md section 4): Ctrl+F5-F8 saves the view to that key, F5-F8 recalls it, and the sandbox
+// cheats are Shift+F5-F8. cameraKeyAction() decides which one a key press is; play/app.mjs acts on it.
+export const CAMERA_KEYS = Object.freeze(['F5', 'F6', 'F7', 'F8']);
+
+/** 'save' | 'recall' | 'cheat' for F5-F8 (null for any other key). Ctrl or Cmd saves; Shift is the cheat in a sandbox. */
+export function cameraKeyAction(key, { ctrl = false, meta = false, shift = false, sandbox = false } = {}) {
+  if (!CAMERA_KEYS.includes(key)) return null;
+  if (ctrl || meta) return 'save';
+  if (shift && sandbox) return 'cheat';
+  return 'recall';
+}
+
+/** The saved views, one per F5-F8 key: save(key, rig) stores centre and zoom, recall(key, rig) moves the rig back. */
+export function createCameraMarks() {
+  const marks = new Map();
+  return {
+    save(key, rig) { marks.set(key, { x: rig.x, y: rig.y, zoom: rig.zoom }); return marks.get(key); },
+    recall(key, rig) {
+      const m = marks.get(key);
+      if (!m) return false;
+      rig.centerOn(m.x, m.y);
+      rig.zoom = m.zoom;
+      return true;
+    },
+    has: (key) => marks.has(key),
+  };
 }

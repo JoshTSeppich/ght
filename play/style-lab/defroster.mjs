@@ -30,7 +30,7 @@ export function poseDefroster(u,{active,age,elapsed,spring,target}){
     const mouth=u.getObjectByName(`heater${i}`);mouth.material.emissive.setHex(0xd99448);mouth.material.emissiveIntensity=repair?1.5:0;
   }
   const beam=u.getObjectByName('repair-beam');beam.visible=repair;
-  if(!repair){if(target){target.userData.repairProgress=0;target.getObjectByName('slot0').material.emissiveIntensity=0;}return;}
+  if(!repair){if(target){target.userData.repairProgress=0;(target.getObjectByName('slot0')??target.getObjectByName('toast0')).material.emissiveIntensity=0;}return;}
   // Transform both ends into the pod's frame; suspension cannot detach the beam.
   u.updateMatrixWorld(true);target.updateMatrixWorld(true);
   const end=beam.parent.worldToLocal(target.localToWorld(new T.Vector3(0,.55,0)));
@@ -40,6 +40,6 @@ export function poseDefroster(u,{active,age,elapsed,spring,target}){
   beam.scale.set(1,delta.length(),1);
   beam.material.emissiveIntensity=1.3+Math.sin(age*18)*.25;
   target.userData.repairProgress=Math.min(1,age/2);
-  target.getObjectByName('slot0').material.emissive.setHex(0xd99448);
-  target.getObjectByName('slot0').material.emissiveIntensity=.8;
+  (target.getObjectByName('slot0')??target.getObjectByName('toast0')).material.emissive.setHex(0xd99448);
+  (target.getObjectByName('slot0')??target.getObjectByName('toast0')).material.emissiveIntensity=.8;
 }

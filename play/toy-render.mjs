@@ -19,6 +19,10 @@ import * as THREE_NS from 'three';
 export function toyEnabled(query) {
   return !(query && typeof query.get === 'function' && query.get('toy') === '0');
 }
+// The same ?toy=0 check, read when a body is built (play/toaster-buildings.mjs picks its old or toy materials with it).
+export function toyLookOn() {
+  return toyEnabled(globalThis.location ? new URLSearchParams(globalThis.location.search) : undefined);
+}
 
 // ----- materials (RENDERING.md item 3) -----
 export const TOY_MATERIALS = {
@@ -28,6 +32,11 @@ export const TOY_MATERIALS = {
   toast:     { color: '#D99448', roughness: 0.82, metalness: 0 },
   feet:      { color: '#434A52', roughness: 0.65, metalness: 0.10 },
 };
+
+// Edge band width in SCREEN pixels (device pixels). The band is measured with fwidth each frame, so it holds at every zoom
+// and window size without a resize hook. Clamped to 2.5..3.5 px (3 px default since #19: 2.25 px never read on cream).
+export const TOY_EDGE_PX = { min: 2.5, default: 3, max: 3.5 };
+export const clampEdgePx = (px) => Math.min(TOY_EDGE_PX.max, Math.max(TOY_EDGE_PX.min, px ?? TOY_EDGE_PX.default));
 
 // Edge band: where the two nearest of the box's three face-pair distances are both inside the band, add a warm ivory
 // highlight. Plain object-space maths on the vertex position, so it works on instanced boxes with a shared geometry.
@@ -59,16 +68,50 @@ export function injectEdgeHighlight(shader, { halfExtents = [0.5, 0.5, 0.5], ban
   return shader;
 }
 
+// Shared by applyToyEdges and the instanced units (play/units-instanced.mjs). Needs `uniform float uToyPx` declared by
+// the caller. Returns (crest mask, inset mask) for point p inside a box of half-extents h, in model units.
+export const TOY_EDGE_MIN_MODEL = 0.025;
+export const TOY_EDGE_FUNC_GLSL = /* glsl */`#define TOY_EDGE_MIN_MODEL 0.025
+      vec2 toyEdgeMasks(vec3 p, vec3 h) {
+        vec3 d = max(h - abs(p), vec3(0.0));
+        vec3 aa = max(fwidth(d), vec3(0.00001));                 // model units per screen pixel, per face pair
+        vec3 band = max(uToyPx * aa, vec3(TOY_EDGE_MIN_MODEL));  // max(model-space width, uToyPx screen pixels)
+        vec3 nearEdge = 1.0 - smoothstep(band - aa, band + aa, d);
+        float hi = max(nearEdge.x * nearEdge.y, max(nearEdge.x * nearEdge.z, nearEdge.y * nearEdge.z));
+        vec3 inner = band + 1.5 * aa;                            // charcoal inset: 1.5 screen px just inside the crest
+        vec3 ip = 1.0 - smoothstep(inner - aa, inner + aa, d);
+        float ie = max(ip.x * ip.y, max(ip.x * ip.z, ip.y * ip.z));
+        return vec2(hi, max(0.0, ie - hi));
+      }`;
+export const TOY_EDGE_UNIFORMS_GLSL = 'uniform float uToyPx; uniform float uToyIntensity; uniform vec3 uToyTint; uniform float uToyInset; uniform float uToyLift;';
+// lift: how far the OUTPUT colour (after lighting and tone mapping) moves toward white on the crest. The albedo tint alone
+// is almost the cream chassis colour, so the band never showed (#11).
+export const TOY_EDGE_LIFT = 0.5;
+// Warm ivory #FFF6DC in linear light (the lift runs before the sRGB encode): pure white read as grey-white on cream.
+export const TOY_EDGE_LIFT_GLSL = 'gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1.0, 0.92, 0.72), toyMasks.x * uToyLift);';
+// Face side of the edge: darken the face ~12 percent (uToyInset) with a charcoal tint on the inset band, then the ivory albedo tint on the crest.
+export const TOY_EDGE_FACE_GLSL = `diffuseColor.rgb = mix(diffuseColor.rgb * (1.0 - toyMasks.y * uToyInset), vec3(0.10, 0.11, 0.13), toyMasks.y * 0.06);
+        diffuseColor.rgb = mix(diffuseColor.rgb, uToyTint, toyMasks.x * uToyIntensity);`;
+export function toyEdgeUniforms({ px = TOY_EDGE_PX.default, intensity = 0.4, tint = 0xfff0d5, inset = 0.12, lift = TOY_EDGE_LIFT, THREE = THREE_NS } = {}) {
+  const clamp01 = (v) => Math.min(1, Math.max(0, v));
+  return {
+    uToyPx: { value: clampEdgePx(px) }, uToyIntensity: { value: clamp01(intensity) },
+    uToyTint: { value: new THREE.Color(tint) }, uToyInset: { value: clamp01(inset) },
+    uToyLift: { value: clamp01(lift) },
+  };
+}
+
 // GPT's per-instance edge shader (research/TOY-EDGES-GPT.md). Needs centred unit BoxGeometry + an instanced aHalf
 // attribute (half-size per instance, see createToyBoxInstances). A mesh WITHOUT aHalf gets no edges (toyHas = 0)
 // instead of the whole surface lighting up. Albedo tint in linear space before PBR, params are uniforms.
-export function applyToyEdges(material, { band = 0.025, intensity = 0.18, tint = 0xfff0d5, inset = 0.07, THREE = THREE_NS } = {}) {
+export function applyToyEdges(material, { px = TOY_EDGE_PX.default, intensity = 0.4, tint = 0xfff0d5, inset = 0.12, lift = TOY_EDGE_LIFT, THREE = THREE_NS } = {}) {
   if (!material.isMeshStandardMaterial) throw new TypeError('applyToyEdges requires THREE.MeshStandardMaterial');
   if (material.userData.toyEdges) throw new Error('Toy edges already applied to this material');
   const clamp01 = (v) => Math.min(1, Math.max(0, v));
   const uniforms = {
-    uToyBand: { value: Math.max(0.0001, band) }, uToyIntensity: { value: clamp01(intensity) },
+    uToyPx: { value: clampEdgePx(px) }, uToyIntensity: { value: clamp01(intensity) },
     uToyTint: { value: new THREE.Color(tint) }, uToyInset: { value: clamp01(inset) },
+    uToyLift: { value: clamp01(lift) },
   };
   const prevCompile = material.onBeforeCompile, prevKey = material.customProgramCacheKey.bind(material);
   material.onBeforeCompile = (shader, renderer) => {
@@ -80,31 +123,22 @@ export function applyToyEdges(material, { band = 0.025, intensity = 0.18, tint =
     shader.fragmentShader = shader.fragmentShader
       .replace('#include <common>', /* glsl */`#include <common>
       varying vec3 vToyPos; varying vec3 vToyHalf;
-      uniform float uToyBand; uniform float uToyIntensity; uniform vec3 uToyTint; uniform float uToyInset;
-      vec2 toyEdgeMasks(vec3 p, vec3 h) {
-        vec3 d = max(h - abs(p), vec3(0.0));
-        vec3 aa = max(fwidth(d), vec3(0.00001));
-        vec3 nearEdge = 1.0 - smoothstep(vec3(uToyBand) - aa, vec3(uToyBand) + aa, d);
-        float hi = max(nearEdge.x * nearEdge.y, max(nearEdge.x * nearEdge.z, nearEdge.y * nearEdge.z));
-        float inner = uToyBand * 2.5;
-        vec3 ip = 1.0 - smoothstep(vec3(inner) - aa, vec3(inner) + aa, d);
-        float ie = max(ip.x * ip.y, max(ip.x * ip.z, ip.y * ip.z));
-        return vec2(hi, max(0.0, ie - hi));
-      }`);
+      uniform float uToyPx; uniform float uToyIntensity; uniform vec3 uToyTint; uniform float uToyInset; uniform float uToyLift;
+      ${TOY_EDGE_FUNC_GLSL}`)
+      .replace('#include <tonemapping_fragment>', `#include <tonemapping_fragment>\n      ${TOY_EDGE_LIFT_GLSL}`);
     const marker = '#include <color_fragment>';
     if (!shader.fragmentShader.includes(marker)) throw new Error('applyToyEdges: color_fragment chunk not found');
     shader.fragmentShader = shader.fragmentShader.replace(marker, /* glsl */`${marker}
       float toyHas = step(0.001, vToyHalf.x);
       vec2 toyMasks = toyEdgeMasks(vToyPos, max(vToyHalf, vec3(0.0001))) * toyHas;
-      diffuseColor.rgb *= 1.0 - toyMasks.y * uToyInset;
-      diffuseColor.rgb = mix(diffuseColor.rgb, uToyTint, toyMasks.x * uToyIntensity);`);
+      ${TOY_EDGE_FACE_GLSL}`);
   };
-  material.customProgramCacheKey = () => prevKey() + '|toy-edges-r169-v1';
+  material.customProgramCacheKey = () => prevKey() + '|toy-edges-r169-v5';
   material.userData.toyEdges = uniforms;
   material.needsUpdate = true;
   return {
     material,
-    setBand(v) { uniforms.uToyBand.value = Math.max(0.0001, v); },
+    setPx(v) { uniforms.uToyPx.value = clampEdgePx(v); },
     setIntensity(v) { uniforms.uToyIntensity.value = clamp01(v); },
     setTint(v) { uniforms.uToyTint.value.set(v); },
     setInset(v) { uniforms.uToyInset.value = clamp01(v); },
@@ -195,14 +229,15 @@ export function snapShadowCentre(centre, dir, texel, THREE = THREE_NS) {
 }
 
 // ----- contact shadows (item 2) -----
-// 64 px gaussian, 0 at the edge; DataTexture so it also builds in node. ONE texture shared by every decal.
+// 64 px solid contact core with a smooth fade to zero at the edge; one shared data texture.
 function radialAlphaTexture(THREE, n = 64) {
   const data = new Uint8Array(n * n * 4);
   const c = (n - 1) / 2, r = n / 2;
   for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
     const d = Math.hypot((i - c) / r, (j - c) / r);
-    const edge = Math.min(1, Math.max(0, (d - 0.7) / 0.3));
-    const a = Math.exp(-5 * d * d) * (1 - edge * edge * (3 - 2 * edge));
+    const edge = Math.min(1, Math.max(0, (d - 0.65) / 0.35));
+    const a = 1 - edge * edge * (3 - 2 * edge);
+    data.fill(255, (j * n + i) * 4, (j * n + i) * 4 + 3);
     data[(j * n + i) * 4 + 3] = Math.round(255 * a);
   }
   const tex = new THREE.DataTexture(data, n, n, THREE.RGBAFormat);
@@ -211,16 +246,42 @@ function radialAlphaTexture(THREE, n = 64) {
   tex.needsUpdate = true;
   return tex;
 }
+// Shared GPU objects (materials, geometry) that many bodies draw. Each body takes one count per mesh (retainObject); its
+// dispose releases one count, and the real dispose runs only when the last user lets go (haiku #733: destroying one
+// building keeps whatever the others still draw; haiku #727: the last one out frees everything).
+export function shareObject(o) {
+  const real = o.dispose.bind(o);
+  o.userData.refs = 0;
+  o.dispose = () => { if (o.userData.refs > 0 && --o.userData.refs === 0) real(); };
+  return o;
+}
+export function retainObject(o) { o.userData.refs = (o.userData.refs ?? 0) + 1; return o; }
+
+// The decal material is shared by every decal set (boulders, buildings): one texture, one material, many draws.
+// Cached per THREE namespace so repeated calls and the building bodies all reuse it.
+const contactCache = new WeakMap();
+export function contactMaterial(THREE = THREE_NS, { opacity = 0.32 } = {}) {
+  let c = contactCache.get(THREE);
+  if (!c) {
+    const map = radialAlphaTexture(THREE);
+    const material = new THREE.MeshBasicMaterial({
+      color: 0x1b2630, map, transparent: true, opacity, depthWrite: false, depthTest: true, side: THREE.DoubleSide,
+      polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1, toneMapped: false, fog: false,
+    });
+    material.name = 'toy-contact';
+    shareObject(material);
+    c = { material, map };
+    contactCache.set(THREE, c);
+  }
+  return c.material;
+}
+
 // list items: { x, y (ground height), z, radius } or { x, y, z, width, depth }. The plane is rotated flat once, so
 // footprint depth lives in scale.z (the note in TOY-EDGES-GPT.md was right).
-export function createContactShadows(ctx, { capacity = 512, opacity = 0.26, widen = 1.12 } = {}) {
+export function createContactShadows(ctx, { capacity = 512, widen = 1.12 } = {}) {
   const { THREE = THREE_NS } = ctx;
   const geo = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
-  const map = radialAlphaTexture(THREE);
-  const mat = new THREE.MeshBasicMaterial({
-    color: 0x18242b, map, transparent: true, opacity, depthWrite: false, depthTest: true, side: THREE.DoubleSide,
-    polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1, toneMapped: false, fog: false,
-  });
+  const mat = contactMaterial(THREE);
   const mesh = new THREE.InstancedMesh(geo, mat, capacity);
   mesh.name = 'toy-contact-shadows'; mesh.count = 0; mesh.frustumCulled = false; mesh.renderOrder = 2;
   mesh.castShadow = mesh.receiveShadow = false;
@@ -239,7 +300,7 @@ export function createContactShadows(ctx, { capacity = 512, opacity = 0.26, wide
       mesh.count = n;
       mesh.instanceMatrix.needsUpdate = true;
     },
-    dispose() { ctx.scene.remove(mesh); geo.dispose(); mat.dispose(); map.dispose(); },
+    dispose() { ctx.scene.remove(mesh); geo.dispose(); },
   };
 }
 
@@ -279,6 +340,9 @@ export function applyToyLook(ctx, { engine = null } = {}) {
   renderer.toneMappingExposure = 1.15;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  // RENDERING.md part 10: ship without bloom. The engine's pass is switched off here, so the cream never glows (no change to engine.mjs).
+  if (ctx.passes?.bloom) ctx.passes.bloom.enabled = false;
 
   const { sun, rim, hemi } = lights;
   sun.color.set(0xffedd7); sun.intensity = 2.6; sun.position.set(-8, 14, 9);

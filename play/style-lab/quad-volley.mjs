@@ -1,9 +1,9 @@
 import * as T from 'three';
-import {buildBible} from './bible.mjs';
+import {buildCuteAttackRig,poseCuteAttackGear} from './cute-attack-rig.mjs';
 const smooth=x=>{x=Math.max(0,Math.min(1,x));return x*x*(3-2*x);};
 function sample(t,keys){for(let i=1;i<keys.length;i++)if(t<=keys[i][0]){const [end,v]=keys[i];return keys[i-1][1]+(v-keys[i-1][1])*smooth((t-end+30)/30);}return keys.at(-1)[1];}
 export function buildQuadVolley(look,team){
- const u=buildBible('four-slice',look,team),anchor=u.getObjectByName('foot-right');
+ const u=buildCuteAttackRig('four-slice',look,team),anchor=u.getObjectByName('foot-right');
  const geo=u.getObjectByName('toast0').geometry;
  for(let i=0;i<4;i++){
   const m=new T.Mesh(geo.clone(),u.getObjectByName('toast0').material.clone());m.name='quad-slice'+i;m.visible=false;anchor.add(m);
@@ -15,12 +15,12 @@ export function buildQuadVolley(look,team){
 export function poseQuadVolley(u,{active,age,ms,homeX=0}){
  const t=Math.max(0,Math.min(520,ms??age*1000)),attack=active==='attack';
  u.position.set(homeX,0,1.2);u.rotation.set(0,0,0);u.scale.set(1,1,1);
- for(const p of u.children){p.position.copy(p.userData.home);p.rotation.set(0,0,0);p.visible=true;}
+ u.traverse(p=>{if(p!==u&&p.userData.home){p.position.copy(p.userData.home);p.rotation.set(0,0,0);}});
  const body=u.getObjectByName('body'),brow=u.getObjectByName('brow');
  const recoil=attack?sample(t,[[0,0],[80,-.2],[160,-.2],[200,.23],[340,.23],[410,-.04],[520,0]]):0;
  body.rotation.x=recoil;brow.rotation.x=recoil*.5;
  u.userData.cameraShake=attack&&t>=200&&t<300?.035*Math.sin((t-200)*.19)*(1-(t-200)/100):0;
- for(let i=0;i<2;i++){
+ for(let i=0;i<4;i++){
   const toast=u.getObjectByName('toast'+i);toast.visible=!attack||t<200||t===520;
   const r=Math.max(0,t-340)/1000;
   toast.position.y+=attack?sample(t,[[0,0],[80,-.16],[160,-.16],[200,.5],[340,0],[520,0]]):Math.sin(age*4+i*.4)*.02;
@@ -42,4 +42,5 @@ export function poseQuadVolley(u,{active,age,ms,homeX=0}){
    body.position.y+=phase>=.8?-.055*Math.sin((phase-.8)*5*Math.PI):.025*Math.sin(p*Math.PI);
   }else body.rotation.x=Math.sin(age*3)*.015;
  }
+  poseCuteAttackGear(u,{active,age,homeX});
 }

@@ -26,6 +26,7 @@ import {
   buildUnitModel, resolveKind, UNIT_SPECS, UNIT_KINDS_3D, normalizeEvents, choosePose, yawBetween, turnToward,
   healthBarState, maxHpOf,
 } from '../viewer3d/units.mjs';
+import { TOY_EDGE_FUNC_GLSL, TOY_EDGE_UNIFORMS_GLSL, TOY_EDGE_LIFT_GLSL, TOY_EDGE_FACE_GLSL, toyEdgeUniforms } from './toy-render.mjs';
 
 // ---------------------------------------------------------------------------------------------------------------
 // Look (the shared palette wins when present; these are viewer3d/units.mjs's own defaults so both agree)
@@ -96,7 +97,24 @@ export function bakeKind(kind, { markers = makeMarkerMaterials() } = {}) {
     if (!o.isMesh) return;
     const isCarry = o === model.parts.carry;
     if (!o.visible && !isCarry) return;
-    const g = o.geometry.clone().applyMatrix4(o.matrixWorld);
+    const g = o.geometry.clone();
+    // edge-light inputs from the part's own box (before the world matrix): aLocal = position / half-extents (-1..1),
+    // aHalf = half-extents in model units (scaled by the part's world scale)
+    g.computeBoundingBox();
+    const bb = g.boundingBox, ctr = bb.getCenter(new THREE.Vector3()), ext = bb.getSize(new THREE.Vector3()).multiplyScalar(0.5);
+    const ws = new THREE.Vector3().setFromMatrixScale(o.matrixWorld);
+    const half = [Math.max(ext.x * ws.x, 1e-4), Math.max(ext.y * ws.y, 1e-4), Math.max(ext.z * ws.z, 1e-4)];
+    const pos0 = g.attributes.position, nv = pos0.count;
+    const aLocal = new Float32Array(nv * 3), aHalf = new Float32Array(nv * 3);
+    for (let i = 0; i < nv; i++) {
+      aLocal[i * 3] = ext.x > 1e-6 ? (pos0.getX(i) - ctr.x) / ext.x : 0;
+      aLocal[i * 3 + 1] = ext.y > 1e-6 ? (pos0.getY(i) - ctr.y) / ext.y : 0;
+      aLocal[i * 3 + 2] = ext.z > 1e-6 ? (pos0.getZ(i) - ctr.z) / ext.z : 0;
+      aHalf[i * 3] = half[0]; aHalf[i * 3 + 1] = half[1]; aHalf[i * 3 + 2] = half[2];
+    }
+    g.setAttribute('aLocal', new THREE.BufferAttribute(aLocal, 3));
+    g.setAttribute('aHalf', new THREE.BufferAttribute(aHalf, 3));
+    g.applyMatrix4(o.matrixWorld);
     const n = g.attributes.position.count;
     const d = slotData(o.material);
     const color = new Float32Array(n * 3), mix = new Float32Array(n), emit = new Float32Array(n);
@@ -123,11 +141,14 @@ export function bakeKind(kind, { markers = makeMarkerMaterials() } = {}) {
 // strips and visors glow by aEmit, and a per-instance aState = (flash, glow) whitens a hit unit for a few frames.
 export function makeUnitMaterial(opts = {}) {
   const m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0.3, ...opts });
-  m.customProgramCacheKey = () => 'driftfall-instanced-units';
+  m.customProgramCacheKey = () => 'driftfall-instanced-units|edge-v4';
+  const edge = toyEdgeUniforms();
   m.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, edge);
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `#include <common>
         attribute float aMix; attribute float aEmit; attribute vec2 aState;
+        attribute vec3 aLocal; attribute vec3 aHalf; varying vec3 vToyLocal; varying vec3 vToyHalf;
         varying float vEmit; varying vec2 vState;`)
       .replace('#include <color_vertex>', `
         vColor = vec3(1.0);
@@ -137,14 +158,21 @@ export function makeUnitMaterial(opts = {}) {
         #ifdef USE_INSTANCING_COLOR
           vColor = mix(vColor, vColor * instanceColor.rgb, aMix);
         #endif
-        vEmit = aEmit; vState = aState;`);
+        vEmit = aEmit; vState = aState; vToyLocal = aLocal; vToyHalf = aHalf;`);
     shader.fragmentShader = shader.fragmentShader
       .replace('#include <common>', `#include <common>
-        varying float vEmit; varying vec2 vState;`)
+        varying float vEmit; varying vec2 vState; varying vec3 vToyLocal; varying vec3 vToyHalf;
+        ${TOY_EDGE_UNIFORMS_GLSL}
+        ${TOY_EDGE_FUNC_GLSL}`)
       .replace('#include <color_fragment>', `#include <color_fragment>
+        // derivatives stay in uniform control flow; emissive parts (eyes, visors) are masked out, not branched
+        vec2 toyMasks = toyEdgeMasks(vToyLocal * vToyHalf, max(vToyHalf, vec3(0.0001))) * (vEmit <= 0.0 ? 1.0 : 0.0);
+        ${TOY_EDGE_FACE_GLSL}
         diffuseColor.rgb = mix(diffuseColor.rgb, vec3(1.0), vState.x);`)
       .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-        totalEmissiveRadiance += vColor * (vEmit * (1.0 + vState.y)) + vec3(vState.x * 1.5);`);
+        totalEmissiveRadiance += vColor * (vEmit * (1.0 + vState.y)) + vec3(vState.x * 1.5);`)
+      .replace('#include <tonemapping_fragment>', `#include <tonemapping_fragment>
+        ${TOY_EDGE_LIFT_GLSL}`);
   };
   return m;
 }
@@ -358,7 +386,7 @@ export function createInstancedUnits(ctx, opts = {}) {
     return c;
   }
 
-  function emit(v, u, pose, alpha, tick) {
+  function emit(v, u, pose, alpha, tick, aim = null) {
     const spec = v.spec, size = spec.size ?? 0.5;
     const walkPhase = spec.heavy ? alpha * Math.PI : (tick + alpha) * Math.PI * (spec.stride ?? 1.2);
     const death = v.dying ? Math.min(1, (time - v.deathAt) / DEATH_SECONDS) : null;
@@ -372,7 +400,7 @@ export function createInstancedUnits(ctx, opts = {}) {
     dummy.scale.setScalar(unitScale * tr.scale);
     dummy.updateMatrix();
     const selected = selection.has(v.id);
-    const toasted = toaster?.emit(v, u, { pose, time, dt: frameDt, selected, tr: v.dying ? { scale: 1 } : tr, state: hungerOf(u), cord: cordOf(u) });
+    const toasted = toaster?.emit(v, u, { pose, time, dt: frameDt, selected, tr: v.dying ? { scale: 1 } : tr, state: hungerOf(u), cord: cordOf(u), aim });
     if (!(toaster ? toasted : drawn?.emit(v, tr))) {
       const b = v.entry.batch;
       const i = slot(b);
@@ -472,7 +500,10 @@ export function createInstancedUnits(ctx, opts = {}) {
         if (hit && v.lastHitTick !== tick) { v.lastHitTick = tick; v.lastHitAt = time; v.hitFlash = 1; }
         v.hitFlash = Math.max(0, v.hitFlash - dt / HIT_FLASH_SECONDS);
         v.visible = isVisible ? !!isVisible(u, v) : true;
-        if (v.visible) emit(v, u, pose, alpha, tick);
+        const hitOn = hitsBy.get(id);
+        const aimEnt = hitOn ? (findEntity(next, hitOn.id) ?? findEntity(prev, hitOn.id) ?? lastKnown.get(hitOn.id)) : null;
+        const aim = aimEnt ? worldOf(aimEnt.x, aimEnt.y, new THREE.Vector3()) : null;   // shot target (play/shots.mjs), #859; gridToWorld needs a Vector3
+        if (v.visible) emit(v, u, pose, alpha, tick, aim);
         if (v.dead) views.delete(id);
       };
       for (const u of next?.units ?? []) handle(u.id);

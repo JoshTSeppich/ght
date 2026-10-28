@@ -1,0 +1,261 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Ghosties, Hosties, and Toasties Teaser</title>
+<script type="importmap">{"imports":{"three":"../node_modules/three/build/three.module.js","three/addons/":"../node_modules/three/examples/jsm/"}}</script>
+<style>html,body{margin:0;background:#1b2229;overflow:hidden}canvas{display:block}</style></head><body>
+<script type="module">
+// TOASTER WARS teaser: a deterministic, choreographed battle using the game's own toaster spec (play/toaster-spec.mjs).
+// window.renderAt(t) draws the frame at t seconds; the recorder steps t at 30 fps.
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { TOASTERS, PALETTE, EXPRESSIONS, WHEELS, CORD } from './toaster-spec.mjs';
+
+const W = 1280, H = 720;
+const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+r.setPixelRatio(1); r.setSize(W, H);
+r.outputColorSpace = THREE.SRGBColorSpace; r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.05;
+r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(r.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color('#9fb2bd'); scene.fog = new THREE.Fog('#9fb2bd', 34, 70);
+scene.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture; scene.environmentIntensity = 0.3;
+const cam = new THREE.PerspectiveCamera(35, W / H, 0.1, 300);
+const key = new THREE.DirectionalLight(0xffedd7, 2.6); key.position.set(-10, 16, 10); key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048); Object.assign(key.shadow.camera, { left: -22, right: 22, top: 22, bottom: -22, near: 0.5, far: 60 });
+key.shadow.bias = -0.0002; key.shadow.normalBias = 0.03; scene.add(key);
+const fill = new THREE.DirectionalLight(0xd7edff, 0.65); fill.position.set(7, 5, -4); scene.add(fill);
+const rim = new THREE.DirectionalLight(0xffffff, 0.9); rim.position.set(4, 9, -10); scene.add(rim);
+scene.add(new THREE.HemisphereLight(0xe8f5ff, 0x65727d, 0.85));
+
+// ---------- ground: Quiet Battlefield grid, a river, a wheat field, rocks ----------
+function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+const rand = rng(7);
+{
+  const N = 64, cv = document.createElement('canvas'); cv.width = cv.height = N * 16; const g = cv.getContext('2d');
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    const river = Math.abs((x - 32) + (y - 32) * 0.35 - 14) < 2.2;
+    const shallow = !river && Math.abs((x - 32) + (y - 32) * 0.35 - 14) < 3.2;
+    const v = 0.96 + rand() * 0.06;
+    let c = [118 * v, 136 * v, 142 * v];
+    if (river) c = [26, 64, 104]; else if (shallow) c = [94, 150, 176];
+    g.fillStyle = `rgb(${c.map(Math.round).join(',')})`; g.fillRect(x * 16, y * 16, 16, 16);
+    g.fillStyle = 'rgba(40,52,60,0.10)'; g.fillRect(x * 16, y * 16, 16, 1); g.fillRect(x * 16, y * 16, 1, 16);
+  }
+  const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(64, 64), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.95 }));
+  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+  // wheat field (golden blocky stalk rows)
+  const wheatM = new THREE.MeshStandardMaterial({ color: '#E8B84A', roughness: 0.7 });
+  const plot = new THREE.Mesh(new THREE.BoxGeometry(7, 0.04, 5), new THREE.MeshStandardMaterial({ color: '#c9a04a', roughness: 0.95 }));
+  plot.position.set(-9, 0.02, -8); plot.receiveShadow = true; scene.add(plot);
+  for (let i = 0; i < 14; i++) for (let j = 0; j < 9; j++) {
+    const s = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.5 + rand() * 0.25, 0.16), wheatM);
+    s.position.set(-12.2 + i * 0.48, 0.3, -10 + j * 0.5); s.castShadow = true; scene.add(s);
+  }
+  const rockM = new THREE.MeshStandardMaterial({ color: '#4a535c', roughness: 0.8, flatShading: true });
+  for (const [x, z, s] of [[-3, -9, 1.3], [-1.8, -10, 0.9], [9, -7, 1.5], [11, 6, 1.2], [-13, 7, 1.4], [2, 11, 1.0]]) {
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(s * 0.6, s * 0.7, s * 1.4, 5), rockM); m.position.set(x, s * 0.7, z); m.castShadow = true; scene.add(m);
+  }
+}
+
+// ---------- toaster models (same construction as play/cute-preview.html, from the shared spec) ----------
+const rough = { cream: 0.48, charcoal: 0.35, team: 0.38, toast: 0.82, feet: 0.65, eyes: 0.5, heat: 0.5 };
+function matFor(c, part, team) {
+  const hex = c === 'team' ? PALETTE[team] : PALETTE[c];
+  const m = new THREE.MeshStandardMaterial({ color: hex, roughness: rough[c] ?? 0.5, metalness: c === 'charcoal' ? 0.08 : 0 });
+  if (part.emissive) { if (c === 'eyes') { m.color.set('#0b4f57'); m.emissive.set(team === 'orange' ? '#ffb070' : '#2EE6F2'); m.emissiveIntensity = 1.1; } else { m.emissive.set(hex); m.emissiveIntensity = 1.2; } }
+  return m;
+}
+function buildToaster(kind, team) {
+  const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
+  const parts = TOASTERS[kind].map((p) => ({ ...p })); const b = parts[0];
+  const Wd = b.size[0], Hh = b.size[1], D = b.size[2]; const isWheel = kind === 'bagel';
+  const lift = isWheel ? 0 : WHEELS.lift * WHEELS.diameterOfBodyH * Hh;
+  const eyes = [], toast = [];
+  for (const p of parts) {
+    if (p.name === 'foot') continue;
+    const xs = p.mirror ? [p.pos[0], -p.pos[0]] : [p.pos[0]];
+    for (const x of xs) {
+      let g; if (p.prism) { g = new THREE.CylinderGeometry(0.5, 0.5, 1, 5); g.rotateX(Math.PI / 2); } else g = new THREE.BoxGeometry(1, 1, 1);
+      const m = new THREE.Mesh(g, matFor(p.colour, p, team)); m.scale.set(...p.size); m.position.set(x, p.pos[1] + lift, p.pos[2]);
+      m.castShadow = !p.decal; body.add(m);
+      if (p.name === 'eye') eyes.push(m); if (p.name === 'toast') toast.push(m);
+      m.userData = { part: p, base: m.position.clone(), baseScale: m.scale.clone() };
+    }
+  }
+  const wheels = [];
+  if (!isWheel) {
+    const dia = WHEELS.diameterOfBodyH * Hh, tw = WHEELS.widthOfBodyW * Wd;
+    const tyreM = new THREE.MeshStandardMaterial({ color: PALETTE.charcoal, roughness: 0.6 }), hubM = new THREE.MeshStandardMaterial({ color: PALETTE.cream, roughness: 0.45 });
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
+      const w = new THREE.Group();
+      const ty = new THREE.Mesh(new THREE.CylinderGeometry(dia / 2, dia / 2, tw, WHEELS.sides), tyreM); ty.rotation.z = Math.PI / 2; ty.castShadow = true; w.add(ty);
+      const hb = new THREE.Mesh(new THREE.CylinderGeometry(dia * 0.21, dia * 0.21, tw * 1.08, WHEELS.sides), hubM); hb.rotation.z = Math.PI / 2; w.add(hb);
+      w.position.set(sx * (Wd / 2 + WHEELS.outsideSides * Wd - tw / 2), dia / 2, sz * (D / 2 - WHEELS.frontInset * D)); root.add(w); wheels.push(w);
+    }
+  }
+  const face = parts.find((p) => p.name === 'face');
+  return { root, body, eyes, toast, wheels, face, kind, team, lift, H: Hh + lift, D, W: Wd, dead: false };
+}
+function setEyes(u, expr, dead) {
+  const E = EXPRESSIONS[expr]; const fw = u.face.size[0], fh = u.face.size[1];
+  for (const e of u.eyes) {
+    const s = Math.sign(e.userData.base.x) || 1;
+    if (dead) { e.scale.set(E.w * fw * 1.1, 0.03, 0.02); e.rotation.z = s * 0.8; e.position.x = s * E.x * fw; continue; }
+    e.scale.set(E.w * fw, E.h * fh, 0.012); e.position.x = s * E.x * fw; e.position.y = u.face.pos[1] + u.lift + E.y * fh; e.rotation.z = -s * E.rot * Math.PI / 180;
+  }
+}
+
+// ---------- cords: tube from the back of each toaster to its power box ----------
+function cordMesh(team) {
+  const m = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial({ color: PALETTE[team], emissive: PALETTE[team], emissiveIntensity: 0.35, roughness: 0.45 }));
+  m.castShadow = true; scene.add(m); return m;
+}
+function setCord(mesh, from, to, slack, taut) {
+  const mid = from.clone().lerp(to, 0.5); mid.y = 0.09; const side = new THREE.Vector3(-(to.z - from.z), 0, to.x - from.x).normalize().multiplyScalar(slack);
+  const pts = [from, from.clone().lerp(mid, 0.3).add(new THREE.Vector3(0, -0.15, 0)), mid.clone().add(side), to.clone().lerp(mid, 0.3).setY(0.09), to];
+  const curve = taut ? new THREE.LineCurve3(from, to) : new THREE.CatmullRomCurve3(pts);
+  mesh.geometry.dispose(); mesh.geometry = new THREE.TubeGeometry(curve, 48, CORD.radius, 6); return curve;
+}
+const beadM = { cyan: new THREE.MeshStandardMaterial({ color: '#fff', emissive: PALETTE.cyan, emissiveIntensity: 3 }), orange: new THREE.MeshStandardMaterial({ color: '#fff', emissive: PALETTE.orange, emissiveIntensity: 3 }) };
+
+// ---------- buildings ----------
+function powerStrip(team, x, z) {
+  const g = new THREE.Group();
+  const base = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.7, 1.3), new THREE.MeshStandardMaterial({ color: PALETTE.cream, roughness: 0.48 })); base.position.y = 0.35; base.castShadow = true; g.add(base);
+  for (let i = 0; i < 4; i++) { const s = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.06, 0.5), new THREE.MeshStandardMaterial({ color: PALETTE.charcoal })); s.position.set(-1.1 + i * 0.66, 0.71, 0); g.add(s); }
+  const tb = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.3, 0.8), new THREE.MeshStandardMaterial({ color: PALETTE[team], emissive: PALETTE[team], emissiveIntensity: 0.4 })); tb.position.set(1.35, 0.85, 0); g.add(tb);
+  g.position.set(x, 0, z); scene.add(g); return g;
+}
+function box(team, x, z) {
+  const g = new THREE.Group();
+  const p = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.5, 0.55), new THREE.MeshStandardMaterial({ color: PALETTE.charcoal, roughness: 0.5 })); p.position.y = 0.25; p.castShadow = true; g.add(p);
+  const cap = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.12, 0.6), new THREE.MeshStandardMaterial({ color: PALETTE[team], emissive: PALETTE[team], emissiveIntensity: 0.9 })); cap.position.y = 0.56; g.add(cap);
+  g.position.set(x, 0, z); scene.add(g); return g;
+}
+
+// ---------- the cast ----------
+const CY = 'cyan', OR = 'orange';
+const stripC = powerStrip(CY, -16, 2), stripO = powerStrip(OR, 16, -2);
+const boxesC = [[-12, 2], [-8, 1.5], [-4.5, 1]].map(([x, z]) => box(CY, x, z));
+const boxesO = [[12, -2], [8, -1.5], [4.5, -1]].map(([x, z]) => box(OR, x, z));
+const chainC = [stripC, ...boxesC], chainO = [stripO, ...boxesO];
+const linkC = chainC.slice(1).map(() => cordMesh(CY)), linkO = chainO.slice(1).map(() => cordMesh(OR));
+const squadDef = [['popper', -0.9, 0.0], ['zapper', 0.9, 1.4], ['four-slice', 1.2, -1.6], ['popper', -1.0, 2.6], ['crumb', -2.6, -0.8]];
+function makeSquad(team, sign) {
+  return squadDef.map(([kind, dx, dz], i) => {
+    const u = buildToaster(kind, team); scene.add(u.root); u.cord = cordMesh(team); u.beads = [0, 1].map(() => { const b = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.22, 0.2), beadM[team]); scene.add(b); return b; });
+    u.dx = dx * sign; u.dz = dz * sign; u.i = i; u.sign = sign; return u;
+  });
+}
+const squadC = makeSquad(CY, 1), squadO = makeSquad(OR, -1);
+
+// projectiles + fx pools
+const slices = [], bolts = [], shards = [], flashes = [];
+const sliceGeo = new THREE.BoxGeometry(0.62, 0.74, 0.14), sliceM = new THREE.MeshStandardMaterial({ color: '#D99448', roughness: 0.8 });
+const boltM = new THREE.MeshStandardMaterial({ color: '#ffd29a', emissive: '#F25745', emissiveIntensity: 3 });
+const shardM = new THREE.MeshStandardMaterial({ color: '#D99448', roughness: 0.8, flatShading: true });
+const flashM = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.9 });
+function pool(arr, n, make) { for (let i = 0; i < n; i++) { const m = make(); m.visible = false; scene.add(m); arr.push(m); } }
+pool(slices, 40, () => { const m = new THREE.Mesh(sliceGeo, sliceM); m.castShadow = true; return m; });
+pool(bolts, 20, () => new THREE.Mesh(new THREE.IcosahedronGeometry(0.26, 0), boltM));
+pool(shards, 120, () => new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.07, 5), shardM));
+pool(flashes, 20, () => new THREE.Mesh(new THREE.SphereGeometry(0.35, 8, 6), flashM.clone()));
+
+// ---------- choreography ----------
+const ease = (x) => x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x);
+const lerp = (a, b, t) => a + (b - a) * t;
+// squad front x over time: roll in, meet near x = +-2.6
+const frontC = (t) => lerp(-11, -2.8, ease((t - 0.5) / 5.5));
+const frontO = (t) => lerp(11, 2.8, ease((t - 3.0) / 4.5));
+// shots: [time, shooterTeam, shooterIndex, targetIndex, type]
+const shots = [];
+for (let k = 0; k < 9; k++) { shots.push([7.0 + k * 0.62, CY, k % 2 ? 3 : 0, k % 3, 'pop']); shots.push([7.3 + k * 0.66, OR, k % 2 ? 0 : 3, (k + 1) % 3, 'pop']); }
+for (let k = 0; k < 5; k++) { shots.push([7.6 + k * 0.9, CY, 1, 2, 'zap']); shots.push([8.1 + k * 0.95, OR, 1, 1, 'zap']); }
+shots.push([10.4, CY, 2, 0, 'volley']);                                    // cyan Four-Slice quad volley -> orange popper 0 dies
+shots.push([12.0, CY, 2, 3, 'volley']);
+const deathsO = { 0: 11.0, 3: 12.6, 2: 13.4 }, deathsC = { 4: 12.1 };
+const FLIGHT = 0.42;
+
+function unitPos(u, t) {
+  const fx = u.team === CY ? frontC(t) : frontO(t);
+  return new THREE.Vector3(fx + u.dx, 0, u.dz);
+}
+function arc(a, b, k, h) { const p = a.clone().lerp(b, k); p.y += Math.sin(Math.PI * k) * h; return p; }
+
+window.renderAt = function (t) {
+  for (const arr of [slices, bolts, shards, flashes]) for (const m of arr) m.visible = false;
+  let si = 0, bi = 0, hi = 0, fi = 0, shake = 0;
+  const hitAt = new Map(); // unit -> last hit time
+  const all = [...squadC, ...squadO];
+  // positions first
+  for (const u of all) { u.p = unitPos(u, t); }
+  const deathOf = (u) => (u.team === OR ? deathsO : deathsC)[u.i];
+  // projectiles
+  for (const [t0, team, si0, ti, type] of shots) {
+    const shooter = (team === CY ? squadC : squadO)[si0], target = (team === CY ? squadO : squadC)[ti];
+    const dS = deathOf(shooter), dT = deathOf(target);
+    if (dS !== undefined && t0 > dS) continue; if (dT !== undefined && t0 > dT + 0.2) continue;
+    const dt = t - t0; if (dt < 0 || dt > FLIGHT + 0.6) continue;
+    const a = shooter.p.clone().setY(shooter.H + 0.3), b = target.p.clone().setY(0.7);
+    if (dt <= FLIGHT) {
+      if (type === 'zap') { const m = bolts[bi++]; if (m) { m.visible = true; m.position.copy(a.clone().lerp(b, dt / FLIGHT)).setY(lerp(a.y, b.y, dt / FLIGHT)); } }
+      else for (let q = 0; q < (type === 'volley' ? 4 : 1); q++) {
+        const m = slices[si++]; if (!m) break; m.visible = true;
+        const off = new THREE.Vector3(0, 0, (q - 1.5) * 0.5 * (type === 'volley' ? 1 : 0));
+        m.position.copy(arc(a.clone().add(off), b.clone().add(off.multiplyScalar(0.6)), dt / FLIGHT, type === 'volley' ? 2.6 : 1.8)); m.rotation.set(dt * 14, dt * 6, 0);
+      }
+    } else {
+      const k = dt - FLIGHT; hitAt.set(target, Math.max(hitAt.get(target) ?? -1, t0 + FLIGHT));
+      if (type === 'volley' && k < 0.25) shake = Math.max(shake, (0.25 - k) * 0.6);
+      const f = flashes[fi++]; if (f && k < 0.15) { f.visible = true; f.position.copy(b); f.scale.setScalar(1 + k * 8); f.material.opacity = 0.9 * (1 - k / 0.15); }
+      for (let q = 0; q < 5; q++) { const m = shards[hi++]; if (!m) break; m.visible = true; const ang = q / 5 * Math.PI * 2 + t0;
+        m.position.set(b.x + Math.cos(ang) * k * 2.2, Math.max(0.03, 0.7 + k * 3 - k * k * 9), b.z + Math.sin(ang) * k * 2.2); m.rotation.set(k * 9, ang, 0); }
+    }
+  }
+  // units
+  for (const u of all) {
+    const d = deathOf(u); const dead = d !== undefined && t >= d; const fight = t > 6.6;
+    const moving = !fight && Math.abs((u.team === CY ? frontC(t + 0.05) : frontO(t + 0.05)) - (u.team === CY ? frontC(t) : frontO(t))) > 0.001;
+    const ht = hitAt.get(u); const sinceHit = ht !== undefined ? t - ht : 99;
+    const knock = sinceHit < 0.3 ? Math.sin(sinceHit / 0.3 * Math.PI) * 0.25 : 0;
+    u.root.position.copy(u.p); u.root.position.x -= u.sign * knock;
+    u.root.rotation.y = u.sign > 0 ? Math.PI / 2 : -Math.PI / 2;
+    const bob = moving ? Math.abs(Math.sin(t * 9 + u.i)) * 0.07 : (fight ? Math.abs(Math.sin(t * 6 + u.i * 1.7)) * 0.03 : 0);
+    u.body.position.y = bob + (sinceHit < 0.25 ? 0.12 * Math.sin(sinceHit / 0.25 * Math.PI) : 0);
+    for (const w of u.wheels) w.rotation.x = -(u.p.x * u.sign) * 2.2;
+    // toast pops up just before a shot (popper anticipation)
+    for (const s of u.toast) s.position.y = s.userData.base.y;
+    // death: X eyes, tip over, sink
+    if (dead) { const k = Math.min(1, (t - d) / 0.5); u.root.rotation.z = u.sign * k * 1.45; u.root.position.y = -k * 0.15; setEyes(u, 'alarmed', true); }
+    else { u.root.rotation.z = 0; setEyes(u, sinceHit < 0.6 ? 'alarmed' : (t > 13.8 && u.team === CY ? 'happy' : 'determined'), false); }
+    // victory hop
+    if (!dead && u.team === CY && t > 13.8) u.root.position.y = Math.abs(Math.sin((t - 13.8) * 7 + u.i * 0.5)) * 0.35;
+    // cords: from the toaster's back to the nearest chain box; snapped cords recoil (Great Unplugging)
+    const chain = u.team === CY ? boxesC : boxesO; const anchor = chain[chain.length - 1].position.clone().setY(0.5);
+    const back = u.p.clone().add(new THREE.Vector3(-u.sign * (u.D / 2 + 0.05), u.H * 0.35, 0));
+    if (dead) {
+      const k = Math.min(1, (t - d) / 0.45); const end = back.clone().lerp(anchor, ease(k)); end.y = lerp(back.y, 0.5, k);
+      setCord(u.cord, anchor, end, 0, true); u.cord.visible = k < 1;
+      for (const b of u.beads) b.visible = false;
+    } else {
+      const dist = back.distanceTo(anchor); const taut = dist > 8.2;
+      const curve = setCord(u.cord, back, anchor, taut ? 0 : 0.35 * Math.sin(u.i + 1), taut); u.cord.visible = true;
+      u.cord.material.emissiveIntensity = taut ? 0.35 + 0.6 * (Math.sin(t * 20) > 0 ? 1 : 0) : 0.35;
+      u.beads.forEach((b, j) => { b.visible = true; const f = 1 - (((t * 0.9) + j / 2 + u.i * 0.13) % 1); b.position.copy(curve.getPoint(f)); });
+    }
+  }
+  // chain links between boxes
+  for (const [chain, links] of [[chainC, linkC], [chainO, linkO]]) chain.slice(1).forEach((bx, i) => setCord(links[i], chain[i].position.clone().setY(0.45), bx.position.clone().setY(0.45), 0.25, false));
+  // camera: 5 shots
+  let pos, look;
+  if (t < 3.2) { const k = t / 3.2; const f = frontC(t); pos = new THREE.Vector3(f + lerp(8, 6, k), lerp(3.6, 2.8, k), lerp(6.5, 5, k)); look = new THREE.Vector3(f, 0.7, 0.7); }
+  else if (t < 6.4) { const k = (t - 3.2) / 3.2; const f = frontO(t); pos = new THREE.Vector3(f - lerp(8, 6, k), lerp(3.6, 2.8, k), lerp(-6.5, -5, k)); look = new THREE.Vector3(f, 0.7, -0.7); }
+  else if (t < 10.2) { const k = (t - 6.4) / 3.8; pos = new THREE.Vector3(lerp(-2, 2, k), 7, 12); look = new THREE.Vector3(0, 0.6, 0.4); }
+  else if (t < 13.6) { const k = (t - 10.2) / 3.4; pos = new THREE.Vector3(lerp(7.5, 6.5, k), lerp(3.0, 2.6, k), lerp(5.5, 4.8, k)); look = new THREE.Vector3(2.6, 0.6, 0.0); }
+  else { const k = ease((t - 13.6) / 3.6); pos = new THREE.Vector3(lerp(-9, -3, k), lerp(4.5, 12, k), lerp(8, 17, k)); look = new THREE.Vector3(-2, 0.5, 0.5); }
+  if (shake) { pos.x += Math.sin(t * 90) * shake; pos.y += Math.cos(t * 77) * shake; }
+  cam.position.copy(pos); cam.lookAt(look); cam.updateProjectionMatrix();
+  r.render(scene, cam);
+  return true;
+};
+window.ready = true;
+window.renderAt(0);
+</script></body></html>

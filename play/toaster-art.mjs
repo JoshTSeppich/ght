@@ -60,6 +60,13 @@ export function structureIconSvg(kind, owner = 0) {
     case 'toaster': // Toaster: a big cream box, two slots with toast popping up, a lever and a team block
       g = rect(40, 100, 176, 110, cream, 20) + rect(66, 92, 60, 14, char, 5) + rect(134, 92, 60, 14, char, 5) + rect(76, 52, 40, 48, toast, 5) + rect(144, 52, 40, 48, toast, 5)
         + rect(96, 150, 64, 36, char, 8) + circ(112, 168, 7, COLORS.eye) + circ(144, 168, 7, COLORS.eye) + rect(200, 126, 24, 18, team, 5); break;
+    case 'extension': // Extension Box: a low charcoal post with a glowing team cap
+      g = rect(70, 190, 116, 26, char, 8) + rect(88, 110, 80, 84, char, 8) + rect(74, 84, 108, 34, team, 8) + circ(128, 150, 9, COLORS.eye); break;
+    case 'pylon': // Relay Pylon: a tall thin post, a wide team cap and a line leaving it
+      g = rect(78, 204, 100, 20, char, 8) + rect(112, 60, 32, 148, char, 6) + rect(70, 40, 116, 28, team, 8) + `<path d="M186 54 L240 74" stroke="${team}" stroke-width="7" stroke-linecap="round"/>`; break;
+    case 'coolingRack': // Cooling Rack: a tier-3 air factory - a big rack with air vents and a team door
+      g = rect(50, 80, 176, 140, cream, 14) + [0, 1, 2].map((i) => rect(65 + i * 50, 100, 35, 100, char, 4)).join('')
+        + rect(112, 130, 32, 50, team, 6) + poly([[60, 70], [196, 70], [196, 60], [60, 60]], char); break;
     default: g = rect(60, 80, 136, 110, cream, 14) + rect(100, 50, 56, 36, team, 8);
   }
   return frame(owner, g);
@@ -81,7 +88,7 @@ export function actionIconSvg(action) {
 }
 
 export const UNIT_ART_KINDS = Object.freeze(['worker', 'grunt', 'lancer', 'brute', 'howler', 'spiker', 'dart']);
-export const STRUCTURE_ART_KINDS = Object.freeze(['core', 'forge', 'turret', 'mill', 'well', 'toaster']);
+export const STRUCTURE_ART_KINDS = Object.freeze(['core', 'forge', 'turret', 'mill', 'well', 'toaster', 'extension', 'pylon', 'coolingRack']);
 const ACTIONS = new Set(['amove', 'stop', 'hold', 'move', 'rally']);
 
 const cache = new Map();

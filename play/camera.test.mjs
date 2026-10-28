@@ -85,12 +85,12 @@ function fakeDom() {
   return { win, doc, overlay };
 }
 
-test('pointer controls: click-in locks, unlock frees, edge exit keeps panning, F11 toggles fullscreen', () => {
+test('pointer controls: click-in locks, unlock frees, leaving the window stops edge panning, F11 toggles fullscreen', () => {
   const { win, doc, overlay } = fakeDom();
   const rig = createCameraRig(64, 64, { x: 32, y: 32 }); rig.size = size;
   const p = installPointerControls({ win, doc, overlay, rig });
   doc.documentElement.fire('mouseleave', { clientX: 1000, clientY: 300 });
-  assert.ok(rig.velocity().x > 0, 'still panning after leaving the window');
+  assert.equal(rig.velocity().x, 0, 'leaving the window must not keep the camera sliding');
   win.fire('mousemove', { clientX: 500, clientY: 300, target: overlay });
   assert.equal(rig.velocity().x, 0);
   overlay.fire('mousedown', { button: 0, clientX: 500, clientY: 300 });

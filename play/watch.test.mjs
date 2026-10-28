@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { STATS } from '../env/stats.mjs';
 import { createCaster, glide, createTopbar, nextSeed, isWatch, RESTART_SECONDS } from './watch.mjs';
 
 const snap = (units = [], structures = [], territory = null) => ({ units, structures, territory });
@@ -82,8 +83,8 @@ test('top bar: income per minute from gains only, army value without workers, Re
   const v = bar.read(state(24, 150, 90, units, [2, 1]));
   assert.equal(v.sides[0].income, 50 * 60, 'a one second window scaled to a minute');
   assert.equal(v.sides[1].income, 0);
-  assert.equal(v.sides[0].army, 50);
-  assert.equal(v.sides[1].army, 150);
+  assert.equal(v.sides[0].army, STATS.units.grunt.cost);
+  assert.equal(v.sides[1].army, STATS.units.brute.cost);
   assert.deepEqual([v.sides[0].reaches, v.sides[1].reaches, v.total], [2, 1, 7]);
   assert.equal(createTopbar().read({ tick: 0, shards: [0, 0], units: [], structures: [] }).total, 0);
 });

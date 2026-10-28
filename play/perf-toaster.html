@@ -1,0 +1,26 @@
+<!doctype html>
+<!-- Toaster Wars frame-rate page (owner: sonnet, PERF). The real Wheatfield scene with 200 toasters (half marching), cords on six
+     power points and twelve buildings, built by play/perf-scenario.mjs and run by play/perf-toaster.mjs. Open from the repo-root server:
+     http://localhost:8123/play/perf-toaster.html?units=200&quality=high      (quality: high | balanced | low)
+     Also: ?frames=120 (measured frames, after 30 warm-up frames that are excluded) and ?mode=render (default, sim frozen) | ?mode=sim (one tick per frame).
+     Result: one console line "PERF: {json}", window.__perf, and the readout on the page. play/perf.html is the old Driftfall map. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ghosties, Hosties, and Toasties perf</title>
+<script type="importmap">{ "imports": {
+  "three": "../node_modules/three/build/three.module.js",
+  "three/addons/": "../node_modules/three/examples/jsm/" } }</script>
+<style>
+  html, body { margin: 0; height: 100%; background: #171326; color: #e8e4f4; font: 13px/1.4 ui-monospace, Menlo, monospace; overflow: hidden; }
+  #stage { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  #out { position: fixed; left: 8px; top: 8px; margin: 0; padding: 5px 8px; box-sizing: border-box; width: 320px; height: 140px; overflow: hidden; background: #0008; border-radius: 4px; white-space: pre; font-size: 11px; line-height: 1.25; font-weight: 600; color: #fff; pointer-events: none; }
+</style>
+</head>
+<body>
+<canvas id="stage"></canvas>
+<pre id="out">starting</pre>
+<script type="module" src="./perf-toaster.mjs"></script>
+</body>
+</html>

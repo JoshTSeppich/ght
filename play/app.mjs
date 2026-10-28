@@ -10,26 +10,46 @@
 
 import { statFor } from '../viewer/replay.mjs';
 import { observe } from '../env/state.mjs';
-import { STATS } from '../env/stats.mjs';
+import { STATS, rowOf } from '../env/stats.mjs';
 import { createLiveMatch, loadAi } from '../env/live.mjs';
 import { isWatch, createCaster, createTopbar, glide, nextSeed, RESTART_SECONDS } from './watch.mjs';
-import { createInput, pickEntity, isStructure, installPointerControls } from './input.mjs';
-import { CAMERA, createCameraRig } from './camera.mjs';
+import { frontFocus, createStallWatch } from './watch-front.mjs';
+import { createInput, pickEntity, isStructure, installPointerControls, MUTE_KEY, INSPECT_KEY, pauseKeyFires, gameTakesKey } from './input.mjs';
+import { tutorialOn, tutorialProgress, OBJECTIVE } from './tutorial.mjs';
+import { mountTutorial } from './tutorial-card.mjs';
+import { CAMERA, createCameraRig, cameraKeyAction, createCameraMarks } from './camera.mjs';
 import { renderSelectionPanel } from './hud.mjs';
+import { createFlowTracker } from './hud-bar.mjs';
+import { badgesFor, drawBadges } from './hud-badges.mjs';
+import { cancelCommand } from './hud-queue.mjs';
+import { createIdleCrumbs, idleButtonHtml } from './idle-crumbs.mjs';
+import { saturationLine } from './hud-saturation.mjs';
 import { renderCard, cardSignature } from './command-card.mjs';
 import { campMarks, drawCampsOverlay, drawCampsMinimap, drawPickups } from './camps.mjs';
 import { cardWithRecall } from './items-ui.mjs';
 import { createFeedback } from './feel.mjs';
 import { createSoundPlayer } from './sound-player.mjs';
-import { stingerFor } from '../viewer3d/audio.mjs';
+import { createToasterSounds, cuesFor, newMemo, mountSoundControls, resultStingers } from './toaster-sounds.mjs';
 import { setArtProvider } from './icons.mjs';
 import { toasterArt } from './toaster-art.mjs';
 import { kindName } from './hud.mjs';
 import { buildMinimapImage } from './wheatfield-terrain.mjs';
 import { toasterBuildingLook } from './toaster-buildings.mjs';
-import { wheatfieldMap, toasterOptions, toasterInputOptions, toasterTopBar, toasterPanel, observeToaster, PAGE_TITLE } from './toaster-play.mjs';
+import { createStationLayer } from './power-stations-3d.mjs';
+import { createBreadLife } from './bread-life.mjs';
+import { replaySeed, nextReplaySeed, replayPlayer, loadReplay } from './replay/replay-bot.mjs';
+import { mountStartScreen, mountFlowMenu, replaySetupQuery, setupQuery, setupValues } from './start-screen.mjs';
+import { saveReplay, loadReplay as loadStoredReplay } from './replay-storage.mjs';
+import { stationCost } from './station-controls.mjs';
+import { drawGhost, ghostFor, tileSet } from './placement-ghost.mjs';
+import { opponentAiName, opponentLevel, mountOpponentChoice } from './opponent.mjs';
+import { sandboxMode,idleOpponent, sandboxState, stepSpeed, cheatCommand, sandboxBadge, speedChip } from './sandbox.mjs';
+import { wheatfieldMap, createReplayState, toasterOptions, createToasterState, toasterInputOptions, keyProfile, toasterTopBar, toasterPanel, observeToaster, PAGE_TITLE } from './toaster-play.mjs';
+import { createMatchStats, resultsCardHtml, saveLastMatch, loadLastMatch, replayQuery, mountMatchMenu } from './results-card.mjs';
 import { territoryOptions, territoryPanel, drawReachBorders, drawPowerOverlay } from './territory-wire.mjs';
 import { reachViews, drawReachMinimap } from './reach-view.mjs';
+import { kitchenSites, createPings, drawKitchenMinimap } from './minimap-kitchen.mjs';
+import { mountKitchenPanel } from './kitchen-panel.mjs';
 
 export const TICKS_PER_SECOND = 24;
 export const DEFAULT_MATCH_TICKS = 24 * 60 * 15; // about 15 minutes of real time
@@ -184,8 +204,17 @@ export { CAMERA, createCameraRig } from './camera.mjs'; // the rig itself lives 
 export async function startGame({ THREE, createEngine, createPlaceholder, root, query = new URLSearchParams(), importer }) {
   const q = query;
   const watch = isWatch(q);
-  const seed = Number(q.get('seed') ?? 7) || 7;
+  if (toasterOptions(q).on && !watch && !sandboxMode(q) && q.get('play') !== '1') {
+    mountStartScreen(root, { query: q });
+    return { setup: true };
+  }
   const side = q.get('side') === '1' ? 1 : 0;
+  // The TV (watch mode on Toaster Wars) plays a recorded toaster-sonnet v toaster-sonnet match that ends in a siege.
+  const wantReplay = watch && side === 0 && toasterOptions(q).on ? replaySeed(q) : null;
+  const storedReplay = q.get('replay');
+  const lastRec = watch && toasterOptions(q).on && (storedReplay === 'last' || /^\d$/.test(storedReplay ?? '')) ? (loadStoredReplay(storedReplay) ?? (storedReplay === 'last' ? loadLastMatch() : null)) : null; // Watch replay on the results card
+  const replay = lastRec ?? (wantReplay ? await loadReplay(wantReplay) : null);
+  const seed = replay ? replay.seed : Number(q.get('seed') ?? 7) || 7;
   const tps = Number(q.get('tps') ?? TICKS_PER_SECOND) || TICKS_PER_SECOND;
   const els = buildDom(root, toasterOptions(q).on);
   const imp = importer ?? ((f) => import(f));
@@ -195,16 +224,20 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
   // gives us the new state; we hand the driver the commands for the next tick.
   // Default opponent: the built-in AI on its easy setting, so a first game survives the opening. The team
   // tournament bots are opt-in with ?ai=sonnet|haiku|fable|sample.
-  const aiName = q.get('ai') ?? 'builtin';
+  const aiName = watch ? (q.get('ai') ?? 'builtin') : opponentAiName(q, toasterOptions(q).on); // Toaster Wars: ?difficulty=easy (default) | normal | none (play/opponent.mjs)
+  const sandbox = !watch && !replay && sandboxMode(q); // ?mode=sandbox or 'Opponent: None': an idle enemy and cheat keys (play/sandbox.mjs)
   let aiModule = null;
-  try { aiModule = await imp(aiName === 'sample' ? '../players/sample-player.mjs' : aiName === 'builtin' ? '../players/builtin/ai.mjs' : `../players/${aiName}/bot.mjs`); }
+  if (replay) aiModule = replayPlayer(replay);
+  else if (sandbox) aiModule = idleOpponent;
+  else try { aiModule = await imp(aiName === 'sample' ? '../players/sample-player.mjs' : aiName === 'builtin' ? '../players/builtin/ai.mjs' : `../players/${aiName}/bot.mjs`); }
   catch (err) { console.warn('[play] bot not loaded', err); toast(els, `Bot "${aiName}" failed to load`); }
   const toaster = toasterOptions(q); // Toaster Wars by default; ?classic=1 keeps the old Driftfall Classic page
   if (toaster.on && typeof document !== 'undefined') document.title = PAGE_TITLE;
   const terr = toaster.on ? toaster : territoryOptions(q); // ?territory=1: Reaches, tiers, the Drift and the flow panel (needs createState in env/live.mjs)
   const driver = createLiveMatch({
-    seed, human: side, createState: terr.createState, tps, ai: aiModule ?? { name: 'idle', act: () => [] },
-    maxTicks: Number(q.get('ticks') ?? DEFAULT_MATCH_TICKS) || DEFAULT_MATCH_TICKS,
+    seed, human: side, createState: replay ? (lastRec ? (lastRec.setup?.difficulty === 'none' || lastRec.setup?.mode === 'sandbox' ? sandboxState(terr.createState) : terr.createState) : createReplayState) : sandbox ? sandboxState(terr.createState) : terr.createState, tps, ai: aiModule ?? { name: 'idle', act: () => [] },
+    ...(replay ? { aiStartTick: 0 } : {}), // a recording acts from tick 0
+    maxTicks: replay ? replay.maxTicks : Number(q.get('ticks') ?? DEFAULT_MATCH_TICKS) || DEFAULT_MATCH_TICKS,
     difficulty: q.get('difficulty') ?? (watch ? 'normal' : 'easy'),
   });
   // Watch mode: a second built-in AI plays the "human" side, its commands queued like a player's.
@@ -213,18 +246,53 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
     try { watchAi = await loadAi(aiModule ?? '../players/builtin/ai.mjs', { side, seed, difficulty: q.get('difficulty') ?? 'normal' }); }
     catch (err) { console.warn('[play] watch AI not loaded', err); }
   }
+  if (replay) driver.queue(replay.commands[0]?.[side] ?? []); // the queue lands on tick 0, like the other side's reply
   const caster = watch ? createCaster() : null, topbar = watch ? createTopbar({ tps }) : null;
   const state = driver.state;
+  const matchStats = createMatchStats(side); // wheat, slices, toasters lost for the results card
+  // Toaster Wars teaching (play/tutorial.mjs): the five-step guide is on unless ?tutorial=0, and the objective line sits under the top bar.
+  const tutorial = toaster.on && !watch && tutorialOn(q) ? mountTutorial(document) : null;
+  const objective = toaster.on && !watch ? root.appendChild(Object.assign(document.createElement('div'), { id: 'objective', textContent: OBJECTIVE })) : null;
+  const kitchen = toaster.on && !watch ? mountKitchenPanel(document) : null; // K: the Kitchen panel (play/kitchen-panel.mjs)
+  if (objective) objective.style.cssText ='position:fixed;left:50%;top:36px;transform:translateX(-50%);z-index:4;font:13px/1.3 system-ui,sans-serif;color:#e8e4f4;text-shadow:0 1px 2px #000;pointer-events:none;white-space:nowrap';
   const interval = 1000 / tps;
-  const input = createInput({ side, stats: STATS, ...(toaster.on ? toasterInputOptions() : {}) });
+  // Map facts the placement ghost needs (Well near water, enemy fenced land); built lazily, the water Set once.
+  let waterSet = null;
+  const placeContext = () => (toaster.on && wheat ? { waterSet: (waterSet ??= tileSet(wheat.water)), springs: wheat.wells, enemyFenced: state.power?.enclosure?.fenced?.[1 - side] } : null);
+  // Key profile (SYSTEMS-DESIGN.md section 4): ?keys=grid|classic, else the stored setting, else grid. One setting, read at load.
+  const keysProfile = keyProfile(q, (() => { try { return localStorage.getItem('keys'); } catch { return null; } })());
+  const input = createInput({ side, stats: STATS, placeContext, rowOf, ...(toaster.on ? toasterInputOptions(keysProfile) : {}) });
   if (toaster.on) setArtProvider(toasterArt); // toaster portraits and card icons instead of the old snake art
   const look = toaster.on ? observeToaster : observe; // the toasters need each unit's power + cord corners to draw their cords
   const world = createLiveWorld(look(state, side), STATS);
-  let paused = false, inspectPower = false, mmBase = null; // mmBase: the Wheatfield land as a canvas, drawn under the minimap dots
+  let gameSpeed = 1;
+  let paused = false, inspectPower = false, mmBase = null, mmSites = null, mmPings = createPings(); // mmSites: windmill pads + dam (item 28); mmBase: the Wheatfield land as a canvas, drawn under the minimap dots
   const game ={ state, driver, input, world, over: false, lastTickAt: performance.now() };
 
+  // Idle Crumbs (play/idle-crumbs.mjs): auto-gather after 3 s idle, a blinking count button, F1 cycles them.
+  const idleCrumbs = toaster.on && !watch ? createIdleCrumbs({ side }) : null;
+  const idleBtn = idleCrumbs ? document.body.appendChild(Object.assign(document.createElement('div'), { id: 'idle-crumbs' })) : null;
+  if (idleBtn) {
+    idleBtn.style.cssText = 'position:fixed;left:10px;top:44px;z-index:30;font:12px sans-serif';
+    document.head.append(Object.assign(document.createElement('style'), { textContent: '.idle-btn{font:inherit;font-weight:700;color:#0b0918;background:#ffd23f;border:1px solid #fff;border-radius:4px;padding:3px 9px;cursor:pointer}@keyframes idleblink{50%{opacity:.35}}.idle-blink{animation:idleblink 1s steps(2) infinite}' }));
+    idleBtn.addEventListener('click', (e) => { if (e.target.closest('[data-idle]')) selectIdleCrumb(); });
+  }
+  function selectIdleCrumb() {
+    const c = idleCrumbs?.cycle(snapNow(), input.ui.plans);
+    if (!c) { toast(els, 'No idle Crumbs'); return; }
+    input.ui.selection = [c.id]; input.ui.stationSel = [];
+    rig.centerOn(c.x, c.y);
+  }
+
   let feedback = null; // made once the camera exists (below), so the tick handler can run before that
+  const flow = createFlowTracker(); // income per minute for the top bar hovers (play/hud-bar.mjs)
+  const synth = createToasterSounds({ muted: q.get('mute') === '1' ? true : undefined }); const soundMemo = newMemo(); // item 26
+  const synthUi = mountSoundControls(synth);
+  for (const type of ['pointerdown', 'keydown']) window.addEventListener(type, () => synth.unlock(), { passive: true });
   driver.on('tick', ({ events }) => {
+    for (const c of cuesFor(events, state, side, soundMemo)) synth.play(c.name, c);
+    flow.feed(events, state);
+    matchStats.note(state.units, events);
     const snap = look(state, side);
     world.push(snap, events.filter((e) => e.e !== 'late'));
     input.noteEvents(snap, events);
@@ -235,17 +303,23 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
       return;
     }
     const cmds = input.tick(snap);
+    if (idleCrumbs) cmds.push(...idleCrumbs.tick(snap, input.ui.plans)); // item 3: idle Crumbs go back to wheat
     feedback?.tick({ events, snap, focus: rig, now: performance.now(), selection: input.ui.selection, commands: cmds });
     driver.queue(cmds);
   });
   // Sounds (play/sound-player.mjs). It replaces the old 'audio' system below. Browsers need a click or key first.
   const sounds = createSoundPlayer({ muted: q.get('mute') === '1' });
-  fetch('../assets/audio/MANIFEST.json').then((r) => r.json()).then((json) => sounds.load(json)).catch(() => {});
+  fetch(new URL('../assets/audio/MANIFEST.json', import.meta.url)).then((r) => r.json()).then((json) => { sounds.load(json); synth.loadAmbient(json); }).catch(() => {});
   for (const type of ['pointerdown', 'keydown']) window.addEventListener(type, () => sounds.unlock(), { passive: true });
   driver.on('end', (result) => {
     game.over = true;
-    if (watch) { showWatchEnd(els, result, seed, q); return; }
-    showResult(els, result, side, toaster.on); sounds.play([{ name: stingerFor(result, side) }]);
+    const stingers = resultStingers(result, side, toaster.on); // one stinger per result (play/toaster-sounds.mjs)
+    if (stingers.synth) synth.play(stingers.synth);
+    if (watch && lastRec) { els.result.hidden = false; els.result.innerHTML = '<h1>Replay over</h1><p><button id="restart">Play again</button></p>'; els.result.querySelector('#restart').onclick = () => { location.search = setupQuery(q, setupValues(q)); }; return; }
+    if (watch) { showWatchEnd(els, result, seed, q, replay); return; }
+    if (toaster.on) showResultsCard(els, result, side, matchStats.totals, tps, driver, q);
+    else showResult(els, result, side, toaster.on);
+    if (stingers.sample) sounds.play([{ name: stingers.sample }]);
   });
 
   // Engine and systems -----------------------------------------------------------------------------------------
@@ -271,7 +345,7 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
   engine.setWorld({
     ticks: 1e9,
     frame() {
-      world.setAlpha(paused || game.over ? 1 : (performance.now() - game.lastTickAt) / interval);
+      world.setAlpha(paused || game.over ? 1 : (performance.now() - game.lastTickAt) / (interval / gameSpeed));
       return world.frame();
     },
   });
@@ -281,6 +355,7 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
   // Toaster Wars on Wheatfield Valley: the grid terrain and a land-coloured minimap (play/wheatfield-terrain.mjs).
   const wheat = toaster.on ? wheatfieldMap(seed, q) : null;
   if (wheat && state.width === wheat.width) mmBase = minimapCanvas(buildMinimapImage(wheat));
+  if (wheat && state.width === wheat.width) mmSites = kitchenSites(wheat);
   const wanted = [
     wheat ? ['terrain', './wheatfield-terrain.mjs', 'createWheatfieldTerrain', () => ({ map: wheat })]
       : ['terrain', '../viewer3d/terrain.mjs', 'createTerrain', () => ({})],
@@ -299,6 +374,14 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
       if (name === 'terrain' && typeof sys?.heightAt === 'function') ctx.heightAt = sys.heightAt;
     } catch (err) { missing[name] = true; console.error(`[play] ${fn} threw`, err); }
   }
+  if (toaster.on && state.power) { // Power Stations, fences, fenced land and cord pegs (play/power-stations-3d.mjs)
+    try { made.stations = createStationLayer(ctx, { THREE, getState: () => state, side }); engine.add(made.stations); }
+    catch (err) { console.warn('[play] power stations', err); }
+  }
+  if (toaster.on) { // the bread chain alive: sacks, sails, bucket, popping slices, toast stack (play/bread-life.mjs)
+    try { made.breadLife = createBreadLife(ctx, { THREE, getState: () => state }); engine.add(made.breadLife); }
+    catch (err) { console.warn('[play] bread life', err); }
+  }
   if (missing.terrain || missing.units || missing.buildings) {
     engine.add(createPlaceholder(ctx, { parts: { terrain: !!missing.terrain, units: !!missing.units, structures: !!missing.buildings } }));
   }
@@ -306,6 +389,9 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
   // Camera and picking -----------------------------------------------------------------------------------------
   const myCore = state.structures.find((s) => s.kind === 'core' && s.owner === side);
   const rig = createCameraRig(state.width, state.height, myCore ?? undefined);
+  const cameraMarks = createCameraMarks(); // F5-F8 saved views (A2)
+  if (watch) { const f = frontFocus(state); rig.centerOn(f.x, f.y); } // the TV opens on the middle of the board, not a corner
+  const stall = watch ? createStallWatch({ graceMs: 10000 }) : null;
   feedback = createFeedback({ player: sounds, side });
   const cam = ctx.camera;
   const v3 = new THREE.Vector3();
@@ -368,7 +454,7 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
   // Mouse ------------------------------------------------------------------------------------------------------
   const mouse = { x: 0, y: 0, down: null, ping: null, inside: false };
   // Pointer feel (play/input.mjs): click-in capture, in-game cursor, fullscreen, middle-drag; rel() is the virtual cursor while locked.
-  const pointer = installPointerControls({ win: window, doc: document, overlay: els.overlay, rig, lock: !watch && q.get('lock') !== 'off' });
+  const pointer = installPointerControls({ win: window, doc: document, overlay: els.overlay, rig, lock: !watch && q.get('lock') === 'on' /* mouse capture is opt-in (?lock=on): in a browser pane it trapped the cursor and kept edge-panning */ });
   const rel = (e) => pointer.rel(e);
   const targetAt = (sx, sy, entity) => {
     const crystal = entity ? null : crystalNear(sx, sy);
@@ -381,8 +467,10 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
     if (e.button === 2) {
       if (input.ui.mode) { input.setMode(null); return; }
       const entity = pickAt(p.x, p.y);
-      const target = targetAt(p.x, p.y, entity && entity.owner !== side ? entity : null);
-      const r = input.rightClick(snapNow(), target, { shift: e.shiftKey });
+      const snap = snapNow();
+      const ownUnit = entity && entity.owner === side && snap.units.some((u) => u.id === entity.id); // B2: right-click a friendly unit follows it
+      const target = targetAt(p.x, p.y, entity && (entity.owner !== side || ownUnit) ? entity : null);
+      const r = input.rightClick(snap, target, { shift: e.shiftKey });
       mouse.ping = { x: target.x, y: target.y, kind: r.kind === 'attack' ? 'attack' : 'move', t: performance.now() };
       return;
     }
@@ -394,7 +482,7 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
       mouse.ping = { x: target.x, y: target.y, kind: input.ui.mode?.type === 'amove' || entity ? 'attack' : 'move', t: performance.now() };
       return;
     }
-    mouse.down = { x: p.x, y: p.y, shift: e.shiftKey };
+    mouse.down = { x: p.x, y: p.y, shift: e.shiftKey, ctrl: e.ctrlKey || e.metaKey };
   });
   window.addEventListener('mousemove', (e) => {
     const p = rel(e); mouse.x = p.x; mouse.y = p.y;
@@ -408,7 +496,9 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
     const snap = snapNow();
     if (Math.hypot(p.x - d.x, p.y - d.y) < 5) {
       const entity = pickAt(p.x, p.y);
-      input.clickSelect(snap, screenProject, cssSize(), entity, { shift: d.shift, now: performance.now() });
+      if (!entity && toaster.on) { const t = groundTile(p.x, p.y); if (input.pickStation(snap, t.x, t.y, d.shift)) return; } // a Power Station under the click
+      else if (entity && !d.shift) input.ui.stationSel = [];
+      input.clickSelect(snap, screenProject, cssSize(), entity, { shift: d.shift, ctrl: d.ctrl, now: performance.now() }); // Ctrl+click: every unit of that type on screen (B2)
     } else {
       const f = world.frame();
       const shown = { ...snap, units: f.units.filter((u) => !u.dying) };
@@ -423,20 +513,58 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
     if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
     if (e.key.startsWith('Arrow')) { rig.keys.add(e.key); e.preventDefault(); return; }
     if (game.over && e.key === 'Enter') { location.reload(); return; }
-    if (e.key === 'p' || e.key === 'P') {
+    if (e.key === MUTE_KEY) { // backtick mutes in both key profiles (play/input.mjs)
+      synth.toggleMute(); sounds.setMuted(synth.isMuted()); synthUi?.paint(); toast(els, synth.isMuted() ? 'Sound off (`)' : 'Sound on (`)'); return;
+    }
+    if (pauseKeyFires(e.key, { paused, selected: input.ui.selection.length, mod: e.ctrlKey || e.metaKey })) { // P: pause with nothing picked (else Patrol, A4)
       paused = !paused;
       if (paused) driver.pause(); else driver.resume();
-      toast(els, paused ? 'Paused (P)' : 'Resumed');
+      toast(els, paused ? 'Paused (P)' : 'Resumed'); updateSandboxBadge();
       return;
     }
-    if (e.key === 'Tab' && toaster.on) { e.preventDefault(); inspectPower = !inspectPower; toast(els, inspectPower ? 'Inspect power: on (Tab)' : 'Inspect power: off'); return; }
-    if (e.key === '+' || e.key === '=') { rig.zoomBy(0.85); return; }
-    if (e.key === '-') { rig.zoomBy(1 / 0.85); return; }
-    if (e.altKey) return;
-    const fx = input.key(snapNow(), e.key, { ctrl: e.ctrlKey || e.metaKey, shift: e.shiftKey, now: performance.now() });
+    if (sandbox && (e.key === '[' || e.key === ']')) {
+      gameSpeed = stepSpeed(gameSpeed, e.key === ']' ? 1 : -1); driver.setSpeed(gameSpeed);
+      toast(els, `Speed ${gameSpeed}x`); updateSandboxBadge(); return;
+    }
+    // F5-F8 (A2, SYSTEMS-DESIGN.md section 4): Ctrl saves the view to that key, the key recalls it, Shift is the sandbox cheat.
+    // preventDefault always, so F5 never reloads the page and loses the match.
+    const camera = cameraKeyAction(e.key, { ctrl: e.ctrlKey, meta: e.metaKey, shift: e.shiftKey, sandbox: Boolean(sandbox) });
+    if (camera) {
+      e.preventDefault();
+      if (camera === 'save') { cameraMarks.save(e.key, rig); toast(els, `View saved to ${e.key}`); }
+      else if (camera === 'recall') { if (!cameraMarks.recall(e.key, rig)) toast(els, `No view on ${e.key} yet (Ctrl+${e.key} saves one)`); }
+      else {
+        const sel = snapNow().units.find((u) => u.id === input.ui.selection[0] && u.owner === side);
+        const cmd = cheatCommand(e.key, { selectedKind: sel?.kind ?? null, cursor: mouse.inside ? groundTile(mouse.x, mouse.y) : null });
+        if (cmd) { driver.queue([cmd]); toast(els, { F5: '+500 wheat', F6: '+20 toast', F7: 'Map revealed', F8: 'Squad spawned' }[e.key]); }
+        else toast(els, 'F8: select a toaster and point at the ground');
+      }
+      return;
+    }
+    if (e.key === 'F1' && idleCrumbs && e.ctrlKey) { // Ctrl+F1 (B2): every idle Crumb at once
+      e.preventDefault();
+      input.key(snapNow(), 'F1', { ctrl: true, idleIds: idleCrumbs.idle(snapNow(), input.ui.plans).map((u) => u.id) });
+      return;
+    }
+    if (e.key === 'F1' && idleCrumbs) { e.preventDefault(); selectIdleCrumb(); return; }
+    if (e.key === INSPECT_KEY && toaster.on) { e.preventDefault(); inspectPower = !inspectPower; toast(els, inspectPower ? 'Inspect power: on (F4)' : 'Inspect power: off'); return; }
+    if (e.key === 'PageUp') { e.preventDefault(); rig.keys.add('PageUp'); return; }
+    if (e.key === 'PageDown') { e.preventDefault(); rig.keys.add('PageDown'); return; }
+    if (kitchen && !e.ctrlKey && !e.metaKey && /^(k|K|Escape)$/.test(e.key) && kitchen.handleKey(e.key, { trainable: input.commandCard(snapNow()).some((c) => c.key === 'k') })) { e.preventDefault(); return; } // K opens the kitchen unless a Flak Popper hotkey is due
+    const mod = e.ctrlKey || e.metaKey; // with Ctrl or Cmd, +/- stay the browser's zoom
+    if (!mod && (e.key === '+' || e.key === '=')) { rig.zoomBy(0.85); return; }
+    if (!mod && e.key === '-') { rig.zoomBy(1 / 0.85); return; }
+    // B1: Alt+number makes a group and takes those units out of the others. Option+digit types a symbol on a Mac, so the digit comes from the key code.
+    const altDigit = e.altKey ? /^Digit([0-9])$/.exec(e.code ?? '') : null;
+    if (e.altKey && !altDigit) return;
+    const fx = input.key(snapNow(), altDigit ? altDigit[1] : e.key, { ctrl: mod, alt: Boolean(altDigit), shift: e.shiftKey && !altDigit, now: performance.now() });
     if (fx?.center) rig.centerOn(fx.center.x, fx.center.y);
-    if (/^[1-9]$/.test(e.key) || e.key === ' ' || e.key === 'Escape' || input.commandCard(snapNow()).some((c) => c.key === e.key.toLowerCase())) e.preventDefault();
+    if (gameTakesKey(e.key, { mod, cardKeys: input.commandCard(snapNow()).map((c) => c.key) })) e.preventDefault(); // Ctrl+0 and Tab too; Ctrl+R stays the browser's
   });
+  const badge = sandbox ? root.appendChild(document.createElement('div')) : null; // the Sandbox badge listing the keys
+  if (badge) badge.style.cssText = 'position:absolute;left:8px;top:40px;padding:6px 9px;background:#000a;color:#ffd36a;font:12px/1.4 sans-serif;border:1px solid #ffd36a;border-radius:4px;pointer-events:none;z-index:5';
+  const updateSandboxBadge = () => { if (badge) badge.innerHTML = sandboxBadge(gameSpeed, paused); };
+  updateSandboxBadge();
   window.addEventListener('keyup', (e) => rig.keys.delete(e.key));
   window.addEventListener('blur', () => rig.keys.clear());
 
@@ -447,11 +575,14 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
   mm.addEventListener('contextmenu', (e) => e.preventDefault());
   mm.addEventListener('mousedown', (e) => {
     const t = toTile(e);
-    if (e.button === 2) {
+    if (e.button === 2 || input.ui.mode) { // B2: the minimap takes attack-move and move clicks (left, while armed) and Shift queues
       const snap = snapNow();
-      const near = [...snap.units, ...snap.structures].filter((u) => u.owner !== side).sort((a, b) => Math.hypot(a.x - t.x, a.y - t.y) - Math.hypot(b.x - t.x, b.y - t.y))[0];
+      // Enemies, and my own units (right-click follows one, B2); my buildings are not picked here.
+      const near = [...snap.units, ...snap.structures].filter((u) => u.owner !== side || snap.units.includes(u)).sort((a, b) => Math.hypot(a.x - t.x, a.y - t.y) - Math.hypot(b.x - t.x, b.y - t.y))[0];
       const entity = near && Math.hypot(near.x - t.x, near.y - t.y) < 2 ? near : null;
-      input.rightClick(snap, { x: Math.round(t.x), y: Math.round(t.y), entity });
+      const tile = { x: Math.round(t.x), y: Math.round(t.y), entity };
+      if (e.button === 2) input.rightClick(snap, tile, { shift: e.shiftKey });
+      else input.modeClick(snap, tile, { shift: e.shiftKey });
     } else { mmDrag = true; rig.centerOn(t.x, t.y); }
   });
   window.addEventListener('mousemove', (e) => { if (mmDrag) { const t = toTile(e); rig.centerOn(t.x, t.y); } });
@@ -467,6 +598,8 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
 
   // Multi-select portraits: click one to select only that unit
   els.selection.addEventListener('click', (e) => {
+    const x = e.target.closest('button[data-cancel]'); // a queued icon: cancel that unit (play/hud-queue.mjs)
+    if (x) { const cmd = cancelCommand(x.dataset.cancel); if (cmd) input.ui.outbox.push(cmd); return; }
     const b = e.target.closest('button[data-pick]');
     if (b) input.ui.selection = [Number(b.dataset.pick)];
   });
@@ -478,7 +611,11 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
     name: 'play-ui',
     update(frame, dt) {
       rig.size = cssSize();
-      if (watch) glide(rig, caster.pick(state.tick), dt); else rig.update(dt);
+      if (watch) {
+        glide(rig, caster.pick(state.tick) ?? frontFocus(state), dt);
+        // A clock stuck at 0:00 is worse than a different match: fall back to the live AIs once.
+        if (stall.check(state.tick, performance.now()) && replay) { const next = new URLSearchParams(q); next.set('replay', 'off'); location.search = next.toString(); }
+      } else rig.update(dt);
       applyCamera();
       const w = cssSize();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -552,17 +689,20 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
         ov.fillRect(d.x, d.y, mouse.x - d.x, mouse.y - d.y); ov.strokeRect(d.x, d.y, mouse.x - d.x, mouse.y - d.y);
       }
     }
+    // Selected Power Stations (click one, shift-click another, press F to fence the link)
+    if (input.ui.stationSel?.length) {
+      for (const p of snapNow().power?.view?.points ?? []) {
+        if (!input.ui.stationSel.includes(p.id)) continue;
+        const sp = project(p.x, p.y, 0);
+        ellipse(sp.sx, sp.sy, 0.7 * tp, 0.4 * tp, '#5dff7a', null);
+      }
+    }
     // Placement footprint
     const mode = input.ui.mode;
     if (mode?.type === 'place' && mouse.inside) {
       const t = groundTile(mouse.x, mouse.y);
       const chk = input.placeCheck(snapNow(), mode.kind, t.x, t.y);
-      const corners = [[-0.5, -0.5], [0.5, -0.5], [0.5, 0.5], [-0.5, 0.5]].map(([dx, dy]) => project(t.x + dx, t.y + dy, 0.02));
-      ov.beginPath(); corners.forEach((c, i) => (i ? ov.lineTo(c.sx, c.sy) : ov.moveTo(c.sx, c.sy))); ov.closePath();
-      ov.fillStyle = chk.ok ? 'rgba(60,255,110,.35)' : 'rgba(255,60,60,.4)';
-      ov.strokeStyle = chk.ok ? '#3cff6e' : '#ff3c3c'; ov.lineWidth = 2; ov.fill(); ov.stroke();
-      ov.fillStyle = '#fff'; ov.font = '12px system-ui';
-      ov.fillText(chk.ok ? `${kindName(mode.kind)} (${STATS.structures[mode.kind].cost})` : chk.reason, corners[2].sx + 8, corners[2].sy + 4);
+      drawGhost(ov, project, ghostFor(chk, mode.kind, t.x, t.y, { need: STATS.structures[mode.kind]?.cost ?? stationCost(mode.kind), label: kindName(mode.kind), ctx: placeContext() }), tp);
     }
     // Click ping
     if (mouse.ping) {
@@ -588,6 +728,7 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
     drawReachBorders(ov, state.territory, side, state.tick, project);
     // Toaster Wars: the thick 3D cords are the cords; the thin lines only show as a faint 'inspect power' overlay (Tab).
     drawPowerOverlay(ov, state, side, input.ui.selection, project, state.tick, toaster.on ? { cords: inspectPower, faint: true } : {});
+    if (toaster.on) drawBadges(ov, badgesFor(state, side), project, tp, performance.now()); // what each Mill, Well and Toaster is missing
     if (mode) {
       ov.fillStyle = 'rgba(0,0,0,.55)'; ov.fillRect(w2() / 2 - 150, 54, 300, 24);
       ov.fillStyle = '#ffe14a'; ov.font = '13px system-ui'; ov.textAlign = 'center';
@@ -613,6 +754,7 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
     for (const s of snap.structures) { mmc.fillStyle = colour(s.owner); mmc.fillRect(s.x * sx - 1, s.y * sy - 1, sx * 1.6 + 2, sy * 1.6 + 2); }
     for (const u of snap.units) { mmc.fillStyle = colour(u.owner); mmc.fillRect(u.x * sx, u.y * sy, Math.max(2, sx), Math.max(2, sy)); }
     drawCampsMinimap(mmc, campMarks(snap.neutrals), sx, sy);
+    if (mmSites) drawKitchenMinimap(mmc, { snap, side, sites: mmSites, pings: mmPings.update(snap, side, state.tick), tick: state.tick, sx, sy });
     if (state.territory) drawReachMinimap(mmc, reachViews(state.territory), { side, tick: state.tick, mapW: state.width, mapH: state.height, width: W, height: H });
     // Camera footprint
     const corners = [[0, 0], [1, 0], [1, 1], [0, 1]].map(([u, v]) => groundTile(u * cssSize().width, v * cssSize().height));
@@ -626,24 +768,28 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
     const myUnits = snap.units.filter((u) => u.owner === side).length;
     const queued = snap.structures.filter((s) => s.owner === side).reduce((n, s) => n + s.queue.length, 0);
     if (toaster.on) {
-      const topHtml = toasterTopBar(state, { side, tps, alert: input.ui.alert });
+      const currentAlert = input.ui.alertCycle < 0 ? input.ui.alert : input.ui.alertHistory[input.ui.alertCycle];
+      const topHtml = toasterTopBar(state, { side, tps, alert: currentAlert, flow }) + (!watch ? speedChip(gameSpeed, paused) : '');
       if (topHtml !== els.top._html) { els.top._html = topHtml; els.top.innerHTML = topHtml; }
+      tutorial?.update(tutorialProgress(snap, side, { wheatGathered: matchStats.totals.wheat }));
+      kitchen?.update(state, side, { tps, flow });
     } else {
       els.shards.textContent = String(snap.shards[side]);
       els.supply.textContent = `${myUnits + queued}/${STATS.match.unitCap}`;
       const secs = Math.floor(snap.tick / tps);
       els.clock.textContent = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
-      const a = input.ui.alert;
-      els.alert.textContent = a && snap.tick - a.tick < tps * 6 ? `${a.text} (Space)` : '';
+      const currentAlert = input.ui.alertCycle < 0 ? input.ui.alert : input.ui.alertHistory[input.ui.alertCycle];
+      els.alert.textContent = currentAlert && snap.tick - currentAlert.tick < tps * 6 ? `${currentAlert.text} (Space)` : '';
     }
     // Selection panel (portraits) and command card (icons) come from hud.mjs / command-card.mjs
+    if (idleBtn) { const h = idleButtonHtml(idleCrumbs.count(snap, input.ui.plans)); if (h !== idleBtn._html) { idleBtn._html = h; idleBtn.innerHTML = h; } }
     const picked = input.mine(snap);
-    const selHtml = renderSelectionPanel(snap, picked, { side });
+    const selHtml = renderSelectionPanel(snap, picked, { side, live: state });
     if (selHtml !== els.selection._html) { els.selection._html = selHtml; els.selection.innerHTML = selHtml; }
-    const tHtml = toaster.on ? toasterPanel(state, side) : territoryPanel(state, side);
+    const tHtml = toaster.on ? toasterPanel(state, side) + saturationLine(state, side) : territoryPanel(state, side);
     if (tHtml !== els.territory._html) { els.territory._html = tHtml; els.territory.innerHTML = tHtml; els.territory.hidden = !tHtml; }
     const card = cardWithRecall(input.commandCard(snap), snap, side, picked);
-    const cardOpts = { shards: snap.shards[side], mode: input.ui.mode };
+    const cardOpts = { shards: snap.shards[side], mode: input.ui.mode, tips: toaster.on };
     const sig = cardSignature(card, cardOpts);
     if (sig !== els.card._sig) {
       els.card._sig = sig;
@@ -653,6 +799,13 @@ export async function startGame({ THREE, createEngine, createPlaceholder, root, 
 
   window.driftfallPlay = { engine, ctx, game, input, rig, project, groundTile };
   engine.start();
+  if (toaster.on && !watch) mountFlowMenu(root, {
+    query: q, isPaused: () => paused,
+    pause: () => { paused = true; driver.pause(); },
+    resume: () => { paused = false; driver.resume(); },
+    onSpeed: speed => { gameSpeed = speed; driver.setSpeed(speed); updateSandboxBadge(); },
+    onSurrender: () => driver.resign(), onRestart: () => location.reload(), isOver: () => game.over,
+  });
   driver.start();
   els.boot.hidden = true;
   if (watch) { root.classList.add('watch'); toast(els, `Watching the AIs, seed ${seed}`); }
@@ -684,7 +837,7 @@ function buildDom(root, toasterOn = false) {
     <div id="toast"></div>
     <div id="result" hidden></div>
     <div id="hud"></div>
-    <div id="boot"><b>${toasterOn ? 'TOASTER WARS' : 'DRIFTFALL'}</b><br>loading…</div>`;
+    <div id="boot"><b>${toasterOn ? 'GHOSTIES, HOSTIES, AND TOASTIES' : 'DRIFTFALL'}</b><br>loading…</div>`;
   const $ = (id) => root.querySelector('#' + id);
   return { canvas: $('view'), overlay: $('overlay'), minimap: $('minimap'), shards: $('shards'), supply: $('supply'), clock: $('clock'),
     top: $('top'), alert: $('alert'), selection: $('selection'), card: $('card'), toast: $('toast'), territory: $('territory'), result: $('result'), hud: $('hud'), boot: $('boot') };
@@ -696,6 +849,18 @@ function toast(els, text) {
   clearTimeout(toastTimer); toastTimer = setTimeout(() => { els.toast.style.opacity = '0'; }, 3200);
 }
 
+// Toaster Wars end card (play/results-card.mjs): the numbers, Restart and Watch replay.
+function showResultsCard(els, result, side, totals, tps, driver, q) {
+  saveLastMatch(driver.log);
+  saveReplay(driver.log, q);
+  els.result.hidden = false;
+  els.result.innerHTML = resultsCardHtml(result, side, totals, { tps, query: q });
+  els.result.querySelector('#restart').onclick = () => location.reload();
+  els.result.querySelector('#replay').onclick = () => { location.search = replaySetupQuery(q, loadStoredReplay('last')); };
+  const normal = els.result.querySelector('#again-normal');
+  if (normal) normal.href = '?' + setupQuery(q, { ...setupValues(q), difficulty: 'normal' });
+}
+
 function showResult(els, result, side, toasterOn = false) {
   const won = result.winner === side, draw = result.winner === null;
   els.result.hidden = false;
@@ -703,7 +868,7 @@ function showResult(els, result, side, toasterOn = false) {
 }
 
 // Watch mode ------------------------------------------------------------------------------------------------------
-const WATCH_WHY = { fight: 'Battle', base: 'Base under attack', claim: 'Reach in play', drift: 'Drift' };
+const WATCH_WHY = { front: 'The front', fight: 'Battle', base: 'Base under attack', claim: 'Reach in play', drift: 'Drift' };
 const WATCH_TEAM = ['#33e0ff', '#ff9a3b'];
 
 function watchBar(v, tick, tps, look) {
@@ -716,12 +881,13 @@ function watchBar(v, tick, tps, look) {
 }
 
 // The next match starts RESTART_SECONDS after this one ends, on the next seed (a reload keeps every other query).
-function showWatchEnd(els, result, seed, q) {
+function showWatchEnd(els, result, seed, q, replay = null) {
   const next = new URLSearchParams(q);
-  next.set('mode', 'watch'); next.set('seed', String(nextSeed(seed)));
+  const upcoming = replay ? nextReplaySeed(seed) : nextSeed(seed);
+  next.set('mode', 'watch'); next.set('seed', String(upcoming)); if (replay) next.delete('replay');
   const who = result.winner === null || result.winner === undefined ? 'Draw' : `${result.winner === 0 ? 'Cyan' : 'Orange'} wins`;
   let left = RESTART_SECONDS;
-  const paint = () => { els.result.hidden = false; els.result.innerHTML = `<h1>${who}</h1><p class="dim">Next match (seed ${nextSeed(seed)}) in ${left} s</p>`; };
+  const paint = () => { els.result.hidden = false; els.result.innerHTML = `<h1>${who}</h1><p class="dim">Next match (seed ${upcoming}) in ${left} s</p>`; };
   paint();
   const timer = setInterval(() => { left -= 1; if (left <= 0) { clearInterval(timer); location.search = next.toString(); } else paint(); }, 1000);
 }

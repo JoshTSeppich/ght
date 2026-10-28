@@ -10,14 +10,14 @@ export function addWheelsCord(root,chassis,team){
   wheel.name='wheel-'+i;wheel.position.set(sign*(w/2+w*W.outsideSides-width/2),r,(i<2?1:-1)*d*(.5-W.frontInset));gear.add(wheel);
   const hub=new T.Mesh(new T.CircleGeometry(r*W.hubOfDiameter,5).rotateY(sign*Math.PI/2),new T.MeshBasicMaterial({color:PALETTE[W.hub]}));hub.position.x=sign*width/2;wheel.add(hub);
  }
- const cord=new T.Mesh(new T.TubeGeometry(new T.LineCurve3(new T.Vector3(),new T.Vector3(0,0,-2)),12,C.radius,5,false),new T.MeshStandardMaterial({color:PALETTE[team],emissive:PALETTE[team],emissiveIntensity:C.colourEmissive,flatShading:true}));cord.name='power-cord';gear.add(cord);
+ const cord=new T.Mesh(new T.TubeGeometry(new T.LineCurve3(new T.Vector3(),new T.Vector3(0,0,-2)),8,C.radius,5,false),new T.MeshStandardMaterial({color:PALETTE[team],emissive:PALETTE[team],emissiveIntensity:C.colourEmissive,flatShading:true}));cord.name='power-cord';gear.add(cord);
  const plug=new T.Mesh(new T.BoxGeometry(...C.plug.size),new T.MeshStandardMaterial({color:PALETTE.charcoal}));plug.name='cord-plug';gear.add(plug);
  for(let i=0;i<3;i++){const bead=new T.Mesh(new T.PlaneGeometry(C.radius*2.3,C.pulseLength).rotateX(-Math.PI/2),new T.MeshBasicMaterial({color:PALETTE[team],toneMapped:false}));bead.name='energy-bead-'+i;gear.add(bead);}
  root.userData.wheelCord={w,h,d,r,lift:root.name==='bagel'?0:2*r*W.lift};poseWheelsCord(root,{active:'idle',age:0});
 }
-export function poseWheelsCord(root,{active,age}){
+export function poseWheelsCord(root,{active,age,travelDistance}){
  const {h,d,r,lift}=root.userData.wheelCord,moving=active==='move';
- const travel=moving?Math.min(age*C.pulseSpeed,C.coilLength*6):0,tension=travel/(C.coilLength*6);root.userData.cordTension=tension;
+ const travel=travelDistance??(moving?Math.min(age*C.pulseSpeed,C.coilLength*6):0),tension=travel/(C.coilLength*6);root.userData.cordTension=tension;
  root.position.x+=travel;root.position.y=lift+(moving?.018*(1-Math.cos(travel/r*5)):.008*Math.sin(age*5));
  root.scale.set(1,1+(moving?.015*Math.sin(age*18):.006*Math.sin(age*5)),1);root.rotation.set(moving?-.025:0,0,0);
  const gear=root.getObjectByName('running-gear');gear.position.y=-root.position.y;
@@ -30,7 +30,7 @@ export function poseWheelsCord(root,{active,age}){
  const curve=new T.CurvePath();for(let i=1;i<points.length;i++)curve.add(new T.LineCurve3(points[i-1],points[i]));
  const cord=root.getObjectByName('power-cord');const positions=cord.geometry.attributes.position,normals=cord.geometry.attributes.normal;
  const up=new T.Vector3(0,1,0),rotation=new T.Quaternion(),normal=new T.Vector3();
- for(let i=0;i<=12;i++){const t=i/12,centre=curve.getPoint(t),tangent=curve.getTangent(Math.min(.99999,Math.max(.00001,t)));rotation.setFromUnitVectors(up,tangent);
+ for(let i=0;i<=8;i++){const t=i/8,centre=curve.getPoint(t),tangent=curve.getTangent(Math.min(.99999,Math.max(.00001,t)));rotation.setFromUnitVectors(up,tangent);
   for(let j=0;j<=5;j++){const a=j/5*Math.PI*2;normal.set(Math.cos(a),0,Math.sin(a)).applyQuaternion(rotation);const n=i*6+j;positions.setXYZ(n,centre.x+normal.x*C.radius,centre.y+normal.y*C.radius,centre.z+normal.z*C.radius);normals.setXYZ(n,normal.x,normal.y,normal.z);}}
  positions.needsUpdate=true;normals.needsUpdate=true;cord.geometry.computeBoundingSphere();
  cord.material.emissiveIntensity=C.colourEmissive+(taut>0?1+Math.abs(Math.sin(age*18))*2:0);

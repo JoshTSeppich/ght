@@ -1,11 +1,22 @@
 // Snakenator ink silhouettes: one instanced billboard per kind, one shared team-foot-ring batch.
+// Also supports Toaster Wars air units with shadows (drawn as dark discs on the ground below).
 import * as THREE from 'three';
 export const DRAWN_KINDS = Object.freeze({
   worker: 'siphoner', grunt: 'fang', lancer: 'spitter', brute: 'constrictor',
   spiker: 'hisser', howler: 'boomslang',
   dart: null, mender: null, shade: null, conduit: null, skiff: null, barge: null, seer: null,
+  // Toaster Wars air units (tier 3)
+  croutonKite: 'crouton-kite', waffleWing: 'waffle-wing', crumpetBomber: 'crumpet-bomber',
+  // Toaster Wars structures
+  coolingRack: 'cooling-rack',
 });
-const HEIGHT = { worker: 0.85, grunt: 1.12, lancer: 1.32, brute: 1.8, spiker: 1.4, howler: 1.45 };
+const HEIGHT = {
+  worker: 0.85, grunt: 1.12, lancer: 1.32, brute: 1.8, spiker: 1.4, howler: 1.45,
+  // Air units (taller due to being in the sky)
+  croutonKite: 1.0, waffleWing: 1.1, crumpetBomber: 1.3,
+  // Structures
+  coolingRack: 2.0,
+};
 // Literal URLs are also discovered by the production build's asset crawler.
 const SPRITES = Object.freeze({
   siphoner: '../assets/sprites/snakenators/siphoner.png',
@@ -14,6 +25,12 @@ const SPRITES = Object.freeze({
   constrictor: '../assets/sprites/snakenators/constrictor.png',
   hisser: '../assets/sprites/snakenators/hisser.png',
   boomslang: '../assets/sprites/snakenators/boomslang.png',
+  // Toaster Wars air units with shadows to read as airborne
+  'crouton-kite': '../assets/generated/toaster-air-scout.png',
+  'waffle-wing': '../assets/generated/toaster-air-fighter.png',
+  'crumpet-bomber': '../assets/generated/toaster-air-bomber.png',
+  // Toaster Wars building
+  'cooling-rack': '../assets/generated/toaster-cooling-rack.png',
 });
 export function spriteFor(kind) {
   return Object.hasOwn(DRAWN_KINDS, kind) ? SPRITES[DRAWN_KINDS[kind]] ?? null : null;
@@ -53,6 +70,10 @@ export function createDrawnUnits(ctx, { scale = 1.45, side = null, loadTexture }
   }
   const rings = batch(new THREE.RingGeometry(0.42, 0.5, 24).rotateX(-Math.PI / 2),
     new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.85, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 }));
+  // Air unit shadows: dark discs on the ground to show flying units
+  const AIR_KINDS = ['croutonKite', 'waffleWing', 'crumpetBomber'];
+  const shadows = batch(new THREE.CircleGeometry(0.5, 24),
+    new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.4, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, color: '#000000' }));
   for (const kind of Object.keys(HEIGHT)) {
     const e = { ready: false, texture: null, aspect: 0.75, batch: null }; kinds.set(kind, e);
     e.batch = batch(new THREE.PlaneGeometry(1, 1).translate(0, 0.5, 0),
@@ -81,6 +102,12 @@ export function createDrawnUnits(ctx, { scale = 1.45, side = null, loadTexture }
       dummy.position.copy(v.pos); dummy.position.y += 0.025;
       dummy.rotation.set(0, 0, 0); dummy.scale.setScalar((v.spec.size ?? 0.5) * unitScale * 1.1);
       put(rings, v.owner === (side ?? 0) ? cyan : orange);
+      // Air units cast shadows on the ground so they read as airborne
+      if (AIR_KINDS.includes(v.kind)) {
+        dummy.position.copy(v.pos); dummy.position.y = 0.01;
+        dummy.rotation.set(0, 0, 0); dummy.scale.setScalar((v.spec.size ?? 0.5) * unitScale);
+        put(shadows);
+      }
     }
     return true;
   }

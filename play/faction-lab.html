@@ -1,0 +1,24 @@
+<!doctype html>
+<!-- Faction lab (ENG-101): Toasters, Ghosters and Hosters from their model DATA, drawn by play/faction-units.mjs inside the real
+     engine (viewer3d/engine.mjs + the toy look) at gameplay zoom. Fixture scene only: Ghosters and Hosters have no sim yet.
+     Open from the repo-root server: http://localhost:8123/play/faction-lab.html   ?zoom=16 (tiles tall)  ?still=1 (no motion) -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Faction lab</title>
+<script type="importmap">{ "imports": {
+  "three": "../node_modules/three/build/three.module.js",
+  "three/addons/": "../node_modules/three/examples/jsm/" } }</script>
+<style>
+  html, body { margin: 0; height: 100%; background: #171326; color: #e8e4f4; font: 13px/1.4 system-ui, sans-serif; overflow: hidden; }
+  #stage { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  #out { position: fixed; left: 10px; top: 10px; margin: 0; padding: 6px 10px; background: #0009; border-radius: 6px; white-space: pre; font: 600 12px/1.35 ui-monospace, Menlo, monospace; }
+</style>
+</head>
+<body>
+<canvas id="stage"></canvas>
+<pre id="out">loading</pre>
+<script type="module" src="./faction-lab.mjs"></script>
+</body>
+</html>

@@ -1,13 +1,13 @@
 import * as T from 'three';
-import {buildBible} from './bible.mjs';
+import {buildCuteAttackRig,poseCuteAttackGear} from './cute-attack-rig.mjs';
 export function buildPopShot(look,team){
-  const u=buildBible('popper',look,team);
+  const u=buildCuteAttackRig('popper',look,team);
   const mat=c=>new T.MeshPhysicalMaterial({color:c,flatShading:true,roughness:look==='Y2K GLOSS'?.3:.85,clearcoat:look==='Y2K GLOSS'?1:0});
   // Effects ride a planted foot, never the recoiling chassis; no extra articulated parts.
   const anchor=u.getObjectByName('foot-right');
   const shot=new T.Mesh(u.getObjectByName('toast0').geometry.clone(),mat(0xd99448));shot.name='pop-projectile';anchor.add(shot);
   const crumbs=new T.Group();crumbs.name='pop-crumbs';anchor.add(crumbs);
-  for(let i=0;i<5;i++){const m=new T.Mesh(new T.CylinderGeometry(.11,.15,.14,5),mat(0x805432));crumbs.add(m);}
+  for(let i=0;i<5;i++){const m=new T.Mesh(new T.CircleGeometry(.15,5),mat(0x805432));crumbs.add(m);}
   const flash=new T.Mesh(new T.CircleGeometry(.45,5),mat(0xffffff));flash.name='pop-flash';flash.material.side=T.DoubleSide;flash.material.emissive.setHex(0xffffff);anchor.add(flash);
   shot.visible=crumbs.visible=flash.visible=false;
   return u;
@@ -46,4 +46,5 @@ export function posePopShot(u,{active,age,homeX=0,ms}){
       toast.position.y+=phase>=.8?.12*Math.sin((phase-.8)/.2*Math.PI):0;
     }else{body.rotation.x=Math.sin(age*4)*.018;toast.position.y+=Math.sin(age*5)*.018;brow.position.y+=Math.sin(age*4)*.008;}
   }
+  poseCuteAttackGear(u,{active,age,homeX});
 }

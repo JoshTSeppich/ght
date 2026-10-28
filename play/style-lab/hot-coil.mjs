@@ -1,10 +1,10 @@
 import * as T from 'three';
-import {buildBible} from './bible.mjs';
+import {buildCuteAttackRig,poseCuteAttackGear} from './cute-attack-rig.mjs';
 const smooth=x=>{x=Math.max(0,Math.min(1,x));return x*x*(3-2*x);};
 // Military key poses hold until their final 30 ms transition.
 function sample(t,keys){for(let i=1;i<keys.length;i++)if(t<=keys[i][0]){const [end,v]=keys[i];return keys[i-1][1]+(v-keys[i-1][1])*smooth((t-end+30)/30);}return keys.at(-1)[1];}
 export function buildHotCoil(look,team){
-  const u=buildBible('zapper',look,team),anchor=u.getObjectByName('foot-right');
+  const u=buildCuteAttackRig('zapper',look,team),anchor=u.getObjectByName('foot-right');
   const mat=c=>new T.MeshPhysicalMaterial({color:c,flatShading:true,roughness:look==='Y2K GLOSS'?.3:.85,clearcoat:look==='Y2K GLOSS'?1:0});
   // One broad pentagonal toast silhouette; effects are fixed to the planted reference foot.
   const toast=new T.CylinderGeometry(.42,.42,.22,5);toast.rotateX(Math.PI/2);
@@ -19,7 +19,7 @@ export function poseHotCoil(u,{active,age,ms,homeX=0}){
   const t=Math.max(0,Math.min(520,ms??age*1000)),attack=active==='attack';
   const body=u.getObjectByName('body'),face=u.getObjectByName('faceplate');
   u.position.set(homeX,0,1.2);u.rotation.set(0,0,0);u.scale.set(1,1,1);
-  for(const p of u.children){p.position.copy(p.userData.home);p.rotation.set(0,0,0);}
+  u.traverse(p=>{if(p!==u&&p.userData.home){p.position.copy(p.userData.home);p.rotation.set(0,0,0);}});
   const bolt=u.getObjectByName('hot-bolt'),target=u.getObjectByName('hot-target'),flash=u.getObjectByName('hot-flash');
   bolt.visible=attack&&t>=200&&t<340;target.visible=attack&&t<520;flash.visible=attack&&t>=340&&t<370;
   const place=(o,x,y,z)=>o.position.set(x-bolt.parent.position.x,y-bolt.parent.position.y,z-bolt.parent.position.z);
@@ -49,4 +49,5 @@ export function poseHotCoil(u,{active,age,ms,homeX=0}){
       body.position.y+=phase>=.8?-.035*Math.sin((phase-.8)/.2*Math.PI):.025*Math.sin(p*Math.PI);
     }else{body.rotation.x=Math.sin(age*4)*.018;face.position.y+=Math.sin(age*4)*.008;}
   }
+  poseCuteAttackGear(u,{active,age,homeX});
 }

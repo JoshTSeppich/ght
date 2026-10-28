@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { createMatch, step } from '../env/sim.mjs';
 import { observe } from '../env/state.mjs';
 import { STATS } from '../env/stats.mjs';
-import { createInput, assignHotkeys, boxEntities, pickEntity } from './input.mjs';
+import { createInput, assignHotkeys, boxEntities, pickEntity, MUTE_KEY } from './input.mjs';
+import { toasterInputOptions, TOASTER_HOTKEYS } from './toaster-play.mjs';
 
 const project = (x, y) => ({ sx: x * 10, sy: y * 10 });
 const ALL = { x0: 0, y0: 0, x1: 9999, y1: 9999 };
@@ -111,4 +112,34 @@ test('hold position sets hold; stop clears it', () => {
   assert.equal(input.ui.plans.get(w.id).hold, true);
   input.key(obs(), 's');
   assert.equal(input.ui.plans.get(w.id).hold, false);
+});
+
+test('box select counts a unit whose body is inside the box, even with its centre just outside', () => {
+  // 10 px per tile, so a unit at (5, 5) has its centre at (50, 50) and its body corners 4.5 px out.
+  const o = { tick: 0, width: 40, height: 40, rocks: [], crystals: [], shards: { 0: 0, 1: 0 }, structures: [],
+    units: [{ id: 7, owner: 0, kind: 'worker', x: 5, y: 5, hp: 10 }] };
+  const box = { x0: 54, y0: 54, x1: 100, y1: 100 }; // catches only the body corner at (54.5, 54.5)
+  assert.deepEqual(boxEntities(o, project, box, 0).map((u) => u.id), [7]);
+  // The same unit well outside the box stays out.
+  assert.deepEqual(boxEntities(o, project, { x0: 200, y0: 200, x1: 300, y1: 300 }, 0), []);
+});
+
+test('under attack names the unit or building that was hit', () => {
+  const input = createInput({ side: 0, stats: STATS, ...toasterInputOptions() });
+  const snap = (units, structures = []) => ({ tick: 3, width: 40, height: 40, rocks: [], crystals: [], shards: { 0: 0, 1: 0 }, units, structures });
+  input.noteEvents(snap([{ id: 4, owner: 0, kind: 'worker', x: 2, y: 2 }]), [{ e: 'hit', id: 4 }]);
+  assert.equal(input.ui.alert.text, 'Crumb under attack');
+  const mill = { id: 9, owner: 0, kind: 'mill', x: 8, y: 8, complete: true, hp: 10, queue: [] };
+  input.noteEvents(snap([], [mill]), [{ e: 'hit', id: 9 }]);
+  assert.equal(input.ui.alert.text, 'Mill under attack');
+});
+
+// SYSTEMS-DESIGN.md section 4: backtick mutes, U is freed.
+test('the mute key is backtick: no hotkey, command or kind ever takes it', () => {
+  assert.equal(MUTE_KEY, '`');
+  assert.notEqual(assignHotkeys(['unit', 'upper', 'mute']).upper, MUTE_KEY);
+  for (const k of Object.values(TOASTER_HOTKEYS)) assert.notEqual(k, MUTE_KEY);
+  const { obs, input } = setup();
+  input.ui.selection = [obs().units.find((u) => u.owner === 0).id];
+  assert.ok(!input.commandCard(obs()).some((c) => c.key === MUTE_KEY));
 });

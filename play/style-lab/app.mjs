@@ -6,16 +6,30 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { createLab, LOOKS } from './lab.mjs';
+import { createLab, LOOKS, SHAPES, BUILDING_ROW } from './lab.mjs';
 export function boot() {
   const canvas=document.querySelector('canvas');
   const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));configureToyRenderer(renderer);renderer.info.autoReset=false;
   let glossy=false, composer, toy=true;
   const lab=createLab({onReactionSound:playReactionSound,onAttackRelease:()=>playThump(),renderer:{render(scene,camera){renderer.info.reset();composer.render();}}});
-  lab.setShape(document.querySelector('#shape').value);
+  // The studio opens on the four-building row (?scene=<shape> picks another; unknown names fall back to the row).
+  const shapeSelect=document.querySelector('#shape');
+  if(![...shapeSelect.options].some(o=>o.value==='buildings')){const o=document.createElement('option');o.value='buildings';o.textContent='BUILDINGS / Power Strip · Mill · Well · Toaster at the /play camera';shapeSelect.prepend(o);}
+  const wanted=new URLSearchParams(location.search).get('scene');
+  shapeSelect.value=(wanted==='buildings'||SHAPES.includes(wanted))?wanted:'buildings';
+  lab.setShape(shapeSelect.value);
+  const captions=document.createElement('div');captions.id='building-captions';captions.style.cssText='position:absolute;inset:0;pointer-events:none;overflow:hidden';
+  const captionEls=BUILDING_ROW.map(b=>{const e=document.createElement('span');e.className='building-caption';e.textContent=b.label;e.style.cssText='position:absolute;transform:translate(-50%,0);font:600 14px system-ui,sans-serif;color:#fff;background:rgba(20,24,32,.72);padding:2px 8px;border-radius:9px;white-space:nowrap';captions.append(e);return e;});
+  canvas.parentElement.append(captions);
+  const captionPoint=new T.Vector3();
+  function placeCaptions(){
+    const on=shapeSelect.value==='buildings';captions.style.display=on?'block':'none';if(!on)return;
+    const w=canvas.clientWidth,h=canvas.clientHeight;
+    BUILDING_ROW.forEach((b,i)=>{captionPoint.set(b.x,0,1.3).project(lab.view);captionEls[i].style.left=`${(captionPoint.x+1)/2*w}px`;captionEls[i].style.top=`${(1-captionPoint.y)/2*h+4}px`;});
+  }
   const pmrem=new T.PMREMGenerator(renderer), room=new RoomEnvironment(), env=pmrem.fromScene(room,.04);room.dispose();pmrem.dispose();lab.scene.environmentIntensity=.35;
   const target=new T.WebGLRenderTarget(1,1,{samples:4,type:T.HalfFloatType});
-  composer=new EffectComposer(renderer,target);composer.addPass(new RenderPass(lab.scene,lab.camera));
+  composer=new EffectComposer(renderer,target);const renderPass=new RenderPass(lab.scene,lab.view);composer.addPass(renderPass);
   const bloom=new UnrealBloomPass(new T.Vector2(innerWidth,innerHeight),.28,.45,1.1);composer.addPass(bloom);composer.addPass(new OutputPass());
   // Four-sample target is used for every look; OutputPass applies tone mapping once.
   const controls=new OrbitControls(lab.camera,canvas);controls.target.set(0,.6,0);controls.enableDamping=true;controls.minDistance=2;controls.maxDistance=28;controls.maxPolarAngle=Math.PI*.48;
@@ -62,12 +76,13 @@ export function boot() {
   document.querySelector('#stress').onclick=()=>{stress=!stress;lab.setStress(stress);document.querySelector('#stress').setAttribute('aria-pressed',String(stress));};
   document.querySelector('#auto').onclick=()=>{auto=!auto;lastDemo=-10;document.querySelector('#auto').setAttribute('aria-pressed',String(auto));};
   addEventListener('keydown',e=>{if(['1','2','3'].includes(e.key))pickLook(Number(e.key)-1);});
-  function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;if(document.querySelector('#production').checked){const u=lab.units[0];const box=new T.Box3().setFromObject(u),center=box.getCenter(new T.Vector3()),size=box.getSize(new T.Vector3());controls.target.copy(center);lab.camera.position.copy(center).add(new T.Vector3(0,1,1.5).normalize().multiplyScalar(Math.max(size.x,size.y,size.z)*2.2));}renderer.setPixelRatio(document.querySelector('#production').checked||document.querySelector('#terrain-inspection').value!=='normal'?1:Math.min(devicePixelRatio,1.5));renderer.setSize(w,h,false);composer.setSize(w,h);lab.resize(w,h);}
+  function syncView(){renderPass.camera=lab.view;controls.enabled=lab.view!==lab.gameCamera;}
+  function resize(){syncView();const w=canvas.clientWidth,h=canvas.clientHeight;if(document.querySelector('#production').checked){const u=lab.units[0];const box=new T.Box3().setFromObject(u),center=box.getCenter(new T.Vector3()),size=box.getSize(new T.Vector3());controls.target.copy(center);lab.camera.position.copy(center).add(new T.Vector3(0,1,1.5).normalize().multiplyScalar(Math.max(size.x,size.y,size.z)*2.2));}renderer.setPixelRatio(document.querySelector('#production').checked||document.querySelector('#terrain-inspection').value!=='normal'?1:Math.min(devicePixelRatio,1.5));renderer.setSize(w,h,false);composer.setSize(w,h);lab.resize(w,h);}
   addEventListener('resize',resize);pickLook(1);
   const sequence=['select','victory','hungry','conga','happy','grumpy','strike','trade','press','convey','drill','produce','claim','detect','drop','push-rock','cut-cord','replug','hide','repair','spawn','idle','move','stop','siege','attack','hit','gather','deliver','grind','pump','churn','generate','harvest','rank-up','shimmer','construction','death'];
   function frame(ms){requestAnimationFrame(frame);const t=ms/1000;
     if(auto&&t-lastDemo>(sequence[(step-1+sequence.length)%sequence.length]==='cut-cord'?12:sequence[(step-1+sequence.length)%sequence.length]==='gather'?4:1.5)){action(sequence[step++%sequence.length]);lastDemo=t;}
-    controls.update();lab.update(t);frames++;
+    if(controls.enabled)controls.update();lab.update(t);placeCaptions();frames++;
     if(ms-last>=500){fps=Math.round(frames*1000/(ms-last));document.querySelector('#fps').textContent=`${fps} FPS · ${stress?200:lab.units.length} units · ${renderer.info.render.calls} draws · ${renderer.info.render.triangles.toLocaleString()} triangles`;frames=0;last=ms;}
   }
   requestAnimationFrame(frame);

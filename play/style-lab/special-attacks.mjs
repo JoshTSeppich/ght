@@ -1,3 +1,4 @@
+import {poseCuteAttackGear} from './cute-attack-rig.mjs';
 import * as T from 'three';
 export const SPECIAL_ATTACKS=['broiler','flak-popper','bagel','crumb'];
 const clamp=x=>Math.max(0,Math.min(1,x));
@@ -10,13 +11,13 @@ export function buildSpecialAttack(u,kind){
  // Static trim and old effects belong to a rigid chassis, never extra articulated parts.
  const keep=kind==='broiler'?['body','leg-left','leg-right','door']:kind==='bagel'?['body','axle-front','axle-back','brake']:kind==='crumb'?['body','foot-left','foot-right','toast0']:['body','feet','toast0'];
  u.updateMatrixWorld(true);
- for(const p of [...u.children])if(!keep.includes(p.name))body.attach(p);
+ if(!u.userData.cute)for(const p of [...u.children])if(!keep.includes(p.name))body.attach(p);
  const fx=new T.Group();fx.name='special-effects';u.add(fx);
  const gold=new T.MeshPhysicalMaterial({color:0xd99448,flatShading:true,roughness:.8});
  const add=(name,geo,mat=gold)=>{const m=new T.Mesh(geo,mat);m.name=name;m.visible=false;fx.add(m);return m;};
  const shell=new T.CylinderGeometry(.27,.38,.75,5);shell.userData.facets=5;
  add('special-shell',shell);
- for(let i=0;i<5;i++){const geo=new T.CylinderGeometry(.12,.17,.19,5);geo.userData.facets=5;add('special-crumb'+i,geo);}
+ for(let i=0;i<5;i++){const geo=new T.CircleGeometry(.17,5);geo.userData.facets=5;add('special-crumb'+i,geo);}
  add('special-flash',new T.CircleGeometry(.55,5),new T.MeshBasicMaterial({color:0xffffff,side:T.DoubleSide}));
  if(kind==='broiler')add('special-fire',new T.ConeGeometry(.7,.85,5),new T.MeshBasicMaterial({color:0xf25745}));
  u.traverse(o=>{o.userData.specialHome=o.position.clone();o.userData.specialRotation=o.rotation.clone();o.userData.specialScale=o.scale.clone();o.userData.specialVisible=o.visible;});
@@ -36,7 +37,7 @@ export function poseSpecialAttack(u,{active,age,ms,homeX=0}){
    if(kind==='bagel')body.rotation.z=-distance/.8;
    else{u.position.y=.3*4*p*(1-p);body.rotation.x=phase<.8?-.15:0;}
   }else body.rotation.x=.015*Math.sin(age*4);
-  return;
+  poseCuteAttackGear(u,{active,age,homeX});return;
  }
  const recoil=pose(t,[[0,0],[80,-.18],[160,-.18],[200,.22],[340,.22],[410,-.07],[520,0]]);
  body.rotation.x+=recoil;
@@ -67,4 +68,5 @@ export function poseSpecialAttack(u,{active,age,ms,homeX=0}){
  if(kind==='crumb'&&t>=410){u.position.z-=.5*Math.sin(Math.PI*r);u.position.y=.5*Math.sin(Math.PI*r);}
  const flash=u.getObjectByName('special-flash');flash.visible=t>=340&&t<375;flash.position.set(0,kind==='flak-popper'?3.6:.8,kind==='flak-popper'?0:2.5);
  const fire=u.getObjectByName('special-fire');if(fire){fire.visible=t>=340&&t<410;fire.position.set(0,.4,2.5);fire.scale.setScalar(1+clamp((t-340)/70)*.4);}
+ if(u.userData.cute)poseCuteAttackGear(u,{active,age:0,homeX});
 }
