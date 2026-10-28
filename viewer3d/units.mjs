@@ -51,6 +51,10 @@ export const UNIT_SPECS = {
   mender:  { rig: 'hover',   size: 0.55, height: 0.72, stride: 1.0, shape: 'ring',      provisional: true },
   shade:   { rig: 'biped',   size: 0.44, height: 0.95, stride: 1.6, shape: 'crescent',  provisional: true, ghost: true },
   conduit: { rig: 'float',   size: 0.50, height: 1.30, stride: 1.0, shape: 'trident',   provisional: true },
+  // Air Layer (DECISIONS.md 3, BUILD-CARDS-W2 M4). Keys are resolveKind()'s stripped lowercase form of the sim kind.
+  croutonkite:   { rig: 'air', size: 0.45, height: 0.25, altitude: 1.4, shape: 'kite' },
+  wafflewing:    { rig: 'air', size: 0.60, height: 0.28, altitude: 1.6, shape: 'wing' },
+  crumpetbomber: { rig: 'air', size: 0.85, height: 0.32, altitude: 1.8, shape: 'barrel', heavy: true },
 };
 // Names used by earlier proposals in the chat (sonnet's v3 draft) map onto the agreed ones so no kind is ever blank.
 export const KIND_ALIASES = { skyspike: 'spiker', bombard: 'howler', gale: 'skiff', ferry: 'barge', lumen: 'seer', hexer: 'conduit' };
